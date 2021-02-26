@@ -1,0 +1,10 @@
+title: Project Thesis Proposal
+subtitle: Distributed Authentication
+author: Christoph Bühler
+fignos-cleveref: true
+fignos-plus-name: figure
+fignos-star-name: Figure
+output:
+  pdf_document:
+    extra_dependencies: ['float']
+graphics: yes
