@@ -1,0 +1,75 @@
+name: Publish GitHub Pages
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build-page:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          mkdir public
+          echo "FILELIST=$(printf '"%s" ' src/sections/*.md)" >> $GITHUB_ENV
+      - name: Build Page
+        uses: docker://ghcr.io/buehler/mse-pandoc:latest
+        with:
+          args: >-
+            --filter pandoc-xnos
+            --metadata-file=src/metadata.yaml
+            --citeproc
+            --bibliography=src/bibliography.bib
+            --toc
+            --standalone
+            --output=public/index.html
+            ${{ env.FILELIST }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: page
+          path: public
+  build-pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          mkdir public
+          echo "FILELIST=$(printf '"%s" ' src/sections/*.md)" >> $GITHUB_ENV
+      - name: Build Page
+        uses: docker://ghcr.io/buehler/mse-pandoc:latest
+        with:
+          args: >-
+            --filter pandoc-xnos
+            --metadata-file=src/metadata.yaml
+            --citeproc
+            --bibliography=src/bibliography.bib
+            --toc
+            --standalone
+            --output=public/report.pdf
+            ${{ env.FILELIST }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: pdf
+          path: public
+  deploy-gh-pages:
+    runs-on: ubuntu-latest
+    needs:
+      - build-page
+      - build-pdf
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download artifacts
+        id: download
+        uses: actions/download-artifact@v2
+        with:
+          path: public
+      - run: mv public/page/* public/
+      - run: mv public/pdf/* public/
+      - name: Deploy gh pages
+        uses: JamesIves/github-pages-deploy-action@4.0.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: public

@@ -1,10 +1,6 @@
 title: Project Thesis Proposal
-subtitle: Distributed Authentication
+subtitle: Distributed Authentication Mesh
 author: Christoph Bühler
 fignos-cleveref: true
 fignos-plus-name: figure
 fignos-star-name: Figure
-output:
-  pdf_document:
-    extra_dependencies: ['float']
-graphics: yes

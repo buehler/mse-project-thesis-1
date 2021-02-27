@@ -1,0 +1,37 @@
+# Metadata
+title: Distributed Authentication Mesh
+subtitle: Declarative Adhoc Conversion of Credentials
+author: Christoph Bühler
+date: xx.xx.xxxx
+lang: en-US
+keywords:
+  - Authentication
+  - Distributed
+  - Trust
+  - Microservices
+  - Kubernetes
+reference-section-title: Bibliography
+abstract: |
+  foo
+  bar
+  stuff
+
+# asdf
+papersize: a4
+toc: true
+numbersections: true
+lof: true
+lot: true
+thanks: todo
+bibliography: references.bib
+
+# Tool configuration
+fignos-cleveref: true
+fignos-plus-name: figure
+fignos-star-name: Figure
+secnos-cleveref: true
+secnos-plus-name: section
+secnos-star-name: Section
+tablenos-cleveref: true
+tablenos-plus-name: table
+tablenos-star-name: Table
