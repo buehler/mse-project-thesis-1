@@ -6,6 +6,9 @@ rm -rf public && mkdir public
 
 pandoc \
     --filter pandoc-xnos \
+    --lua-filter=filters/build-date.lua \
+    --lua-filter=filters/scholarly-metadata.lua \
+    --lua-filter=filters/author-info-blocks.lua \
     --metadata-file=src/metadata.yaml \
     --citeproc \
     --bibliography=src/bibliography.bib \
@@ -16,6 +19,9 @@ pandoc \
 
 pandoc \
     --filter pandoc-xnos \
+    --lua-filter=filters/build-date.lua \
+    --lua-filter=filters/scholarly-metadata.lua \
+    --lua-filter=filters/author-info-blocks.lua \
     --metadata-file=src/metadata.yaml \
     --citeproc \
     --bibliography=src/bibliography.bib \

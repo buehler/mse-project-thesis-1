@@ -18,6 +18,9 @@ jobs:
           args: >-
             --filter pandoc-xnos
             --metadata-file=src/metadata.yaml
+            --lua-filter=filters/build-date.lua
+            --lua-filter=filters/scholarly-metadata.lua
+            --lua-filter=filters/author-info-blocks.lua
             --citeproc
             --bibliography=src/bibliography.bib
             --toc
@@ -42,6 +45,9 @@ jobs:
           args: >-
             --filter pandoc-xnos
             --metadata-file=src/metadata.yaml
+            --lua-filter=filters/build-date.lua
+            --lua-filter=filters/scholarly-metadata.lua
+            --lua-filter=filters/author-info-blocks.lua
             --citeproc
             --bibliography=src/bibliography.bib
             --toc
