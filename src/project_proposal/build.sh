@@ -1,3 +1,10 @@
 #!/bin/bash
 
-pandoc main.md --metadata-file=metadata.yaml --filter pandoc-fignos -s -o project-proposal.pdf
+pandoc \
+    --filter pandoc-xnos \
+    --lua-filter=../../filters/scholarly-metadata.lua \
+    --lua-filter=../../filters/author-info-blocks.lua \
+    --metadata-file=metadata.yaml \
+    --standalone \
+    --output=project-proposal.pdf \
+    main.md

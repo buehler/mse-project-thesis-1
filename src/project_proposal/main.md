@@ -21,7 +21,7 @@ shed light upon the problem.
 
 ![IS Situation](images/is.png){#fig:is_situation}
 
-As seen in @fig:is_situation, a modern client application that supports
+As seen in \*@fig:is_situation, a modern client application that supports
 OIDC^[<https://openid.net/connect/>] communicates with the IAM
 (identity access management) and fetches an access token to connect
 to "Service A". The connection is routed into a trusted zone through
@@ -54,7 +54,7 @@ transformation in a declarative way.
 ![SHOULD Situation](images/should.png){#fig:should_situation}
 
 The goal of this project is to provide a solution stated in
-{@fig:should_situation}. The figure should give a grasp of a solution
+{\*@fig:should_situation}. The figure should give a grasp of a solution
 but the pattern may change during the work. An initial idea is
 to provide a sidecar pattern^[<https://docs.microsoft.com/en-us/azure/architecture/patterns/sidecar>]
 that knows how to transform credentials so that their partner-services
@@ -64,20 +64,27 @@ with any other OIDC application. The sidecar of "Service B" will then
 check if the access token is valid and allowed to access the service
 and finally transforms the credentials to valid basic auth.
 
+This pattern removes the error prone work since no additional
+code is introduced into "Service A" nor "Service B". Additionally,
+a declarative solution that is modularized and extendable does scale.
+
 \newpage
 
 # Deliverables and Critical Success Factors
 
-The following elements are delivered:
+The project is expected to deliver the following results:
 
-- Analysis of actual work into the topic
-- Softwarearchitecture of the proposed solution
-- Proof of concept of the given scenario in @fig:should_situation
-- OpenSource repository with the solution (PoC state)
+- Report of the state of the art, the practice and a critical assessment of it
+- Specification of the proposed solution
+- Proof of concept (PoC) of the given scenario in \*@fig:should_situation
+- Evaluation report of the proposed solution
+- Initial release in an open source repository of the PoC
+- Developer documentation of the PoC
 
-Additionally, a tutorial into the sidecar pattern is published
+Additionally, a tutorial into one or more topics of the project is published
 onto a to be defined platform to provide reading material into
-the topic.
+the topic. The tutorial provides material for 30 to 45 minutes of workshop-like
+work.
 
 A critical factor in the project is the generalization of the solution.
 The solution must be pluggable/modularized to add additional authentication
