@@ -1,0 +1,30 @@
+{
+  "name": "mse-project-thesis-1",
+  "version": "1.0.0",
+  "description": "Project report for the project thesis 1.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "start": "concurrently -k npm:nodemon npm:server",
+    "nodemon": "nodemon -e md,bib,yaml,png -w src --exec \"bash ./build.sh\"",
+    "server": "http-server public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/buehler/mse-project-thesis-1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/buehler/mse-project-thesis-1/issues"
+  },
+  "homepage": "https://github.com/buehler/mse-project-thesis-1#readme",
+  "dependencies": {
+    "concurrently": "^6.0.0",
+    "http-server": "^0.12.3",
+    "nodemon": "^2.0.7"
+  }
+}

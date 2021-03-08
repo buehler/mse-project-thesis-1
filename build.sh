@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-rm -rf public && mkdir public
+rm -rf public/*
 
 pandoc \
     --filter pandoc-xnos \
