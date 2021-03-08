@@ -1,8 +1,0 @@
-- fachlicher kontext beschreibung (app security, etc) beschreiben, wo das dieses ding anwendbar ist.
-- Problem beschreibung (effektive problemstellung)
-- marktanalyse und literaturforschung
-- review von MDSL in bezug auf authmesh
-- beschreibung der ziel-software (mit diagrammen etc.)
-- beschreibung des poc (mit diagrammen etc.)
-- empfehlung für allfällige spracherweiterung MDSL
-- code of PoC
