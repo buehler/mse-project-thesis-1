@@ -6,8 +6,8 @@ rm -rf public && mkdir public
 
 pandoc \
     --filter pandoc-xnos \
-    --lua-filter=filters/scholarly-metadata.lua \
-    --lua-filter=filters/author-info-blocks.lua \
+    --lua-filter=lib/lua-filters/scholarly-metadata/scholarly-metadata.lua \
+    --lua-filter=lib/lua-filters/author-info-blocks/author-info-blocks.lua \
     --metadata-file=src/metadata.yaml \
     --citeproc \
     --bibliography=src/bibliography.bib \
@@ -18,8 +18,8 @@ pandoc \
 
 pandoc \
     --filter pandoc-xnos \
-    --lua-filter=filters/scholarly-metadata.lua \
-    --lua-filter=filters/author-info-blocks.lua \
+    --lua-filter=lib/lua-filters/scholarly-metadata/scholarly-metadata.lua \
+    --lua-filter=lib/lua-filters/author-info-blocks/author-info-blocks.lua \
     --metadata-file=src/metadata.yaml \
     --citeproc \
     --bibliography=src/bibliography.bib \

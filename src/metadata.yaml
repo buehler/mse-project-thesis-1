@@ -20,7 +20,7 @@ abstract: |
   bar
   stuff
 
-# asdf
+# Latex config
 papersize: a4
 toc: true
 numbersections: true
