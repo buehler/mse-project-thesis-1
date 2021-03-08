@@ -38,6 +38,5 @@ mechanism to communicate with a legacy application that was deployed
 on the Kubernetes cluster but not yet rewritten.
 
 - sidecar?
--
 
 TODO.
