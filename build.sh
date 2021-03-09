@@ -5,6 +5,7 @@ set -euo pipefail
 # rm -rf public/*
 
 PLANTUML_BIN=/c/Users/cbueh/scoop/shims/plantuml.cmd pandoc \
+    --lua-filter=lib/lua-filters/include-files/include-files.lua \
     --filter pandoc-xnos \
     --lua-filter=lib/custom/plantuml-converter.lua \
     --lua-filter=lib/lua-filters/short-captions/short-captions.lua \
@@ -19,6 +20,7 @@ PLANTUML_BIN=/c/Users/cbueh/scoop/shims/plantuml.cmd pandoc \
     ./sections/*.md
 
 PLANTUML_BIN=/c/Users/cbueh/scoop/shims/plantuml.cmd pandoc \
+    --lua-filter=lib/lua-filters/include-files/include-files.lua \
     --filter pandoc-xnos \
     --lua-filter=lib/custom/plantuml-converter.lua \
     --lua-filter=lib/lua-filters/short-captions/short-captions.lua \

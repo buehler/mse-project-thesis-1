@@ -85,22 +85,9 @@ Find the common Kubernetes terminology attached in {@tbl:kubernetes_terminology}
 The table provides a list of terms that will be used to explain concepts like
 the operator pattern in {@sec:kubernetes_operator}.
 
-| Object    | Description                                                                              |
-| --------- | ---------------------------------------------------------------------------------------- |
-| Container | Smallest possible unit in a deployment. Contains a workload and runs with a docker image |
-| Pod       | Composed of multiple containers. Is ran by kubernetes as an "application" or "workload"  |
-
-Table: Common Kubernetes Terminology {#tbl:kubernetes_terminology}
-
-- Deployment
-- Watcher
-- Service
-- Resource
-- CRD
-- Validator
-- Mutator
-- Data Plane
-- Control Plane
+```{.include}
+tables/kubernetes_terminology.md
+```
 
 ### Operator {#sec:kubernetes_operator}
 

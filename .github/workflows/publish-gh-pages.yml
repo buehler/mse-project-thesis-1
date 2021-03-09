@@ -18,6 +18,7 @@ jobs:
         uses: docker://ghcr.io/buehler/mse-pandoc:latest
         with:
           args: >-
+            --lua-filter=lib/lua-filters/include-files/include-files.lua
             --filter pandoc-xnos
             --lua-filter=lib/custom/plantuml-converter.lua
             --lua-filter=lib/lua-filters/short-captions/short-captions.lua
@@ -53,6 +54,7 @@ jobs:
         uses: docker://ghcr.io/buehler/mse-pandoc:latest
         with:
           args: >-
+            --lua-filter=lib/lua-filters/include-files/include-files.lua
             --filter pandoc-xnos
             --lua-filter=lib/custom/plantuml-converter.lua
             --lua-filter=lib/lua-filters/short-captions/short-captions.lua
