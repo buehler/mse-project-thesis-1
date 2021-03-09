@@ -2,28 +2,33 @@
 
 set -euo pipefail
 
-rm -rf public/*
+# rm -rf public/*
 
-pandoc \
+PLANTUML_BIN=/c/Users/cbueh/scoop/shims/plantuml.cmd pandoc \
     --filter pandoc-xnos \
-    --lua-filter=lib/lua-filters/scholarly-metadata/scholarly-metadata.lua \
-    --lua-filter=lib/lua-filters/author-info-blocks/author-info-blocks.lua \
-    --metadata-file=src/metadata.yaml \
+    --filter pandoc-plantuml \
+    --lua-filter=../lib/lua-filters/scholarly-metadata/scholarly-metadata.lua \
+    --lua-filter=../lib/lua-filters/author-info-blocks/author-info-blocks.lua \
+    --metadata-file=./metadata.yaml \
     --citeproc \
-    --bibliography=src/bibliography.bib \
+    --bibliography=./bibliography.bib \
     --toc \
     --standalone \
-    --output=public/index.html \
-    src/sections/*.md
+    --output=../public/index.html \
+    ./sections/*.md
 
-pandoc \
-    --filter pandoc-xnos \
-    --lua-filter=lib/lua-filters/scholarly-metadata/scholarly-metadata.lua \
-    --lua-filter=lib/lua-filters/author-info-blocks/author-info-blocks.lua \
-    --metadata-file=src/metadata.yaml \
-    --citeproc \
-    --bibliography=src/bibliography.bib \
-    --toc \
-    --standalone \
-    --output=public/report.pdf \
-    src/sections/*.md
+# PLANTUML_BIN=/c/Users/cbueh/scoop/shims/plantuml.cmd pandoc \
+#     --filter pandoc-xnos \
+#     --filter pandoc-plantuml \
+#     --lua-filter=../lib/lua-filters/scholarly-metadata/scholarly-metadata.lua \
+#     --lua-filter=../lib/lua-filters/author-info-blocks/author-info-blocks.lua \
+#     --metadata-file=./metadata.yaml \
+#     --citeproc \
+#     --bibliography=./bibliography.bib \
+#     --toc \
+#     --standalone \
+#     --output=../public/report.pdf \
+#     ./sections/*.md
+
+cp -R images ../public/images
+cp -R plantuml-images ../public/plantuml-images

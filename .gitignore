@@ -1,5 +1,7 @@
+## 
 public/
 *.pdf
+plantuml-images/
 
 ## NodeJS
 

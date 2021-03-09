@@ -21,22 +21,3 @@ X services times Y authentication methods].
 
 The goal of the project "Distributed Authentication Mesh" is to provide a solution
 for this problem. TODO.
-
-## Project Context
-
-This project aims at the specific problem of declarative conversion
-of credentials to ensure authorized communication between services.
-The solution may be runnable on various platforms but will be implemented
-according to Kubernetes standards. Kubernetes^[<https://kubernetes.io/>] is an
-orchestration platform that works with containerized applications.
-
-The deliverables of this project may be used to ensure services can
-communicate with each other despite their different authentication
-mechanisms. As an example, this could be used to enable a modern
-web application that uses OIDC as the authentication and authorization
-mechanism to communicate with a legacy application that was deployed
-on the Kubernetes cluster but not yet rewritten.
-
-- sidecar?
-
-TODO.
