@@ -240,41 +240,70 @@
 </blockquote>
 <p>Find the common Kubernetes terminology attached in Table <a href="#tbl:kubernetes_terminology">1</a>. The table provides a list of terms that will be used to explain concepts like the operator pattern in Section <a href="#sec:kubernetes_operator">2.2.3</a>.</p>
 <div id="tbl:kubernetes_terminology" class="tablenos">
-<table id="tbl:kubernetes_terminology">
+<table id="tbl:kubernetes_terminology" style="width:90%;">
 <caption><span>Table 1:</span> Common Kubernetes Terminology </caption>
 <colgroup>
-<col style="width: 9%" />
-<col style="width: 90%" />
+<col style="width: 20%" />
+<col style="width: 70%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th>Object</th>
+<th>Term</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>Container</td>
-<td>Smallest possible unit in a deployment. Contains a workload and runs with a docker image</td>
+<td>Smallest possible unit in a deployment. Contains the definition of the workload. A container consists of a container image, arguments, volumes and other specific information to carry out a task.</td>
 </tr>
 <tr class="even">
 <td>Pod</td>
-<td>Composed of multiple containers. Is ran by kubernetes as an “application” or “workload”</td>
+<td>Composed of multiple containers. Is ran by kubernetes as an instance of a deployment. Pods may be scaled according to definitions or “pod scalers.”</td>
+</tr>
+<tr class="odd">
+<td>Deployment</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Service</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Resource</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>CRD</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Operator</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Watcher</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Validator</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Mutator</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Data Plane</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Control Plane</td>
+<td></td>
 </tr>
 </tbody>
 </table>
 </div>
-<ul>
-<li>Deployment</li>
-<li>Watcher</li>
-<li>Service</li>
-<li>Resource</li>
-<li>CRD</li>
-<li>Validator</li>
-<li>Mutator</li>
-<li>Data Plane</li>
-<li>Control Plane</li>
-</ul>
 <h3 id="sec:kubernetes_operator">Operator</h3>
 <p>An operator in Kubernetes is an extension to the Kubernetes API itself. A custom operator typically manages the whole lifecycle of an appliction it manages <span class="citation" data-cites="dobies:KubernetesOperators">(Dobies and Wood 2020)</span>. Such a custom operator can further be used to reconcile normal Kubernetes resources or any combination thereof.</p>
 <p>Some examples of application operators are:</p>
