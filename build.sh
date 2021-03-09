@@ -4,13 +4,11 @@ set -euo pipefail
 
 # rm -rf public/*
 
-PLANTUML_BIN=/c/Users/cbueh/scoop/shims/plantuml.cmd pandoc \
+pandoc \
     --lua-filter=lib/lua-filters/include-files/include-files.lua \
     --filter pandoc-xnos \
     --lua-filter=lib/custom/plantuml-converter.lua \
     --lua-filter=lib/lua-filters/short-captions/short-captions.lua \
-    --lua-filter=lib/lua-filters/scholarly-metadata/scholarly-metadata.lua \
-    --lua-filter=lib/lua-filters/author-info-blocks/author-info-blocks.lua \
     --metadata-file=./metadata.yaml \
     --citeproc \
     --bibliography=./bibliography.bib \
@@ -19,13 +17,11 @@ PLANTUML_BIN=/c/Users/cbueh/scoop/shims/plantuml.cmd pandoc \
     --output=public/index.html \
     ./sections/*.md
 
-PLANTUML_BIN=/c/Users/cbueh/scoop/shims/plantuml.cmd pandoc \
+pandoc \
     --lua-filter=lib/lua-filters/include-files/include-files.lua \
     --filter pandoc-xnos \
     --lua-filter=lib/custom/plantuml-converter.lua \
     --lua-filter=lib/lua-filters/short-captions/short-captions.lua \
-    --lua-filter=lib/lua-filters/scholarly-metadata/scholarly-metadata.lua \
-    --lua-filter=lib/lua-filters/author-info-blocks/author-info-blocks.lua \
     --metadata-file=./metadata.yaml \
     --citeproc \
     --bibliography=./bibliography.bib \

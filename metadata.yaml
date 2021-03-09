@@ -1,12 +1,10 @@
 # Metadata
 title: Distributed Authentication Mesh
 subtitle: Declarative Adhoc Conversion of Credentials
-author:
-  - Christoph Bühler:
-      institute: [ost]
-institute:
-  - ost: University of Applied Science of Eastern Switzerland (OST)
-date: Spring Semester 2021
+author: Christoph Bühler
+date: |
+  Spring Semester 2021\
+  University of Applied Science of Eastern Switzerland (OST)
 lang: en-US
 keywords:
   - Authentication

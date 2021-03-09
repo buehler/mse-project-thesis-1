@@ -22,8 +22,6 @@ jobs:
             --filter pandoc-xnos
             --lua-filter=lib/custom/plantuml-converter.lua
             --lua-filter=lib/lua-filters/short-captions/short-captions.lua
-            --lua-filter=lib/lua-filters/scholarly-metadata/scholarly-metadata.lua
-            --lua-filter=lib/lua-filters/author-info-blocks/author-info-blocks.lua
             --metadata-file=metadata.yaml
             --citeproc
             --bibliography=bibliography.bib
@@ -58,8 +56,6 @@ jobs:
             --filter pandoc-xnos
             --lua-filter=lib/custom/plantuml-converter.lua
             --lua-filter=lib/lua-filters/short-captions/short-captions.lua
-            --lua-filter=lib/lua-filters/scholarly-metadata/scholarly-metadata.lua
-            --lua-filter=lib/lua-filters/author-info-blocks/author-info-blocks.lua
             --metadata-file=metadata.yaml
             --citeproc
             --bibliography=bibliography.bib

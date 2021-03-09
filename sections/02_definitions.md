@@ -79,8 +79,6 @@ features according to the documentation [@github:kubernetesWebsite]:
 
 ### Terminology
 
-> TODO, make fancy (table is not nice)
-
 Find the common Kubernetes terminology attached in {@tbl:kubernetes_terminology}.
 The table provides a list of terms that will be used to explain concepts like
 the operator pattern in {@sec:kubernetes_operator}.
