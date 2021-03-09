@@ -174,15 +174,29 @@
 <h1 class="title">Distributed Authentication Mesh</h1>
 <p class="subtitle">Declarative Adhoc Conversion of Credentials</p>
 <p class="author">Christoph Bühler<sup>1</sup></p>
-<p class="date">05.03.2021</p>
+<p class="date">Spring Semester 2021</p>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#introduction">Introduction</a>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#definitions-and-boundaries">Definitions and Boundaries</a>
 <ul>
-<li><a href="#project-context">Project Context</a></li>
+<li><a href="#context">Context</a></li>
+<li><a href="#kubernetes">Kubernetes</a>
+<ul>
+<li><a href="#what-is-kubernetes">What is Kubernetes</a></li>
+<li><a href="#operator">Operator</a></li>
+<li><a href="#service-mesh">Service Mesh</a></li>
 </ul></li>
-<li><a href="#state-of-the-art-and-deficiencies">State of the Art and Deficiencies</a></li>
+<li><a href="#authentication-and-authorization">Authentication and Authorization</a>
+<ul>
+<li><a href="#basic">Basic</a></li>
+<li><a href="#openid-connect-oidc">OpenID Connect (OIDC)</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#state-of-the-art-the-practice-and-deficiencies">State of the Art, the Practice and Deficiencies</a></li>
+<li><a href="#grober-roter-faden-projektbericht">Grober Roter Faden Projektbericht</a></li>
+<li><a href="#todos">Todos</a></li>
 <li><a href="#bibliography">Bibliography</a></li>
 </ul>
 </nav>
@@ -191,20 +205,73 @@
 <p>Modern cloud environments solve many problems like the discovery of services and data transfer or communiation between services in general. One modern way of solving service discovery and communication is a Service Mesh, which introduces an additional infrastructure layer that manages the communication between services <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>.</p>
 <p>However, a specific problem is not solved yet: “dynamic” trusted communication between services. When a service, that is capable of handling OpenID Connect (OIDC) credentials, wants to communicate with a service that only knows Basic Authentication that originating service must implement some sort of conversion or know static credentials to communicate with the basic auth service. Generally, this introduces changes to the software of services. In small applications which consist of one or two services, implementing this conversion may be a feasable option. If we look at an application which spans over a big landscape and a multitude of services, implementing each and every possible authentication mechanism and the according conversions will be error prone work and does not scale well<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
 <p>The goal of the project “Distributed Authentication Mesh” is to provide a solution for this problem. TODO.</p>
-<h2 id="project-context">Project Context</h2>
+<h1 id="definitions-and-boundaries">Definitions and Boundaries</h1>
+<p>This section provides information about the project. It gives an overview of the context as well as terminology and general definitions.</p>
+<h2 id="context">Context</h2>
 <p>This project aims at the specific problem of declarative conversion of credentials to ensure authorized communication between services. The solution may be runnable on various platforms but will be implemented according to Kubernetes standards. Kubernetes<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> is an orchestration platform that works with containerized applications.</p>
-<p>The deliverables of this project may be used to ensure services can communicate with each other despite their different authentication mechanisms. As an example, this could be used to enable a modern web application that uses OIDC as the authentication and authorization mechanism to communicate with a legacy application that was deployed on the Kubernetes cluster but not yet rewritten.</p>
-<ul>
-<li>sidecar?</li>
-<li></li>
-</ul>
-<p>TODO.</p>
-<h1 id="state-of-the-art-and-deficiencies">State of the Art and Deficiencies</h1>
+<p>The deliverables of this project may aid services to communicate with each other despite different authentication mechanisms. As an example, this could be used to enable a modern web application that uses OpenID Connect (OIDC) as the authentication and authorization mechanism to communicate with a legacy application that was deployed on the Kubernetes cluster but not yet rewritten. This transformation of credentials (from OIDC to Basic Auth) is done by the solution of this project instead of manual work which may introduc code changes to either service.</p>
+<p>To use the proposed solution of this project, no service mesh or other complex layer is needed. The solution runs without those additional parts on a Kubernetes cluster. To provide service discovery, the default internal DNS capabilities of Kubernetes are sufficient.</p>
+<h2 id="kubernetes">Kubernetes</h2>
+<h3 id="what-is-kubernetes">What is Kubernetes</h3>
+<p>briefly describe kubernetes <img src="images/Kubernetes/Container_Evolution.png" alt="Container Evolution" /> -&gt; fetched from github repo with CCBY4.0 lizenz!</p>
+<h3 id="operator">Operator</h3>
+<p>briefly describe what an operator is</p>
+<h3 id="service-mesh">Service Mesh</h3>
+<p>briefly describe a service mesh.</p>
+<h2 id="authentication-and-authorization">Authentication and Authorization</h2>
+<h3 id="basic">Basic</h3>
+<h3 id="openid-connect-oidc">OpenID Connect (OIDC)</h3>
+<p>briefly describe OIDC</p>
+<h1 id="state-of-the-art-the-practice-and-deficiencies">State of the Art, the Practice and Deficiencies</h1>
 <p>This section gives an overview over the current state of the art as well as the deficiencies according to the author. Following the description of the current situation, a definition of the should situation gives an overview of the purposed solution.</p>
 <ul>
 <li>Describe the IS situation.</li>
 <li>Describe the SHOULD situation.</li>
 <li>describe service mesh (image from referecne could be used)</li>
+</ul>
+<p>Test:</p>
+<p><img src="plantuml-images/baa25c3cb8497fdf5c9585d82e660b748ea3f4d3.svg" /></p>
+<h1 id="grober-roter-faden-projektbericht">Grober Roter Faden Projektbericht</h1>
+<ol type="1">
+<li>Introduction
+<ul>
+<li>Das Erreichte und den Überblick der Arbeit wiedergeben</li>
+<li>Erklären wie die Arbeit aufgebaut ist und welche Details wo zu finden sind</li>
+</ul></li>
+<li>Einführung ins Thema
+<ul>
+<li>Leser ausbilden</li>
+<li>Backgroundinformationen liefern</li>
+<li>Context der Arbeit</li>
+<li>Begrifflichkeiten erklären</li>
+</ul></li>
+<li>IST / SOLL Beschreibung
+<ul>
+<li>Was gibt es</li>
+<li>Wie arbeit die Leute</li>
+<li>Wo sind die Defizite</li>
+</ul></li>
+<li>Wie lösen wir die Probleme
+<ul>
+<li>Planung der Software (Diagramme etc.)</li>
+<li>Wie die Lösung aussieht</li>
+<li>Umsetzung der Konzepte</li>
+</ul></li>
+<li>Nachweis
+<ul>
+<li>Beweis anführen, dass das vorgeschlagene Konzept funktioniert</li>
+<li>Beispiele nutzen um Leute abzuholen</li>
+</ul></li>
+<li>Conclusion
+<ul>
+<li>Ausblick (Referenz auf weitere Projektarbeit)</li>
+<li>Was man gemacht hat (klassischer Paperdiamant)</li>
+</ul></li>
+</ol>
+<h1 id="todos">Todos</h1>
+<p>Todos:</p>
+<ul>
+<li>nope.</li>
 </ul>
 <h1 class="unnumbered" id="bibliography">Bibliography</h1>
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
