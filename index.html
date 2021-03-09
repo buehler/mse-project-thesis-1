@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="author" content="Christoph Bühler1" />
+  <meta name="author" content="Christoph Bühler" />
   <meta name="keywords" content="Authentication, Distributed, Trust, Microservices, Kubernetes" />
   <title>Distributed Authentication Mesh</title>
   <style>
@@ -173,8 +173,9 @@
 <header id="title-block-header">
 <h1 class="title">Distributed Authentication Mesh</h1>
 <p class="subtitle">Declarative Adhoc Conversion of Credentials</p>
-<p class="author">Christoph Bühler<sup>1</sup></p>
-<p class="date">Spring Semester 2021</p>
+<p class="author">Christoph Bühler</p>
+<p class="date"><p>Spring Semester 2021<br />
+University of Applied Science of Eastern Switzerland (OST)</p></p>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
@@ -202,7 +203,6 @@
 <li><a href="#bibliography">Bibliography</a></li>
 </ul>
 </nav>
-<p><sup>1</sup> University of Applied Science of Eastern Switzerland (OST)</p>
 <h1 id="introduction">Introduction</h1>
 <p>Modern cloud environments solve many problems like the discovery of services and data transfer or communiation between services in general. One modern way of solving service discovery and communication is a Service Mesh, which introduces an additional infrastructure layer that manages the communication between services <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>.</p>
 <p>However, a specific problem is not solved yet: “dynamic” trusted communication between services. When a service, that is capable of handling OpenID Connect (OIDC) credentials, wants to communicate with a service that only knows Basic Authentication that originating service must implement some sort of conversion or know static credentials to communicate with the basic auth service. Generally, this introduces changes to the software of services. In small applications which consist of one or two services, implementing this conversion may be a feasable option. If we look at an application which spans over a big landscape and a multitude of services, implementing each and every possible authentication mechanism and the according conversions will be error prone work and does not scale well<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
@@ -235,9 +235,6 @@
 <li><strong>Secret and configuration management</strong>: Kubernetes has a store for sensitive data as well as configurational data that may change the behaviour of a workload</li>
 </ul>
 <h3 id="terminology">Terminology</h3>
-<blockquote>
-<p>TODO, make fancy (table is not nice)</p>
-</blockquote>
 <p>Find the common Kubernetes terminology attached in Table <a href="#tbl:kubernetes_terminology">1</a>. The table provides a list of terms that will be used to explain concepts like the operator pattern in Section <a href="#sec:kubernetes_operator">2.2.3</a>.</p>
 <div id="tbl:kubernetes_terminology" class="tablenos">
 <table id="tbl:kubernetes_terminology" style="width:90%;">
