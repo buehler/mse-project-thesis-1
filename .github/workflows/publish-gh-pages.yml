@@ -85,7 +85,7 @@ jobs:
       - run: mv public/page/* public/
       - run: mv public/pdf/* public/
       - name: Deploy gh pages
-        uses: JamesIves/github-pages-deploy-action@4.0.0
+        uses: JamesIves/github-pages-deploy-action@4.1.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
