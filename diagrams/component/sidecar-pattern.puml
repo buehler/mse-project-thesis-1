@@ -1,0 +1,15 @@
+@startuml
+!include https://raw.githubusercontent.com/bschwarz/puml-themes/master/themes/cerulean-outline/puml-theme-cerulean-outline.puml
+
+node "Application Pod" {
+    component [Main Container] as m #line:FD7E14;text:FD7E14
+    component [Sidecar A] as sa
+    component [Sidecar B] as sb
+    database "File System" as f
+
+    m -down- f
+    sa -down- f
+    sb -down- f
+}
+
+@enduml

@@ -90,15 +90,17 @@ the operator pattern in {@sec:kubernetes_operator}.
 | Container | Smallest possible unit in a deployment. Contains a workload and runs with a docker image |
 | Pod       | Composed of multiple containers. Is ran by kubernetes as an "application" or "workload"  |
 
-<!-- | Deployment | Defines a deployment that sp
-ecifies the pod and how many replicas of the pod should run                       |
-| Service    | Used to access a pod in
-side Kubernetes (provides DNS name for a deployment)                                   |
-| Watcher    | Open connection fro
-m a Kubernetes client to the master API to g
-et notified about changes to watched resources | -->
-
 Table: Common Kubernetes Terminology {#tbl:kubernetes_terminology}
+
+- Deployment
+- Watcher
+- Service
+- Resource
+- CRD
+- Validator
+- Mutator
+- Data Plane
+- Control Plane
 
 ### Operator {#sec:kubernetes_operator}
 
@@ -137,13 +139,72 @@ tries to apply the transition for the new desired state. Now, the operator recei
 the notification about the watched resource and may interact with the event. Such an
 action may include to update resources, create more resources or even delete other instances.
 
+### Sidecar {#sec:kubernetes_sidecar}
+
+The sidecar pattern is the most common pattern for multi-container
+deployments. Sidecars are containers that enhance the functionality
+of the main container in a pod. An example for such a sidecar is
+a log collector, that collects log files written to the file system
+and forwards them to some log processing software [@burns:DesignPatternsForContainerSystems, section 4.1].
+Another example is the Google CloudSQL Proxy^[<https://github.com/GoogleCloudPlatform/cloudsql-proxy>],
+which provides access to a CloudSQL instance from a pod without routing the whole traffic through
+Kubernetes services.
+
+![Sidecar container extending a main container
+in a pod. As example, this could be a log collector
+[@burns:DesignPatternsForContainerSystems, figure 1].](diagrams/component/sidecar-pattern.puml){#fig:kubernetes_sidecar
+short-caption="Example of a sidecar container"}
+
+The example shown in {@fig:kubernetes_sidecar} is extensible.
+Such sidecars may be injected by a mutator or an operator to extend
+functionality.
+
 ### Service Mesh
 
-briefly describe a service mesh.
+A "Service Mesh" is a dedicated infrastructure layer that handles
+intercommunication between services. It is responsible for the
+delivery of requests in a modern cloud application [@li:ServiceMesh, section 2].
+An example from the practice is "Istio"^[<https://istio.io/>]. When using
+Istio, the applications do not need to know if there is a service mesh installed
+or not. Istio will inject a sidecar (see {@sec:kubernetes_sidecar}) into
+pods and handle the communication with the injected services.
+
+The service mesh provides a set of features [@li:ServiceMesh, section 2]:
+
+- **Service discovery**: The mechanism to locate and communicate
+  with a workload / service. In a cloud environment, the location
+  of services will likely change, thus the service mesh provides
+  a way to access the services in the cloud.
+- **Load balancing**: As an addition to the service discovery,
+  the mesh provides load balancing mechanisms as is done by Kubernetes itself.
+- **Fault tolerance**: The router in a service mesh is responsible
+  to route traffic to healthy services. If a service is unavailable or
+  even reports a crash, traffic should not be routed to this instance.
+- **Traffic monitoring**: In contrast to the default Kubernetes possibilities,
+  with a service mesh, the traffic from and to various services can be monitored
+  in detail. This offers the opportunity to derive reports per target, success
+  rates and other metrics.
+- **Circuit breaking**: The ability to cut off an overloaded service and
+  back off the remaining requests instead of totally failing the service under stress.
+  A circuit breaker pattern measures the failure rate of a service and
+  applies states to the service: "Closed" - requests are passed to the service,
+  "Open" - requests are not passed to this instance, "Half-Open" - only a limited
+  number is passed [@montesi:CircuitBreakers, section 2].
+- **Authentication and access control**: Through the control plane,
+  a service mesh may define the rules of communication. It defines which
+  services can communicate with one another.
+
+As observed in the list above, many of the features of a service mesh
+are already provided by Kubernetes. Service discovery, load balancing,
+fault tolerance and - though limited - traffic monitoring is already
+possible with Kubernetes. Introducing a service mesh into a cluster
+enables administrators to build more complex scenarios and deployments.
 
 ## Authentication and Authorization
 
 ### Basic
+
+briefly describe basic auth.
 
 ### OpenID Connect (OIDC)
 

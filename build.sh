@@ -32,5 +32,5 @@ PLANTUML_BIN=/c/Users/cbueh/scoop/shims/plantuml.cmd pandoc \
     --output=public/report.pdf \
     ./sections/*.md
 
-cp -R images public/images
-cp -R diagrams public/diagrams
+cp -R images public/
+cp -R diagrams public/
