@@ -4,8 +4,8 @@
   "scripts": {
     "prestart": "rm -rf public && mkdir public",
     "start": "concurrently -k npm:nodemon npm:server",
-    "nodemon": "nodemon -e md,bib,yaml,png -w src --exec \"bash ./build.sh\"",
-    "server": "http-server public"
+    "nodemon": "nodemon -e md,bib,yaml,png -w sections -w images --exec \"bash ./build.sh\"",
+    "server": "http-server public -o"
   },
   "dependencies": {
     "concurrently": "^6.0.0",

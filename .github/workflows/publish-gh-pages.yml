@@ -19,10 +19,11 @@ jobs:
         with:
           args: >-
             --filter pandoc-xnos
-            --filter pandoc-plantuml
-            --metadata-file=metadata.yaml
+            --lua-filter=lib/custom/plantuml-converter.lua
+            --lua-filter=lib/lua-filters/short-captions/short-captions.lua
             --lua-filter=lib/lua-filters/scholarly-metadata/scholarly-metadata.lua
             --lua-filter=lib/lua-filters/author-info-blocks/author-info-blocks.lua
+            --metadata-file=metadata.yaml
             --citeproc
             --bibliography=bibliography.bib
             --toc
@@ -32,7 +33,8 @@ jobs:
       - name: Copy Assets
         run: |
           cp -R images public/images
-          cp -R plantuml-images public/plantuml-images
+          cp -R diagrams public/diagrams
+          rm -rf public/diagrams/.gitignore
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -52,10 +54,11 @@ jobs:
         with:
           args: >-
             --filter pandoc-xnos
-            --filter pandoc-plantuml
-            --metadata-file=metadata.yaml
+            --lua-filter=lib/custom/plantuml-converter.lua
+            --lua-filter=lib/lua-filters/short-captions/short-captions.lua
             --lua-filter=lib/lua-filters/scholarly-metadata/scholarly-metadata.lua
             --lua-filter=lib/lua-filters/author-info-blocks/author-info-blocks.lua
+            --metadata-file=metadata.yaml
             --citeproc
             --bibliography=bibliography.bib
             --toc

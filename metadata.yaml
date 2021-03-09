@@ -27,15 +27,15 @@ numbersections: true
 lof: true
 lot: true
 thanks: todo
-bibliography: references.bib
+bibliography: bibliography.bib
 
 # Tool configuration
 fignos-cleveref: true
-fignos-plus-name: figure
-fignos-star-name: Figure
+fignos-plus-name: Figure
+fignos-star-name: figure
 secnos-cleveref: true
-secnos-plus-name: section
-secnos-star-name: Section
+secnos-plus-name: Section
+secnos-star-name: section
 tablenos-cleveref: true
-tablenos-plus-name: table
-tablenos-star-name: Table
+tablenos-plus-name: Table
+tablenos-star-name: table
