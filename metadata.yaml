@@ -16,18 +16,20 @@ keywords:
   - Kubernetes
 reference-section-title: Bibliography
 abstract: |
-  foo
-  bar
-  stuff
+  TODO, this will contain the
+  abstract of the project report.
 
 # Latex config
 papersize: a4
+documentclass: scrreprt
 toc: true
 numbersections: true
 lof: true
 lot: true
-thanks: todo
 bibliography: bibliography.bib
+thanks: |
+  I would like to thank Dr. Olaf Zimmermann
+  and Florian Forster. TODO.
 
 # Tool configuration
 fignos-cleveref: true

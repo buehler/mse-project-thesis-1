@@ -12,19 +12,6 @@ the purposed solution.
 
 Test:
 
-```plantuml
-@startuml
-!include https://raw.githubusercontent.com/bschwarz/puml-themes/master/themes/cerulean-outline/puml-theme-cerulean-outline.puml
+![Diagram Test](diagrams/sequences/is-solution-process.puml){#fig:diagram_test}
 
-actor Client as c
-participant IAM as i
-participant "Service A" as a
-participant "Service B" as b
-
-c -> i : Authenticate with OIDC
-i --> c : Return Credentials
-c -> a : Call Service with OIDC
-a -> a : Transform Credentials to Basic
-a -> b : Call with Basic Credentials
-@enduml
-```
+This {@fig:diagram_test} shows a test.

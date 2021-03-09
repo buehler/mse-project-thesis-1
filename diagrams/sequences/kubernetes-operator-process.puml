@@ -1,0 +1,28 @@
+@startuml
+!include https://raw.githubusercontent.com/bschwarz/puml-themes/master/themes/cerulean-outline/puml-theme-cerulean-outline.puml
+
+actor User as u
+participant "API" as api
+participant "Operator" as op
+participant "Nodes" as node
+participant "Mutator" as mut
+participant "Validator" as val
+
+u -> api : Install operator
+op -> api : Register Watcher
+u -> api : ""kubectl apply -f file.yaml""
+
+alt Mutator registered for type
+    api -> mut : Check for mutations
+    mut --> api : JSONPatch with zero or more patches
+end
+
+alt Validator registered for type
+    api -> val : Validate resource
+    val --> api : Allowed / Not Allowed
+end
+
+api -> node : Create / Update / Delete resource
+api -> op : Notify about the event
+
+@enduml

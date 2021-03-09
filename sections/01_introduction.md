@@ -17,7 +17,9 @@ conversion may be a feasable option. If we look at an application which
 spans over a big landscape and a multitude of services, implementing each
 and every possible authentication mechanism and the according conversions
 will be error prone work and does not scale well^[According to the matrix problem:
-X services times Y authentication methods].
+$X \text{ services} * Y \text{ authentication methods}$].
 
 The goal of the project "Distributed Authentication Mesh" is to provide a solution
-for this problem. TODO.
+for this problem.
+
+> TODO.
