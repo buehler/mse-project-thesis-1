@@ -198,6 +198,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </ul></li>
 </ul></li>
 <li><a href="#state-of-the-art-the-practice-and-deficiencies">State of the Art, the Practice and Deficiencies</a></li>
+<li><a href="#further-work">Further work</a></li>
 <li><a href="#grober-roter-faden-projektbericht">Grober Roter Faden Projektbericht</a></li>
 <li><a href="#todos">Todos</a></li>
 <li><a href="#bibliography">Bibliography</a></li>
@@ -214,7 +215,8 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <p>This section provides general information about the project, the context and prerequisite knowledge. It gives an overview of the context as well as terminology and general definitions.</p>
 <h2 id="context">Context</h2>
 <p>This project aims at the specific problem of declarative conversion of credentials to ensure authorized communication between services. The solution may be runnable on various platforms but will be implemented according to Kubernetes standards. Kubernetes<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> is an orchestration platform that works with containerized applications. The solution introduces an operator pattern, as explained in Section <a href="#sec:kubernetes_operator">2.2.3</a></p>
-<p>The deliverables of this project may aid services to communicate with each other despite different authentication mechanisms. As an example, this could be used to enable a modern web application that uses OpenID Connect (OIDC) as the authentication and authorization mechanism to communicate with a legacy application that was deployed on the Kubernetes cluster but not yet rewritten. This transformation of credentials (from OIDC to Basic Auth) is done by the solution of this project instead of manual work which may introduc code changes to either service.</p>
+<p>The deliverables of this and further projects may aid services to communicate with each other despite different authentication mechanisms. As an example, this could be used to enable a modern web application that uses OpenID Connect (OIDC) as the authentication and authorization mechanism to communicate with a legacy application that was deployed on the Kubernetes cluster but not yet rewritten. This transformation of credentials (from OIDC to Basic Auth) is done by the solution of the projects instead of manual work which may introduc code changes to either service.</p>
+<p>This specific project provides a proof of concept (PoC) with an initial version on a GitHub repository. The PoC demonstrates that it is possible to instruct an Envoy<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> proxy to communicate with an injected service to modify authentication credentials in-flight.</p>
 <p>To use the proposed solution of this project, no service mesh or other complex layer is needed. The solution runs without those additional parts on a Kubernetes cluster. To provide service discovery, the default internal DNS capabilities of Kubernetes are sufficient.</p>
 <h2 id="kubernetes">Kubernetes</h2>
 <h3 id="what-is-kubernetes">What is Kubernetes</h3>
@@ -237,11 +239,11 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <h3 id="terminology">Terminology</h3>
 <p>Find the common Kubernetes terminology attached in Table <a href="#tbl:kubernetes_terminology">1</a>. The table provides a list of terms that will be used to explain concepts like the operator pattern in Section <a href="#sec:kubernetes_operator">2.2.3</a>.</p>
 <div id="tbl:kubernetes_terminology" class="tablenos">
-<table id="tbl:kubernetes_terminology" style="width:90%;">
+<table id="tbl:kubernetes_terminology" style="width:92%;">
 <caption><span>Table 1:</span> Common Kubernetes Terminology </caption>
 <colgroup>
-<col style="width: 20%" />
-<col style="width: 70%" />
+<col style="width: 16%" />
+<col style="width: 76%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -256,47 +258,39 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </tr>
 <tr class="even">
 <td>Pod</td>
-<td>Composed of multiple containers. Is ran by kubernetes as an instance of a deployment. Pods may be scaled according to definitions or “pod scalers.”</td>
+<td>Composed of multiple containers. Is ran by kubernetes as an instance of a deployment. Pods may be scaled according to definitions or “pod scalers.” Highly coupled tasks are deployed together in a pod (i.e. multiple coupled containers in a pod).</td>
 </tr>
 <tr class="odd">
 <td>Deployment</td>
-<td></td>
+<td>A deployment is a managed instance of a pod. Kubernetes will run the described pod with the desired replica count on the best possible worker node. Deployments may be scaled with auto-scaling mechanisms.</td>
 </tr>
 <tr class="even">
 <td>Service</td>
-<td></td>
+<td>A service enables communciation with one or multiple pods. The service contains a selector that points to a certain number of pods and then ensures that the pods are accessable via a DNS name. The name is typically a combination of the servicename and the namespace (e.g. <code>my-service.namespace</code>).</td>
 </tr>
 <tr class="odd">
 <td>Resource</td>
-<td></td>
+<td>A resource is something that can be managed by Kubernetes. It defines an API endpoint on the master node and allows Kubernetes to store a collection of such API objects. Examples are: <code>Deployment</code>, <code>Service</code> and <code>Pod</code>, to name a few of the built-in resources.</td>
 </tr>
 <tr class="even">
 <td>CRD</td>
-<td></td>
+<td>A Custom Resource Definition (CRD) enables developers to extend the default Kubernetes API. With a CRD, it is possible to create own resources which creates an API endpoint on the Kubernetes API. An example of such a CRD is the <code>Mapping</code> resource of Ambassador<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>.</td>
 </tr>
 <tr class="odd">
 <td>Operator</td>
-<td></td>
+<td>An operator is a software that manages Kubernetes resources and their lifecycle. Operators may use CRDs to define custom objects on which they react when some event (<code>Added</code>, <code>Modified</code> or <code>Deleted</code>) triggers on a resource. For a more in-depth description, see Section <a href="#sec:kubernetes_operator">2.2.3</a>.</td>
 </tr>
 <tr class="even">
 <td>Watcher</td>
-<td></td>
+<td>A watcher is a constant connection from a client to the Kubernetes API. The watcher defines some search and filter parameters and receives events for the found resources.</td>
 </tr>
 <tr class="odd">
 <td>Validator</td>
-<td></td>
+<td>A validator is a service that may reject the creation, modification or deletion of resources.</td>
 </tr>
 <tr class="even">
 <td>Mutator</td>
-<td></td>
-</tr>
-<tr class="odd">
-<td>Data Plane</td>
-<td></td>
-</tr>
-<tr class="even">
-<td>Control Plane</td>
-<td></td>
+<td>Mutators are called before Kubernetes validates and stores a resource. Mutators may return JSON patches <span class="citation" data-cites="bryan:JSONPatch">(Bryan and Nottingham 2013)</span> to instruct Kubernetes to modify a resource prior to validating and storing them.</td>
 </tr>
 </tbody>
 </table>
@@ -305,8 +299,8 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <p>An operator in Kubernetes is an extension to the Kubernetes API itself. A custom operator typically manages the whole lifecycle of an appliction it manages <span class="citation" data-cites="dobies:KubernetesOperators">(Dobies and Wood 2020)</span>. Such a custom operator can further be used to reconcile normal Kubernetes resources or any combination thereof.</p>
 <p>Some examples of application operators are:</p>
 <ul>
-<li>Prometheus Operator<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>: Manages instances of Prometheus in a cluster</li>
-<li>Postgres Operator<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>: Manages PostgreSQL clusters inside Kubernetes, with the support of multiple instance database clusters</li>
+<li>Prometheus Operator<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>: Manages instances of Prometheus in a cluster</li>
+<li>Postgres Operator<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>: Manages PostgreSQL clusters inside Kubernetes, with the support of multiple instance database clusters</li>
 </ul>
 <p>There exists a broad list of operators, which can be (partially) viewed on <a href="https://operatorhub.io/">operatorhub.io</a>.</p>
 <div id="fig:kubernetes_operator_workflow" class="fignos">
@@ -317,7 +311,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <p>Figure <a href="#fig:kubernetes_operator_workflow">2</a> shows the general workflow of an event that is managed by an operator. When an operator is installed and running on a Kubernetes cluster, it registers “Resource Watchers” with the API and receives notifications when the master node modifies resources a watched resource. The overviewed events are “Added,” “Modified” and “Deleted.” There are two additional events that may be returned by the API (“Error” and “Bookmark”) but they are typically not needed in an operator.</p>
 <p>When the user interacts with the Kubernetes API (for example via the <code>kubectl</code> executable) and creates a new instance of a resource, the API will first call any “Mutator” in a serial manner. After the mutators, the API will call any “Validators” in parallel and if no validator objects against the creation, the API will then store the resource and tries to apply the transition for the new desired state. Now, the operator receives the notification about the watched resource and may interact with the event. Such an action may include to update resources, create more resources or even delete other instances.</p>
 <h3 id="sec:kubernetes_sidecar">Sidecar</h3>
-<p>The sidecar pattern is the most common pattern for multi-container deployments. Sidecars are containers that enhance the functionality of the main container in a pod. An example for such a sidecar is a log collector, that collects log files written to the file system and forwards them to some log processing software <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, sec. 4.1)</span>. Another example is the Google CloudSQL Proxy<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>, which provides access to a CloudSQL instance from a pod without routing the whole traffic through Kubernetes services.</p>
+<p>The sidecar pattern is the most common pattern for multi-container deployments. Sidecars are containers that enhance the functionality of the main container in a pod. An example for such a sidecar is a log collector, that collects log files written to the file system and forwards them towards some log processing software <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, sec. 4.1)</span>. Another example is the Google CloudSQL Proxy<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a>, which provides access to a CloudSQL instance from a pod without routing the whole traffic through Kubernetes services.</p>
 <div id="fig:kubernetes_sidecar" class="fignos">
 <figure>
 <img src="diagrams/component/e04b0bd0476fb01ac6d4e9a5b2f2a17a.png" data-short-caption="Example of a sidecar container" alt="Figure 3: Sidecar container extending a main container in a pod. As example, this could be a log collector , figure 1(Burns and Oppenheimer 2016, fig. 1)." /><figcaption aria-hidden="true"><span>Figure 3:</span> Sidecar container extending a main container in a pod. As example, this could be a log collector <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, fig. 1)</span>.</figcaption>
@@ -325,7 +319,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </div>
 <p>The example shown in Figure <a href="#fig:kubernetes_sidecar">3</a> is extensible. Such sidecars may be injected by a mutator or an operator to extend functionality.</p>
 <h3 id="service-mesh">Service Mesh</h3>
-<p>A “Service Mesh” is a dedicated infrastructure layer that handles intercommunication between services. It is responsible for the delivery of requests in a modern cloud application <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>. An example from the practice is “Istio”<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>. When using Istio, the applications do not need to know if there is a service mesh installed or not. Istio will inject a sidecar (see Section <a href="#sec:kubernetes_sidecar">2.2.4</a>) into pods and handle the communication with the injected services.</p>
+<p>A “Service Mesh” is a dedicated infrastructure layer that handles intercommunication between services. It is responsible for the delivery of requests in a modern cloud application <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>. An example from the practice is “Istio”<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a>. When using Istio, the applications do not need to know if there is a service mesh installed or not. Istio will inject a sidecar (see Section <a href="#sec:kubernetes_sidecar">2.2.4</a>) into pods and handle the communication with the injected services.</p>
 <p>The service mesh provides a set of features <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>:</p>
 <ul>
 <li><strong>Service discovery</strong>: The mechanism to locate and communicate with a workload / service. In a cloud environment, the location of services will likely change, thus the service mesh provides a way to access the services in the cloud.</li>
@@ -338,9 +332,15 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <p>As observed in the list above, many of the features of a service mesh are already provided by Kubernetes. Service discovery, load balancing, fault tolerance and - though limited - traffic monitoring is already possible with Kubernetes. Introducing a service mesh into a cluster enables administrators to build more complex scenarios and deployments.</p>
 <h2 id="authentication-and-authorization">Authentication and Authorization</h2>
 <h3 id="basic">Basic</h3>
-<p>briefly describe basic auth.</p>
+<p>The <code>Basic</code> authentication scheme is a trivial authentication that accepts a username and a password encoded in Base64. To transmit the credentials, a construct with the schematics of <code>&lt;username&gt;:&lt;password&gt;</code> is created and inserted into the http request as the <code>Authorization</code> header with the prefix <code>Basic</code> <span class="citation" data-cites="reschke:BasicAuth">(Reschke 2015, sec. 2)</span>. An example with the username <code>ChristophBuehler</code> and password <code>SuperSecure</code> would result in the following header: <code>Authorization: Basic Q2hyaXN0b3BoQnVlaGxlcjpTdXBlclNlY3VyZQ==</code>.</p>
 <h3 id="openid-connect-oidc">OpenID Connect (OIDC)</h3>
-<p>briefly describe OIDC</p>
+<p>OpenID Connect is an authenticating mechanism, that builds upon the <code>OAuth 2.0</code> authorization protocol. OAuth 2.0 deals with authorization only and grants access to data and features on a specific application. OAuth by itself does not define <em>how</em> the credentials are transmitted and exchanged <span class="citation" data-cites="hardt:OAuth2.0Spez">(Hardt and others 2012)</span>. OIDC adds a layer on top of OAuth 2.0 that defines <em>how</em> these credentials must be exchanged. This adds login and profile capabilities to any application that uses OIDC <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014)</span>.</p>
+<div id="fig:oidc_code_flow" class="fignos">
+<figure>
+<img src="diagrams/sequences/b45156f65349258d13a013f27e003332.png" data-short-caption="OIDC code flow" alt="Figure 4: OIDC code authorization flow (Sakimura et al. 2014)." /><figcaption aria-hidden="true"><span>Figure 4:</span> OIDC code authorization flow <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014)</span>.</figcaption>
+</figure>
+</div>
+<p>When a user wants to authenticate himself with OIDC, one of the possible “flows” is the “Authorization Code Flow” <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 3.1)</span>. Other possible flows are the “Implicit Flow” <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 3.2)</span> and the “Hybrid Flow” <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 3.3)</span>. In Figure <a href="#fig:oidc_code_flow">4</a>, the “Authorization Code Flow” is depicted. A user that wants to access a certain resource on a relying party (i.e. something that relies on the information about the user) and is not authenticated and authorized, the relying party forwards the user to the identity provider (IdP). The user provides his credentials to the IdP and is returned to the relying party with an authorization code. The relying party can then exchange the authorization code to valid tokens on the token endpoint of the IdP. Typically, <code>access_token</code> and <code>id_token</code> are provided. While the <code>id_token</code> must be a JSON Web Token (JWT) <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 2)</span>, the <code>access_token</code> can be in any format <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 3.3.3.8)</span>.</p>
 <h1 id="state-of-the-art-the-practice-and-deficiencies">State of the Art, the Practice and Deficiencies</h1>
 <p>This section gives an overview over the current state of the art as well as the deficiencies according to the author. Following the description of the current situation, a definition of the should situation gives an overview of the purposed solution.</p>
 <ul>
@@ -351,10 +351,18 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <p>Test:</p>
 <div id="fig:diagram_test" class="fignos">
 <figure>
-<img src="diagrams/sequences/abf568f8e377caa7c2c463d28331ee60.png" alt="Figure 4: Diagram Test" /><figcaption aria-hidden="true"><span>Figure 4:</span> Diagram Test</figcaption>
+<img src="diagrams/sequences/abf568f8e377caa7c2c463d28331ee60.png" alt="Figure 5: Diagram Test" /><figcaption aria-hidden="true"><span>Figure 5:</span> Diagram Test</figcaption>
 </figure>
 </div>
-<p>This Figure <a href="#fig:diagram_test">4</a> shows a test.</p>
+<p>This Figure <a href="#fig:diagram_test">5</a> shows a test.</p>
+<h1 id="further-work">Further work</h1>
+<ul>
+<li>create common domain model for user</li>
+<li>use this domain language model to translate credentials from and to a specific implementation</li>
+<li>use JWT to harden these credentials (signing)</li>
+<li>operator must create and deliver keys</li>
+<li>operator must have set of public keys</li>
+</ul>
 <h1 id="grober-roter-faden-projektbericht">Grober Roter Faden Projektbericht</h1>
 <ol type="1">
 <li>Introduction
@@ -399,6 +407,9 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </ul>
 <h1 class="unnumbered" id="bibliography">Bibliography</h1>
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-bryan:JSONPatch" class="csl-entry" role="doc-biblioentry">
+Bryan, Paul, and Mark Nottingham. 2013. <span>“Javascript Object Notation (Json) Patch.”</span> <em>RFC 6902 (Proposed Standard)</em>.
+</div>
 <div id="ref-burns:DesignPatternsForContainerSystems" class="csl-entry" role="doc-biblioentry">
 Burns, Brendan, and David Oppenheimer. 2016. <span>“Design Patterns for Container-Based Distributed Systems.”</span> In <em>8th <span>USENIX</span> Workshop on Hot Topics in Cloud Computing (HotCloud 16)</em>. Denver, CO: <span>USENIX</span> Association. <a href="https://www.usenix.org/conference/hotcloud16/workshop-program/presentation/burns">https://www.usenix.org/conference/hotcloud16/workshop-program/presentation/burns</a>.
 </div>
@@ -411,11 +422,20 @@ Creative Commons. 2021. <span>“Attribution 4.0 International (CC BY 4.0).”</
 <div id="ref-dobies:KubernetesOperators" class="csl-entry" role="doc-biblioentry">
 Dobies, Jason, and Joshua Wood. 2020. <em>Kubernetes Operators: Automating the Container Orchestration Platform</em>. " O’Reilly Media, Inc.".
 </div>
+<div id="ref-hardt:OAuth2.0Spez" class="csl-entry" role="doc-biblioentry">
+Hardt, Dick, and others. 2012. <span>“The OAuth 2.0 Authorization Framework.”</span> RFC 6749, October.
+</div>
 <div id="ref-li:ServiceMesh" class="csl-entry" role="doc-biblioentry">
 Li, W., Y. Lemieux, J. Gao, Z. Zhao, and Y. Han. 2019. <span>“Service Mesh: Challenges, State of the Art, and Future Research Opportunities.”</span> In <em>2019 IEEE International Conference on Service-Oriented System Engineering (SOSE)</em>, 122–25. <a href="https://doi.org/10.1109/SOSE.2019.00026">https://doi.org/10.1109/SOSE.2019.00026</a>.
 </div>
 <div id="ref-montesi:CircuitBreakers" class="csl-entry" role="doc-biblioentry">
 Montesi, Fabrizio, and Janine Weber. 2016. <span>“Circuit Breakers, Discovery, and <span>API</span> Gateways in Microservices.”</span> <em>CoRR</em> abs/1609.05830. <a href="http://arxiv.org/abs/1609.05830">http://arxiv.org/abs/1609.05830</a>.
+</div>
+<div id="ref-reschke:BasicAuth" class="csl-entry" role="doc-biblioentry">
+Reschke, Julian. 2015. <span>“The’basic’http Authentication Scheme.”</span> <em>Work in Progress, Draft-Ietf-Httpauth-Basicauth-Update-07</em>.
+</div>
+<div id="ref-sakimura:OIDCCore" class="csl-entry" role="doc-biblioentry">
+Sakimura, Natsuhiko, John Bradley, Mike Jones, Breno De Medeiros, and Chuck Mortimore. 2014. <span>“Openid Connect Core 1.0.”</span> <em>The OpenID Foundation</em>, S3.
 </div>
 </div>
 <section class="footnotes" role="doc-endnotes">
@@ -423,10 +443,12 @@ Montesi, Fabrizio, and Janine Weber. 2016. <span>“Circuit Breakers, Discovery,
 <ol>
 <li id="fn1" role="doc-endnote"><p>According to the matrix problem: <span class="math inline"><em>X</em> services * <em>Y</em> authentication methods</span><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2" role="doc-endnote"><p><a href="https://kubernetes.io/" class="uri">https://kubernetes.io/</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3" role="doc-endnote"><p><a href="https://github.com/prometheus-operator/prometheus-operator" class="uri">https://github.com/prometheus-operator/prometheus-operator</a><a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4" role="doc-endnote"><p><a href="https://github.com/zalando/postgres-operator" class="uri">https://github.com/zalando/postgres-operator</a><a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn5" role="doc-endnote"><p><a href="https://github.com/GoogleCloudPlatform/cloudsql-proxy" class="uri">https://github.com/GoogleCloudPlatform/cloudsql-proxy</a><a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn6" role="doc-endnote"><p><a href="https://istio.io/" class="uri">https://istio.io/</a><a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p><a href="https://www.envoyproxy.io/" class="uri">https://www.envoyproxy.io/</a><a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4" role="doc-endnote"><p><a href="https://www.getambassador.io/" class="uri">https://www.getambassador.io/</a><a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5" role="doc-endnote"><p><a href="https://github.com/prometheus-operator/prometheus-operator" class="uri">https://github.com/prometheus-operator/prometheus-operator</a><a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6" role="doc-endnote"><p><a href="https://github.com/zalando/postgres-operator" class="uri">https://github.com/zalando/postgres-operator</a><a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7" role="doc-endnote"><p><a href="https://github.com/GoogleCloudPlatform/cloudsql-proxy" class="uri">https://github.com/GoogleCloudPlatform/cloudsql-proxy</a><a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn8" role="doc-endnote"><p><a href="https://istio.io/" class="uri">https://istio.io/</a><a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 </body>

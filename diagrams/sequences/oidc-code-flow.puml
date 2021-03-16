@@ -1,0 +1,20 @@
+@startuml
+!include https://raw.githubusercontent.com/bschwarz/puml-themes/master/themes/cerulean-outline/puml-theme-cerulean-outline.puml
+
+actor User as c
+participant "Relying Party" as s
+participant "Identity Provider" as i
+
+c -> s : Wants to access
+s --> c : Redirect to login
+
+c -> i : Provide login credentials
+i --> c : Redirect to service with authorization code
+c -> s : Provide code
+s -> i : Exchange code for tokens
+i --> s : Receive access & id token
+s -> i : Fetch userinfo with access token
+i --> s : Retrieve userinfo
+s --> c : Client is able to access
+
+@enduml
