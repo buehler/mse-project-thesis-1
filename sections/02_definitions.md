@@ -15,14 +15,20 @@ orchestration platform that works with containerized applications.
 The solution introduces an operator pattern, as explained in
 {@sec:kubernetes_operator}
 
-The deliverables of this project may aid services to
+The deliverables of this and further projects may aid services to
 communicate with each other despite different authentication
 mechanisms. As an example, this could be used to enable a modern
 web application that uses OpenID Connect (OIDC) as the authentication and authorization
 mechanism to communicate with a legacy application that was deployed
 on the Kubernetes cluster but not yet rewritten. This transformation of credentials
-(from OIDC to Basic Auth) is done by the solution of this project instead
+(from OIDC to Basic Auth) is done by the solution of the projects instead
 of manual work which may introduc code changes to either service.
+
+This specific project provides a proof of concept (PoC) with an
+initial version on a GitHub repository. The PoC demonstrates that
+it is possible to instruct an Envoy^[<https://www.envoyproxy.io/>] proxy
+to communicate with an injected service to modify authentication credentials
+in-flight.
 
 To use the proposed solution of this project, no service mesh or other
 complex layer is needed. The solution runs without those additional
@@ -130,7 +136,7 @@ The sidecar pattern is the most common pattern for multi-container
 deployments. Sidecars are containers that enhance the functionality
 of the main container in a pod. An example for such a sidecar is
 a log collector, that collects log files written to the file system
-and forwards them to some log processing software [@burns:DesignPatternsForContainerSystems, section 4.1].
+and forwards them towards some log processing software [@burns:DesignPatternsForContainerSystems, section 4.1].
 Another example is the Google CloudSQL Proxy^[<https://github.com/GoogleCloudPlatform/cloudsql-proxy>],
 which provides access to a CloudSQL instance from a pod without routing the whole traffic through
 Kubernetes services.
@@ -189,8 +195,38 @@ enables administrators to build more complex scenarios and deployments.
 
 ### Basic
 
-briefly describe basic auth.
+The `Basic` authentication scheme is a trivial authentication that accepts
+a username and a password encoded in Base64. To transmit the credentials,
+a construct with the schematics of `<username>:<password>` is created and
+inserted into the http request as the `Authorization` header with the prefix
+`Basic` [@reschke:BasicAuth, section 2]. An example with the username
+`ChristophBuehler` and password `SuperSecure` would result in the following header:
+`Authorization: Basic Q2hyaXN0b3BoQnVlaGxlcjpTdXBlclNlY3VyZQ==`.
 
 ### OpenID Connect (OIDC)
 
-briefly describe OIDC
+OpenID Connect is an authenticating mechanism, that builds upon
+the `OAuth 2.0` authorization protocol. OAuth 2.0 deals with authorization
+only and grants access to data and features on a specific application.
+OAuth by itself does not define _how_ the credentials are transmitted
+and exchanged [@hardt:OAuth2.0Spez]. OIDC adds a layer on top of
+OAuth 2.0 that defines _how_ these credentials must be exchanged. This
+adds login and profile capabilities to any application that uses OIDC
+[@sakimura:OIDCCore].
+
+![OIDC code authorization flow [@sakimura:OIDCCore].
+](diagrams/sequences/oidc-code-flow.puml){#fig:oidc_code_flow
+short-caption="OIDC code flow"}
+
+When a user wants to authenticate himself with OIDC, one of the possible
+"flows" is the "Authorization Code Flow" [@sakimura:OIDCCore, sec. 3.1]. Other possible flows
+are the "Implicit Flow" [@sakimura:OIDCCore, sec. 3.2] and the "Hybrid Flow"
+[@sakimura:OIDCCore, sec. 3.3]. In {@fig:oidc_code_flow}, the "Authorization Code Flow" is
+depicted. A user that wants to access a certain resource on a relying party (i.e. something
+that relies on the information about the user) and is not authenticated and authorized, the
+relying party forwards the user to the identity provider (IdP). The user provides his
+credentials to the IdP and is returned to the relying party with an authorization code.
+The relying party can then exchange the authorization code to valid tokens on the
+token endpoint of the IdP. Typically, `access_token` and `id_token` are provided. While
+the `id_token` must be a JSON Web Token (JWT) [@sakimura:OIDCCore, sec. 2],
+the `access_token` can be in any format [@sakimura:OIDCCore, sec. 3.3.3.8].
