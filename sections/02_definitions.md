@@ -83,6 +83,10 @@ features according to the documentation [@github:kubernetesWebsite]:
   sensitive data as well as configurational data that may change
   the behaviour of a workload
 
+The list of features is not complete. There are many concepts in Kubernetes
+which help to build complex deployment scenarios and enable teams
+to ship their applications in an agile manner.
+
 ### Terminology
 
 Find the common Kubernetes terminology attached in {@tbl:kubernetes_terminology}.
@@ -203,13 +207,13 @@ inserted into the http request as the `Authorization` header with the prefix
 `ChristophBuehler` and password `SuperSecure` would result in the following header:
 `Authorization: Basic Q2hyaXN0b3BoQnVlaGxlcjpTdXBlclNlY3VyZQ==`.
 
-### OpenID Connect (OIDC)
+### OpenID Connect (OIDC) {#sec:auth_oidc}
 
 OpenID Connect is an authenticating mechanism, that builds upon
 the `OAuth 2.0` authorization protocol. OAuth 2.0 deals with authorization
 only and grants access to data and features on a specific application.
 OAuth by itself does not define _how_ the credentials are transmitted
-and exchanged [@hardt:OAuth2.0Spez]. OIDC adds a layer on top of
+and exchanged [@hardt:OAuth2.0Spec]. OIDC adds a layer on top of
 OAuth 2.0 that defines _how_ these credentials must be exchanged. This
 adds login and profile capabilities to any application that uses OIDC
 [@sakimura:OIDCCore].

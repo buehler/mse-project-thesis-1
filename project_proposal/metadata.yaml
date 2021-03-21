@@ -1,12 +1,22 @@
+# Metadata
 title: Project Thesis Proposal
 subtitle: Distributed Authentication Mesh
-author:
-  - Christoph Bühler:
-      institute: [ost]
-institute:
-  - ost: University of Applied Science of Eastern Switzerland (OST)
-date: Spring Semester 2021
+author: Christoph Bühler
+date: |
+  Spring Semester 2021\
+  University of Applied Science of Eastern Switzerland (OST)
 lang: en-US
+# Latex config
+papersize: a4
+documentclass: scrreprt
+
+# Tool configuration
 fignos-cleveref: true
-fignos-plus-name: figure
-fignos-star-name: Figure
+fignos-plus-name: Figure
+fignos-star-name: figure
+secnos-cleveref: true
+secnos-plus-name: Section
+secnos-star-name: section
+tablenos-cleveref: true
+tablenos-plus-name: Table
+tablenos-star-name: table
