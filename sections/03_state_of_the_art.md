@@ -1,7 +1,7 @@
 # State of the Art, the Practice and Deficiencies
 
 This section gives an overview over the current state of the
-art, the practice, as well as the deficiencies according to the author.
+art, the practice, as well as the deficiencies to an optimal situation.
 Furthermore this section states an assessment of the current
 practice and the solutions found.
 
@@ -51,20 +51,55 @@ We consider the components in {@fig:is_solution_components}:
 - **Service B**: Legacy service that is called by service a to fetch some additional data
 
 The stated scenario is quite common. Legacy services may not be the primary use-case,
-but there exist other reasons to have the need of using TODO
+but there exist other reasons to have the need of using a translation of credentials.
+Another case is the usage of third party applications which only support
+certain authentication mechanisms.
 
 ![Current state of the art of accessing legacy systems from
 modern services with differing authentication schemes.
 ](diagrams/sequences/is-solution-process.puml){#fig:is_solution_process
 short-caption="Current process of legacy communication"}
 
-The process in {@fig:is_solution_process} shows such a describe scenario. In
-{@fig:is_solution_process}, the "client" is a single page application (SPA),
+The process in {@fig:is_solution_process} shows the process of communication
+in such a described scenario. In
+{@fig:is_solution_process}, the "Client" is the single page application (SPA),
 that authenticates against an arbitrary Identity and Access Management System (IAM).
-"Service A"
+"Service A" is the modern backend that supports the client as backend API.
+Therefore, "Service A" provides functionality for the client. "Service B" is
+a legacy application, for example an old ERP with order information, that
+was moved into the cloud, but is not refactored nor rewritten to communicate
+with modern authentication technologies.
 
-TODO: describe the process better
+In this scenario, the client calls some API on "Service A" that then
+will call "Service B" to get additional information to present to the
+user. Since the client and "Service A" communicate with the same authentication
+technology, the call is straight forward. The client authenticates himself
+and obtains an access token. When calling the service ("Service A"),
+the token is transmitted and the service can check with the IAM if the user
+is authorized to access the system. When "Service A" then calls "Service B"
+for additional information, it needs to translate the user provided credentials
+to a format that "Service B" understands. In the provided example, "Service B"
+is only able to handle Basic Authentication, as explained in {@sec:basic_auth}.
+This means, if "Service A" wants to communicate with "Service B", it must implement
+some translation logic to change the credentials to a format that B understands.
+This introduces code changes to "Service A", since "Service B" is a legacy
+application that is not maintainable.
 
 ## Deficiencies
 
-asdf
+The situation described in the previous section introduces several problems.
+It does not matter if "Service B" is a third party application to which
+no code changes can be applied to, or if it is a legacy application that
+cannot be updated for the time being. Most likely, the code change to provide
+the ability to communicate will be introduced into the "Service A". This
+adds the risk of errors since new code must be produced, which would
+not be necessary if the legacy service would be refactored.
+Also, changing "Service A" to communicate wih B may be a feasable solution
+in a small setup. But as the landscape of the microservice architecture
+grows, this solution does not scale well. The matrix problem
+$X \text{ services} * Y \text{ authentication methods}$ describes this
+problematic. As the landscape and the different methods of authentication
+grows, it is not a feasable solution to implement each and every authentication
+scheme in all the services.
+
+TODO: describe SHOULD solution

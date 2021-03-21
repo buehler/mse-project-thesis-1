@@ -197,7 +197,7 @@ enables administrators to build more complex scenarios and deployments.
 
 ## Authentication and Authorization
 
-### Basic
+### Basic {#sec:basic_auth}
 
 The `Basic` authentication scheme is a trivial authentication that accepts
 a username and a password encoded in Base64. To transmit the credentials,
