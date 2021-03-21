@@ -1,0 +1,20 @@
+@startuml
+!include https://raw.githubusercontent.com/bschwarz/puml-themes/master/themes/cerulean-outline/puml-theme-cerulean-outline.puml
+
+actor User as u
+component [IAM] as i
+
+node "Cloud Environment" {
+    component [Client (SPA)] as c
+    component [Service A] as sa
+    component [Service B] as sb
+
+    c -> sa : OIDC
+    sa -> sb : Basic
+}
+
+u --> c
+c <--> i
+i <--> sa
+
+@enduml

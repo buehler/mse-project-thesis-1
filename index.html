@@ -194,10 +194,14 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <li><a href="#authentication-and-authorization">Authentication and Authorization</a>
 <ul>
 <li><a href="#basic">Basic</a></li>
-<li><a href="#openid-connect-oidc">OpenID Connect (OIDC)</a></li>
+<li><a href="#sec:auth_oidc">OpenID Connect (OIDC)</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#state-of-the-art-the-practice-and-deficiencies">State of the Art, the Practice and Deficiencies</a></li>
+<li><a href="#state-of-the-art-the-practice-and-deficiencies">State of the Art, the Practice and Deficiencies</a>
+<ul>
+<li><a href="#state-of-the-art">State of the Art</a></li>
+<li><a href="#deficiencies">Deficiencies</a></li>
+</ul></li>
 <li><a href="#further-work">Further work</a></li>
 <li><a href="#grober-roter-faden-projektbericht">Grober Roter Faden Projektbericht</a></li>
 <li><a href="#todos">Todos</a></li>
@@ -236,6 +240,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <li><strong>Self-healing</strong>: If workloads are failing, Kubernetes tries to restart the applications and even kills services that do not respond to the configured health checks</li>
 <li><strong>Secret and configuration management</strong>: Kubernetes has a store for sensitive data as well as configurational data that may change the behaviour of a workload</li>
 </ul>
+<p>The list of features is not complete. There are many concepts in Kubernetes which help to build complex deployment scenarios and enable teams to ship their applications in an agile manner.</p>
 <h3 id="terminology">Terminology</h3>
 <p>Find the common Kubernetes terminology attached in Table <a href="#tbl:kubernetes_terminology">1</a>. The table provides a list of terms that will be used to explain concepts like the operator pattern in Section <a href="#sec:kubernetes_operator">2.2.3</a>.</p>
 <div id="tbl:kubernetes_terminology" class="tablenos">
@@ -333,8 +338,8 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <h2 id="authentication-and-authorization">Authentication and Authorization</h2>
 <h3 id="basic">Basic</h3>
 <p>The <code>Basic</code> authentication scheme is a trivial authentication that accepts a username and a password encoded in Base64. To transmit the credentials, a construct with the schematics of <code>&lt;username&gt;:&lt;password&gt;</code> is created and inserted into the http request as the <code>Authorization</code> header with the prefix <code>Basic</code> <span class="citation" data-cites="reschke:BasicAuth">(Reschke 2015, sec. 2)</span>. An example with the username <code>ChristophBuehler</code> and password <code>SuperSecure</code> would result in the following header: <code>Authorization: Basic Q2hyaXN0b3BoQnVlaGxlcjpTdXBlclNlY3VyZQ==</code>.</p>
-<h3 id="openid-connect-oidc">OpenID Connect (OIDC)</h3>
-<p>OpenID Connect is an authenticating mechanism, that builds upon the <code>OAuth 2.0</code> authorization protocol. OAuth 2.0 deals with authorization only and grants access to data and features on a specific application. OAuth by itself does not define <em>how</em> the credentials are transmitted and exchanged <span class="citation" data-cites="hardt:OAuth2.0Spez">(Hardt and others 2012)</span>. OIDC adds a layer on top of OAuth 2.0 that defines <em>how</em> these credentials must be exchanged. This adds login and profile capabilities to any application that uses OIDC <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014)</span>.</p>
+<h3 id="sec:auth_oidc">OpenID Connect (OIDC)</h3>
+<p>OpenID Connect is an authenticating mechanism, that builds upon the <code>OAuth 2.0</code> authorization protocol. OAuth 2.0 deals with authorization only and grants access to data and features on a specific application. OAuth by itself does not define <em>how</em> the credentials are transmitted and exchanged <span class="citation" data-cites="hardt:OAuth2.0Spec">(Hardt and others 2012)</span>. OIDC adds a layer on top of OAuth 2.0 that defines <em>how</em> these credentials must be exchanged. This adds login and profile capabilities to any application that uses OIDC <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014)</span>.</p>
 <div id="fig:oidc_code_flow" class="fignos">
 <figure>
 <img src="diagrams/sequences/b45156f65349258d13a013f27e003332.png" data-short-caption="OIDC code flow" alt="Figure 4: OIDC code authorization flow (Sakimura et al. 2014)." /><figcaption aria-hidden="true"><span>Figure 4:</span> OIDC code authorization flow <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014)</span>.</figcaption>
@@ -342,19 +347,37 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </div>
 <p>When a user wants to authenticate himself with OIDC, one of the possible “flows” is the “Authorization Code Flow” <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 3.1)</span>. Other possible flows are the “Implicit Flow” <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 3.2)</span> and the “Hybrid Flow” <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 3.3)</span>. In Figure <a href="#fig:oidc_code_flow">4</a>, the “Authorization Code Flow” is depicted. A user that wants to access a certain resource on a relying party (i.e. something that relies on the information about the user) and is not authenticated and authorized, the relying party forwards the user to the identity provider (IdP). The user provides his credentials to the IdP and is returned to the relying party with an authorization code. The relying party can then exchange the authorization code to valid tokens on the token endpoint of the IdP. Typically, <code>access_token</code> and <code>id_token</code> are provided. While the <code>id_token</code> must be a JSON Web Token (JWT) <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 2)</span>, the <code>access_token</code> can be in any format <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 3.3.3.8)</span>.</p>
 <h1 id="state-of-the-art-the-practice-and-deficiencies">State of the Art, the Practice and Deficiencies</h1>
-<p>This section gives an overview over the current state of the art as well as the deficiencies according to the author. Following the description of the current situation, a definition of the should situation gives an overview of the purposed solution.</p>
-<ul>
-<li>Describe the IS situation.</li>
-<li>Describe the SHOULD situation.</li>
-<li>describe service mesh (image from referecne could be used)</li>
-</ul>
-<p>Test:</p>
-<div id="fig:diagram_test" class="fignos">
+<p>This section gives an overview over the current state of the art, the practice, as well as the deficiencies according to the author. Furthermore this section states an assessment of the current practice and the solutions found.</p>
+<h2 id="state-of-the-art">State of the Art</h2>
+<p>In cloud environments, a problem that is well solved is the transmission of data from one point to another. Kubernetes, for example, uses “Services” that provide a DNS name for a specified workload. In terms of authentication and authorization, there exist a variety of schemes that enable an application to authenticate and authorize their users. OpenID Connect (OIDC) (see Section <a href="#sec:auth_oidc">2.3.2</a>) is a modern authentication scheme, that builds upon OAuth 2.0, that in turn handles authorization <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014)</span>.</p>
+<p>Modern software architectures that are specifically designed for the cloud are called “Cloud Native Applications” (CNA). <span class="citation" data-cites="kratzke:CloudNativeApplications">Kratzke and Peinl (2016)</span> define a CNA as:</p>
+<blockquote>
+<p>“A cloud-native application is a distributed, elastic and horizontal scalable system composed of (micro)services which isolates state in a minimum of stateful components. The application and each self-contained deployment unit of that application is designed according to cloud-focused design patterns and operated on a self-service elastic platform.” <span class="citation" data-cites="kratzke:CloudNativeApplications">(Kratzke and Peinl 2016, sec. 3)</span>.</p>
+</blockquote>
+<p>However, with CNAs and the general movement to cloud environments, not all applications get that chance to adjust. For various reasons like budget, time or complexity, legacy applications and monoliths are not refactored or re-written before they are deployed into a cloud environment. If the legacy applications are mixed with modern systems, then the need of “translation” arises. Assuming, that the modern part is a secure application, that uses OIDC to authorize its users and the application needs to fetch data from the legacy system that does not understand OIDC, code changes must be made. Following the previous assumption, the code changes will likely be introduced into the modern application, since it is better maintainable and deployable than the legacy monolith. Hence, the modern application receives changes that may introduce new bugs or security vulnerabilities.</p>
+<div id="fig:is_solution_components" class="fignos">
 <figure>
-<img src="diagrams/sequences/abf568f8e377caa7c2c463d28331ee60.png" alt="Figure 5: Diagram Test" /><figcaption aria-hidden="true"><span>Figure 5:</span> Diagram Test</figcaption>
+<img src="diagrams/component/227922acac1ebbd8575475cb4e34cc24.png" data-short-caption="Microservice Architecture with legacy components" alt="Figure 5: Microservice Architecture that contains modern applications as well as legacy services." /><figcaption aria-hidden="true"><span>Figure 5:</span> Microservice Architecture that contains modern applications as well as legacy services.</figcaption>
 </figure>
 </div>
-<p>This Figure <a href="#fig:diagram_test">5</a> shows a test.</p>
+<p>We consider the components in Figure <a href="#fig:is_solution_components">5</a>:</p>
+<ul>
+<li><strong>User</strong>: A person with access to the application</li>
+<li><strong>Client</strong>: A modern single page application (SPA)</li>
+<li><strong>IAM</strong>: Identity Provider for the solution (does not necessarily reside in the same cloud)</li>
+<li><strong>Service A</strong>: A modern API application and primary access point for the client</li>
+<li><strong>Service B</strong>: Legacy service that is called by service a to fetch some additional data</li>
+</ul>
+<p>The stated scenario is quite common. Legacy services may not be the primary use-case, but there exist other reasons to have the need of using TODO</p>
+<div id="fig:is_solution_process" class="fignos">
+<figure>
+<img src="diagrams/sequences/abf568f8e377caa7c2c463d28331ee60.png" data-short-caption="Current process of legacy communication" alt="Figure 6: Current state of the art of accessing legacy systems from modern services with differing authentication schemes." /><figcaption aria-hidden="true"><span>Figure 6:</span> Current state of the art of accessing legacy systems from modern services with differing authentication schemes.</figcaption>
+</figure>
+</div>
+<p>The process in Figure <a href="#fig:is_solution_process">6</a> shows such a describe scenario. In Figure <a href="#fig:is_solution_process">6</a>, the “client” is a single page application (SPA), that authenticates against an arbitrary Identity and Access Management System (IAM). “Service A”</p>
+<p>TODO: describe the process better</p>
+<h2 id="deficiencies">Deficiencies</h2>
+<p>asdf</p>
 <h1 id="further-work">Further work</h1>
 <ul>
 <li>create common domain model for user</li>
@@ -401,9 +424,11 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </ul></li>
 </ol>
 <h1 id="todos">Todos</h1>
-<p>Todos:</p>
+<p>Following the description of the current situation, a definition of the should situation gives an overview of the purposed solution.</p>
 <ul>
-<li>nope.</li>
+<li>Describe the IS situation.</li>
+<li>Describe the SHOULD situation.</li>
+<li>describe service mesh (image from referecne could be used)</li>
 </ul>
 <h1 class="unnumbered" id="bibliography">Bibliography</h1>
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
@@ -422,8 +447,11 @@ Creative Commons. 2021. <span>“Attribution 4.0 International (CC BY 4.0).”</
 <div id="ref-dobies:KubernetesOperators" class="csl-entry" role="doc-biblioentry">
 Dobies, Jason, and Joshua Wood. 2020. <em>Kubernetes Operators: Automating the Container Orchestration Platform</em>. " O’Reilly Media, Inc.".
 </div>
-<div id="ref-hardt:OAuth2.0Spez" class="csl-entry" role="doc-biblioentry">
+<div id="ref-hardt:OAuth2.0Spec" class="csl-entry" role="doc-biblioentry">
 Hardt, Dick, and others. 2012. <span>“The OAuth 2.0 Authorization Framework.”</span> RFC 6749, October.
+</div>
+<div id="ref-kratzke:CloudNativeApplications" class="csl-entry" role="doc-biblioentry">
+Kratzke, N., and R. Peinl. 2016. <span>“ClouNS - a Cloud-Native Application Reference Model for Enterprise Architects.”</span> In <em>2016 IEEE 20th International Enterprise Distributed Object Computing Workshop (EDOCW)</em>, 1–10. <a href="https://doi.org/10.1109/EDOCW.2016.7584353">https://doi.org/10.1109/EDOCW.2016.7584353</a>.
 </div>
 <div id="ref-li:ServiceMesh" class="csl-entry" role="doc-biblioentry">
 Li, W., Y. Lemieux, J. Gao, Z. Zhao, and Y. Han. 2019. <span>“Service Mesh: Challenges, State of the Art, and Future Research Opportunities.”</span> In <em>2019 IEEE International Conference on Service-Oriented System Engineering (SOSE)</em>, 122–25. <a href="https://doi.org/10.1109/SOSE.2019.00026">https://doi.org/10.1109/SOSE.2019.00026</a>.
