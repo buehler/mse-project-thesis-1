@@ -85,21 +85,37 @@ some translation logic to change the credentials to a format that B understands.
 This introduces code changes to "Service A", since "Service B" is a legacy
 application that is not maintainable.
 
+## The Practice
+
+In practice, a Service Mesh (see {@sec:service_mesh}) may be able to perform
+such credential transformation.
+
+TODO: describe isio approach to shared auth.
+TODO: describe in deficiencies that service mesh are complicated and therefore not a solution
+
 ## Deficiencies
 
-The situation described in the previous section introduces several problems.
+The situation described in the previous sections introduces several problems.
 It does not matter if "Service B" is a third party application to which
 no code changes can be applied to, or if it is a legacy application that
 cannot be updated for the time being. Most likely, the code change to provide
-the ability to communicate will be introduced into the "Service A". This
+the ability to communicate will be introduced into "Service A". This
 adds the risk of errors since new code must be produced, which would
 not be necessary if the legacy service would be refactored.
-Also, changing "Service A" to communicate wih B may be a feasable solution
+Also, changing "Service A" to communicate with B may be a feasible solution
 in a small setup. But as the landscape of the microservice architecture
 grows, this solution does not scale well. The matrix problem
 $X \text{ services} * Y \text{ authentication methods}$ describes this
 problematic. As the landscape and the different methods of authentication
-grows, it is not a feasable solution to implement each and every authentication
+grows, it is not a feasible solution to implement each and every authentication
 scheme in all the services.
 
-TODO: describe SHOULD solution
+Another issue that emerges with this transformation of credentials:
+The credentials leak into the trust zone. As long as each service
+is in the same trust zone (for example in the same data-center in the same
+cluster behind the same API gateway), this may not be problematic. As soon
+as communication is between data centers, the communication and the credentials
+must be protected. It is not possible to create a zero trust environment with
+the need of knowledge about the targets authentication schemes.
+
+TODO: conditional access?

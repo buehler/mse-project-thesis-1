@@ -154,7 +154,7 @@ The example shown in {@fig:kubernetes_sidecar} is extensible.
 Such sidecars may be injected by a mutator or an operator to extend
 functionality.
 
-### Service Mesh
+### Service Mesh {#sec:service_mesh}
 
 A "Service Mesh" is a dedicated infrastructure layer that handles
 intercommunication between services. It is responsible for the

@@ -1,0 +1,21 @@
+reference-section-title: Bibliography
+
+# Latex config
+papersize: a4
+documentclass: scrreprt
+toc: false
+numbersections: false
+lof: false
+lot: false
+bibliography: bibliography.bib
+
+# Tool configuration
+fignos-cleveref: true
+fignos-plus-name: Figure
+fignos-star-name: figure
+secnos-cleveref: true
+secnos-plus-name: Section
+secnos-star-name: section
+tablenos-cleveref: true
+tablenos-plus-name: Table
+tablenos-star-name: table
