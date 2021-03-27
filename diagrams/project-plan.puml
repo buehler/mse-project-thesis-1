@@ -1,0 +1,16 @@
+@startgantt
+!include https://raw.githubusercontent.com/bschwarz/puml-themes/master/themes/cerulean-outline/puml-theme-cerulean-outline.puml
+printscale weekly
+project starts on 2021-03-01
+
+[Setup] happens 2021-03-14
+[Section 2] happens 2021-03-31
+[Is / Should description] happens 2021-04-18
+[Solution Description] happens 2021-05-16
+[PoC First Steps] happens 2021-05-30
+[PoC finished] happens 2021-06-13
+[Documented Solution] happens 2021-06-27
+[Learn Material] happens 2021-07-11
+[Review 1] happens 2021-07-18
+
+@endgantt

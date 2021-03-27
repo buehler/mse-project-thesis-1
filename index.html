@@ -189,7 +189,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <li><a href="#terminology">Terminology</a></li>
 <li><a href="#sec:kubernetes_operator">Operator</a></li>
 <li><a href="#sec:kubernetes_sidecar">Sidecar</a></li>
-<li><a href="#service-mesh">Service Mesh</a></li>
+<li><a href="#sec:service_mesh">Service Mesh</a></li>
 </ul></li>
 <li><a href="#authentication-and-authorization">Authentication and Authorization</a>
 <ul>
@@ -200,6 +200,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <li><a href="#state-of-the-art-the-practice-and-deficiencies">State of the Art, the Practice and Deficiencies</a>
 <ul>
 <li><a href="#state-of-the-art">State of the Art</a></li>
+<li><a href="#the-practice">The Practice</a></li>
 <li><a href="#deficiencies">Deficiencies</a></li>
 </ul></li>
 <li><a href="#further-work">Further work</a></li>
@@ -323,7 +324,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </figure>
 </div>
 <p>The example shown in Figure <a href="#fig:kubernetes_sidecar">3</a> is extensible. Such sidecars may be injected by a mutator or an operator to extend functionality.</p>
-<h3 id="service-mesh">Service Mesh</h3>
+<h3 id="sec:service_mesh">Service Mesh</h3>
 <p>A “Service Mesh” is a dedicated infrastructure layer that handles intercommunication between services. It is responsible for the delivery of requests in a modern cloud application <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>. An example from the practice is “Istio”<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a>. When using Istio, the applications do not need to know if there is a service mesh installed or not. Istio will inject a sidecar (see Section <a href="#sec:kubernetes_sidecar">2.2.4</a>) into pods and handle the communication with the injected services.</p>
 <p>The service mesh provides a set of features <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>:</p>
 <ul>
@@ -376,9 +377,13 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </div>
 <p>The process in Figure <a href="#fig:is_solution_process">6</a> shows the process of communication in such a described scenario. In Figure <a href="#fig:is_solution_process">6</a>, the “Client” is the single page application (SPA), that authenticates against an arbitrary Identity and Access Management System (IAM). “Service A” is the modern backend that supports the client as backend API. Therefore, “Service A” provides functionality for the client. “Service B” is a legacy application, for example an old ERP with order information, that was moved into the cloud, but is not refactored nor rewritten to communicate with modern authentication technologies.</p>
 <p>In this scenario, the client calls some API on “Service A” that then will call “Service B” to get additional information to present to the user. Since the client and “Service A” communicate with the same authentication technology, the call is straight forward. The client authenticates himself and obtains an access token. When calling the service (“Service A”), the token is transmitted and the service can check with the IAM if the user is authorized to access the system. When “Service A” then calls “Service B” for additional information, it needs to translate the user provided credentials to a format that “Service B” understands. In the provided example, “Service B” is only able to handle Basic Authentication, as explained in Section <a href="#sec:basic_auth">2.3.1</a>. This means, if “Service A” wants to communicate with “Service B,” it must implement some translation logic to change the credentials to a format that B understands. This introduces code changes to “Service A,” since “Service B” is a legacy application that is not maintainable.</p>
+<h2 id="the-practice">The Practice</h2>
+<p>In practice, a Service Mesh (see Section <a href="#sec:service_mesh">2.2.5</a>) may be able to perform such credential transformation.</p>
+<p>TODO: describe isio approach to shared auth. TODO: describe in deficiencies that service mesh are complicated and therefore not a solution</p>
 <h2 id="deficiencies">Deficiencies</h2>
-<p>The situation described in the previous section introduces several problems. It does not matter if “Service B” is a third party application to which no code changes can be applied to, or if it is a legacy application that cannot be updated for the time being. Most likely, the code change to provide the ability to communicate will be introduced into the “Service A.” This adds the risk of errors since new code must be produced, which would not be necessary if the legacy service would be refactored. Also, changing “Service A” to communicate wih B may be a feasable solution in a small setup. But as the landscape of the microservice architecture grows, this solution does not scale well. The matrix problem <span class="math inline"><em>X</em> services * <em>Y</em> authentication methods</span> describes this problematic. As the landscape and the different methods of authentication grows, it is not a feasable solution to implement each and every authentication scheme in all the services.</p>
-<p>TODO: describe SHOULD solution</p>
+<p>The situation described in the previous sections introduces several problems. It does not matter if “Service B” is a third party application to which no code changes can be applied to, or if it is a legacy application that cannot be updated for the time being. Most likely, the code change to provide the ability to communicate will be introduced into “Service A.” This adds the risk of errors since new code must be produced, which would not be necessary if the legacy service would be refactored. Also, changing “Service A” to communicate with B may be a feasible solution in a small setup. But as the landscape of the microservice architecture grows, this solution does not scale well. The matrix problem <span class="math inline"><em>X</em> services * <em>Y</em> authentication methods</span> describes this problematic. As the landscape and the different methods of authentication grows, it is not a feasible solution to implement each and every authentication scheme in all the services.</p>
+<p>Another issue that emerges with this transformation of credentials: The credentials leak into the trust zone. As long as each service is in the same trust zone (for example in the same data-center in the same cluster behind the same API gateway), this may not be problematic. As soon as communication is between data centers, the communication and the credentials must be protected. It is not possible to create a zero trust environment with the need of knowledge about the targets authentication schemes.</p>
+<p>TODO: conditional access?</p>
 <h1 id="further-work">Further work</h1>
 <ul>
 <li>create common domain model for user</li>
