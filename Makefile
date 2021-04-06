@@ -11,10 +11,12 @@ common_build_args = \
 	--standalone
 
 
-.PHONY: default clean clean_diagrams clean_build build build_html build_pdf
-
+.PHONY: default clean clean_diagrams clean_build build build_html build_pdf force
 
 default: clean_build build
+
+
+force:
 
 
 clean: clean_diagrams
@@ -43,3 +45,11 @@ build_html:
 build_pdf:
 	@echo "Build PDF version"
 	@pandoc ${common_build_args} --output=public/report.pdf ${sections}
+
+
+sections/%.md: force
+	@echo "Build section $@ to pdf"
+	@pandoc $(filter-out --metadata-file=./metadata.yaml,$(common_build_args)) \
+		--metadata-file=./section-metadata.yaml \
+		--output=public/$(patsubst sections/%,%,$(patsubst %.md,%.pdf,$(@))) \
+		$@

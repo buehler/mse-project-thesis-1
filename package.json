@@ -2,9 +2,9 @@
   "name": "mse-project-thesis-1",
   "private": true,
   "scripts": {
-    "prestart": "rm -rf public && mkdir public",
+    "prestart": "make clean_build",
     "start": "concurrently -k npm:nodemon npm:server",
-    "nodemon": "nodemon -e md,bib,yaml,png -w sections -w images --exec \"bash ./build.sh\"",
+    "nodemon": "nodemon -e md,bib,yaml,png -w sections -w images --exec \"make build_html\"",
     "server": "http-server public -o"
   },
   "dependencies": {
