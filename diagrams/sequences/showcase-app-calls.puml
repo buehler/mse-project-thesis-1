@@ -1,0 +1,27 @@
+@startuml
+!include https://raw.githubusercontent.com/bschwarz/puml-themes/master/themes/materia-outline/puml-theme-materia-outline.puml
+
+actor User as u
+participant Frontend as fe
+participant "Modern API" as m
+participant "Legacy API" as l
+
+u -> fe : Open web application
+u <-> fe : Authorize via Zitadel
+u -> fe : Click "Call API" button
+fe -> m : Call "/customers"
+m --> fe : Returns customer data
+fe -> m : Call "/orders"
+
+alt USE_WIREPACT = true
+    m -> l : Call "/orders"\nwith OIDC token
+else USE_WIREPACT = false
+    m -> m : Transform credentials
+    m -> l : Call "/orders"\nwith basic auth
+end
+
+l --> m : Return order data
+m --> fe : Return order data
+fe --> u : Present customer\nand order data
+
+@enduml

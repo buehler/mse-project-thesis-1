@@ -144,6 +144,69 @@
     div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
     div.csl-bib-body { }
     div.csl-entry {
@@ -185,7 +248,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <li><a href="#context">Context</a></li>
 <li><a href="#kubernetes">Kubernetes</a>
 <ul>
-<li><a href="#what-is-kubernetes">What is Kubernetes</a></li>
+<li><a href="#introduction-1">Introduction</a></li>
 <li><a href="#terminology">Terminology</a></li>
 <li><a href="#sec:kubernetes_operator">Operator</a></li>
 <li><a href="#sec:kubernetes_sidecar">Sidecar</a></li>
@@ -193,7 +256,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </ul></li>
 <li><a href="#authentication-and-authorization">Authentication and Authorization</a>
 <ul>
-<li><a href="#sec:basic_auth">Basic</a></li>
+<li><a href="#sec:basic_auth">Basic (RFC7617)</a></li>
 <li><a href="#sec:auth_oidc">OpenID Connect (OIDC)</a></li>
 </ul></li>
 </ul></li>
@@ -201,8 +264,37 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <ul>
 <li><a href="#state-of-the-art">State of the Art</a></li>
 <li><a href="#the-practice">The Practice</a></li>
-<li><a href="#deficiencies">Deficiencies</a></li>
+<li><a href="#sec:deficiencies">Deficiencies</a></li>
 </ul></li>
+<li><a href="#distributed-authentication-mesh">Distributed Authentication Mesh</a>
+<ul>
+<li><a href="#definition">Definition</a></li>
+<li><a href="#requirements">Requirements</a></li>
+<li><a href="#non-functional-requirements">Non-Functional Requirements</a></li>
+<li><a href="#standards-and-best-practices">Standards and Best Practices</a></li>
+<li><a href="#contrast">Contrast</a>
+<ul>
+<li><a href="#saml">SAML</a></li>
+<li><a href="#ws-">WS-*</a></li>
+</ul></li>
+<li><a href="#architecture">Architecture</a>
+<ul>
+<li><a href="#brief-description">Brief Description</a></li>
+<li><a href="#usecases">UseCases</a></li>
+<li><a href="#application-domain">Application Domain</a></li>
+<li><a href="#sequences">Sequences</a></li>
+<li><a href="#communication">Communication</a></li>
+</ul></li>
+<li><a href="#implementation-proof-of-concept-poc">Implementation Proof of Concept (PoC)</a>
+<ul>
+<li><a href="#showcase-application">Showcase Application</a></li>
+<li><a href="#envoy-sidecar">Envoy Sidecar</a></li>
+<li><a href="#translator">Translator</a></li>
+<li><a href="#operator">Operator</a></li>
+<li><a href="#poc-composition">PoC Composition</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#evaluation">Evaluation</a></li>
 <li><a href="#further-work">Further work</a></li>
 <li><a href="#grober-roter-faden-projektbericht">Grober Roter Faden Projektbericht</a></li>
 <li><a href="#todos">Todos</a></li>
@@ -213,26 +305,34 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <p>Modern cloud environments solve many problems like the discovery of services and data transfer or communiation between services in general. One modern way of solving service discovery and communication is a Service Mesh, which introduces an additional infrastructure layer that manages the communication between services <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>.</p>
 <p>However, a specific problem is not solved yet: “dynamic” trusted communication between services. When a service, that is capable of handling OpenID Connect (OIDC) credentials, wants to communicate with a service that only knows Basic Authentication that originating service must implement some sort of conversion or know static credentials to communicate with the basic auth service. Generally, this introduces changes to the software of services. In small applications which consist of one or two services, implementing this conversion may be a feasable option. If we look at an application which spans over a big landscape and a multitude of services, implementing each and every possible authentication mechanism and the according conversions will be error prone work and does not scale well<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
 <p>The goal of the project “Distributed Authentication Mesh” is to provide a solution for this problem.</p>
+<p>Prerequisits:</p>
+<ul>
+<li>Docker knowledge</li>
+<li>Microservice knowledge</li>
+</ul>
 <blockquote>
 <p>TODO.</p>
 </blockquote>
 <h1 id="definitions-and-boundaries">Definitions and Boundaries</h1>
 <p>This section provides general information about the project, the context and prerequisite knowledge. It gives an overview of the context as well as terminology and general definitions.</p>
 <h2 id="context">Context</h2>
-<p>This project aims at the specific problem of declarative conversion of credentials to ensure authorized communication between services. The solution may be runnable on various platforms but will be implemented according to Kubernetes standards. Kubernetes<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> is an orchestration platform that works with containerized applications. The solution introduces an operator pattern, as explained in Section <a href="#sec:kubernetes_operator">2.2.3</a></p>
-<p>The deliverables of this and further projects may aid services to communicate with each other despite different authentication mechanisms. As an example, this could be used to enable a modern web application that uses OpenID Connect (OIDC) as the authentication and authorization mechanism to communicate with a legacy application that was deployed on the Kubernetes cluster but not yet rewritten. This transformation of credentials (from OIDC to Basic Auth) is done by the solution of the projects instead of manual work which may introduc code changes to either service.</p>
+<blockquote>
+<p>TODO: restructure to have better reading flow</p>
+</blockquote>
+<p>This project addresses the specific problem of declarative conversion of credentials to ensure authorized communication between services. The solution may be runnable on various platforms but will be implemented according to Kubernetes standards. Kubernetes<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> is an orchestration platform that works with containerized applications. The solution introduces an operator pattern, as explained in Section <a href="#sec:kubernetes_operator">2.2.3</a></p>
+<p>The deliverables of this and further projects may aid applications or APIs to communicate with each other despite different authentication mechanisms. As an example, this could be used to enable a modern web application that uses OpenID Connect (OIDC) as the authentication and authorization mechanism to communicate with a legacy application that was deployed on the Kubernetes cluster but not yet rewritten. This transformation of credentials (from OIDC to Basic Auth) is done by the solution of the projects instead of manual work which may introduc code changes to either service.</p>
 <p>This specific project provides a proof of concept (PoC) with an initial version on a GitHub repository. The PoC demonstrates that it is possible to instruct an Envoy<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> proxy to communicate with an injected service to modify authentication credentials in-flight.</p>
 <p>To use the proposed solution of this project, no service mesh or other complex layer is needed. The solution runs without those additional parts on a Kubernetes cluster. To provide service discovery, the default internal DNS capabilities of Kubernetes are sufficient.</p>
 <h2 id="kubernetes">Kubernetes</h2>
-<h3 id="what-is-kubernetes">What is Kubernetes</h3>
+<h3 id="introduction-1">Introduction</h3>
 <p>Kubernetes is an open source platform that manages containerized workloads and applications. Workloads may be accessed via “Services” that use a DNS naming system. Kubernetes uses declarative definitions to compare the actual state of the system with the expected state <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span>.</p>
 <div id="fig:kubernetes_container_evolution" class="fignos">
 <figure>
 <img src="images/Kubernetes/Container_Evolution.png" data-short-caption="Kubernetes Container Evolution" alt="Figure 1: Container and Deployment Evolution. Description of the evolution of deployments as found on the documentation website of Kubernetes (CNCF 2021). This image is licensed under the CC BY 4.0 license (Creative Commons 2021)." /><figcaption aria-hidden="true"><span>Figure 1:</span> Container and Deployment Evolution. Description of the evolution of deployments as found on the documentation website of Kubernetes <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span>. This image is licensed under the CC BY 4.0 license <span class="citation" data-cites="cc:CCBY4.0">(Creative Commons 2021)</span>.</figcaption>
 </figure>
 </div>
-<p>According to the Kubernetes team, the way of deploying applications has evolved. As shown in Figure <a href="#fig:kubernetes_container_evolution">1</a>, the “Traditional Era” was the time, when applications were deployed via FTP access and started manually (e.g. on an Apache webserver). Then the revolution to virtual machines came and technologies that could virtualize a whole operating system, such as VMWare, were born. The latest stage, “Container Era,” defines a new way deploying workloads by virtualizing processes instead of operating systems and therefore better use the given resources <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span>.</p>
-<p>Kubernetes is a major player in “Container Deployment” as seen in Figure <a href="#fig:kubernetes_container_evolution">1</a> and supports teams with the following features according to the documentation <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span>:</p>
+<p>According to Kubernetes, the way of deploying applications has evolved. As shown in Figure <a href="#fig:kubernetes_container_evolution">1</a>, the “Traditional Era” was the time, when applications were deployed via FTP access and started manually (e.g. on an Apache webserver). Then the revolution to virtual machines came and technologies that could virtualize a whole operating system, such as VMWare, were born. The latest stage, “Container Era,” defines a new way deploying workloads by virtualizing processes instead of operating systems and therefore better use the given resources <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span>.</p>
+<p>Kubernetes is a major player, among others like “Docker Swarm” or “Cloud Foundry,” in “Container Deployment” as seen in Figure <a href="#fig:kubernetes_container_evolution">1</a> and supports teams with the following features according to the documentation <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span>:</p>
 <ul>
 <li><strong>Service discovery and load balancing</strong>: Use DNS names or IP addresses to route traffic to a container and if the traffic is high and multiple instances are available, Kubernetes does load balance the traffic</li>
 <li><strong>Storage orchestration</strong>: Automatically provide storage in the form of mountable volumes</li>
@@ -242,8 +342,9 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <li><strong>Secret and configuration management</strong>: Kubernetes has a store for sensitive data as well as configurational data that may change the behaviour of a workload</li>
 </ul>
 <p>The list of features is not complete. There are many concepts in Kubernetes which help to build complex deployment scenarios and enable teams to ship their applications in an agile manner.</p>
+<p>Kubernetes works with containerized applications. In contrast to “plain” Docker, it orchestrates the applications and is responsible to reach the desired state depicted in the applications manifest files. Examples of such manifests can be viewed at: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment.</p>
 <h3 id="terminology">Terminology</h3>
-<p>Find the common Kubernetes terminology attached in Table <a href="#tbl:kubernetes_terminology">1</a>. The table provides a list of terms that will be used to explain concepts like the operator pattern in Section <a href="#sec:kubernetes_operator">2.2.3</a>.</p>
+<p>In Table <a href="#tbl:kubernetes_terminology">1</a>, we state the most common Kubernetes terminology. The table provides a list of terms that will be used to explain concepts like the operator pattern in Section <a href="#sec:kubernetes_operator">2.2.3</a>.</p>
 <div id="tbl:kubernetes_terminology" class="tablenos">
 <table id="tbl:kubernetes_terminology" style="width:92%;">
 <caption><span>Table 1:</span> Common Kubernetes Terminology </caption>
@@ -259,12 +360,20 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </thead>
 <tbody>
 <tr class="odd">
+<td>Docker</td>
+<td>Container runtime. Enables developers to create images of applications. Those images are then run in an isolated environment. Docker images are often used in Kubernetes to define the application that Kubernetes should run.</td>
+</tr>
+<tr class="even">
+<td>Kustomize</td>
+<td>“Kustomize” is a special templating CLI to declaratively bundle Kubernetes manifests. It consists of a <code>kustomization.yaml</code> and various referenced manifest yaml files. It is declarative and does not allow dynamic structures. It helps administrators to template applications for Kubernetes.</td>
+</tr>
+<tr class="odd">
 <td>Container</td>
 <td>Smallest possible unit in a deployment. Contains the definition of the workload. A container consists of a container image, arguments, volumes and other specific information to carry out a task.</td>
 </tr>
 <tr class="even">
 <td>Pod</td>
-<td>Composed of multiple containers. Is ran by kubernetes as an instance of a deployment. Pods may be scaled according to definitions or “pod scalers.” Highly coupled tasks are deployed together in a pod (i.e. multiple coupled containers in a pod).</td>
+<td>Composed of multiple containers. Is ran by Kubernetes as an instance of a deployment. Pods may be scaled according to definitions or “pod scalers.” Highly coupled tasks are deployed together in a pod (i.e. multiple coupled containers in a pod).</td>
 </tr>
 <tr class="odd">
 <td>Deployment</td>
@@ -296,11 +405,14 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </tr>
 <tr class="even">
 <td>Mutator</td>
-<td>Mutators are called before Kubernetes validates and stores a resource. Mutators may return JSON patches <span class="citation" data-cites="bryan:JSONPatch">(Bryan and Nottingham 2013)</span> to instruct Kubernetes to modify a resource prior to validating and storing them.</td>
+<td>Mutators are called before Kubernetes validates and stores a resource. Mutators may return JSON patches <strong>RFC6902</strong> <span class="citation" data-cites="RFC6902">(Bryan and Nottingham 2013)</span> to instruct Kubernetes to modify a resource prior to validating and storing them.</td>
 </tr>
 </tbody>
 </table>
 </div>
+<blockquote>
+<p>TODO: UML of kubernetes parts</p>
+</blockquote>
 <h3 id="sec:kubernetes_operator">Operator</h3>
 <p>An operator in Kubernetes is an extension to the Kubernetes API itself. A custom operator typically manages the whole lifecycle of an appliction it manages <span class="citation" data-cites="dobies:KubernetesOperators">(Dobies and Wood 2020)</span>. Such a custom operator can further be used to reconcile normal Kubernetes resources or any combination thereof.</p>
 <p>Some examples of application operators are:</p>
@@ -311,19 +423,20 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <p>There exists a broad list of operators, which can be (partially) viewed on <a href="https://operatorhub.io/">operatorhub.io</a>.</p>
 <div id="fig:kubernetes_operator_workflow" class="fignos">
 <figure>
-<img src="diagrams/sequences/bc6f3409edb67939f5539cb0ada59de7.png" alt="Figure 2: Kubernetes Operator Workflow" /><figcaption aria-hidden="true"><span>Figure 2:</span> Kubernetes Operator Workflow</figcaption>
+<img src="diagrams/sequences/aa65e382f6a2fe3087f6f2409dd66f0f.png" alt="Figure 2: Kubernetes Operator Workflow" /><figcaption aria-hidden="true"><span>Figure 2:</span> Kubernetes Operator Workflow</figcaption>
 </figure>
 </div>
-<p>Figure <a href="#fig:kubernetes_operator_workflow">2</a> shows the general workflow of an event that is managed by an operator. When an operator is installed and running on a Kubernetes cluster, it registers “Resource Watchers” with the API and receives notifications when the master node modifies resources a watched resource. The overviewed events are “Added,” “Modified” and “Deleted.” There are two additional events that may be returned by the API (“Error” and “Bookmark”) but they are typically not needed in an operator.</p>
+<p>In Figure <a href="#fig:kubernetes_operator_workflow">2</a>, we depict the general workflow of an event that is managed by an operator. When an operator is installed and running on a Kubernetes cluster, it registers “Resource Watchers” with the API and receives notifications when the master node modifies resources a watched resource. The overviewed events are “Added,” “Modified” and “Deleted.” There are two additional events that may be returned by the API (“Error” and “Bookmark”) but they are typically not needed in an operator.</p>
 <p>When the user interacts with the Kubernetes API (for example via the <code>kubectl</code> executable) and creates a new instance of a resource, the API will first call any “Mutator” in a serial manner. After the mutators, the API will call any “Validators” in parallel and if no validator objects against the creation, the API will then store the resource and tries to apply the transition for the new desired state. Now, the operator receives the notification about the watched resource and may interact with the event. Such an action may include to update resources, create more resources or even delete other instances.</p>
 <h3 id="sec:kubernetes_sidecar">Sidecar</h3>
-<p>The sidecar pattern is the most common pattern for multi-container deployments. Sidecars are containers that enhance the functionality of the main container in a pod. An example for such a sidecar is a log collector, that collects log files written to the file system and forwards them towards some log processing software <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, sec. 4.1)</span>. Another example is the Google CloudSQL Proxy<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a>, which provides access to a CloudSQL instance from a pod without routing the whole traffic through Kubernetes services.</p>
+<p>According to <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">Burns and Oppenheimer (2016)</span>, the sidecar pattern is the most common pattern for multi-container deployments <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, sec. 4.1)</span>. Sidecars are containers that enhance the functionality of the main container in a pod. An example for such a sidecar is a log collector, that collects log files written to the file system and forwards them towards some log processing software <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, sec. 4.1)</span>. Another example is the Google CloudSQL Proxy<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a>, which provides access to a CloudSQL instance from a pod without routing the whole traffic through Kubernetes services.</p>
 <div id="fig:kubernetes_sidecar" class="fignos">
 <figure>
-<img src="diagrams/component/e04b0bd0476fb01ac6d4e9a5b2f2a17a.png" data-short-caption="Example of a sidecar container" alt="Figure 3: Sidecar container extending a main container in a pod. As example, this could be a log collector , figure 1(Burns and Oppenheimer 2016, fig. 1)." /><figcaption aria-hidden="true"><span>Figure 3:</span> Sidecar container extending a main container in a pod. As example, this could be a log collector <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, fig. 1)</span>.</figcaption>
+<img src="diagrams/component/e0da4a8fee732a0b7c6fb822bbe41198.png" data-short-caption="Example of a sidecar container" alt="Figure 3: Sidecar container extending a main container in a pod. As example, this could be a log collector , figure 1(Burns and Oppenheimer 2016, fig. 1)." /><figcaption aria-hidden="true"><span>Figure 3:</span> Sidecar container extending a main container in a pod. As example, this could be a log collector <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, fig. 1)</span>.</figcaption>
 </figure>
 </div>
 <p>The example shown in Figure <a href="#fig:kubernetes_sidecar">3</a> is extensible. Such sidecars may be injected by a mutator or an operator to extend functionality.</p>
+<p>Common usecases for sidecars are controlling the data flow in a cluster in service mesh, providing access to secure locations or performing additional tasks such as collecting logs of an application. Since sidecars are tightly coupled to the original application, they scale with the Pod. It is not possible to scale a sidecar without scaling the Pod - and therefore the application - itself.</p>
 <h3 id="sec:service_mesh">Service Mesh</h3>
 <p>A “Service Mesh” is a dedicated infrastructure layer that handles intercommunication between services. It is responsible for the delivery of requests in a modern cloud application <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>. An example from the practice is “Istio”<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a>. When using Istio, the applications do not need to know if there is a service mesh installed or not. Istio will inject a sidecar (see Section <a href="#sec:kubernetes_sidecar">2.2.4</a>) into pods and handle the communication with the injected services.</p>
 <p>The service mesh provides a set of features <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>:</p>
@@ -337,20 +450,39 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </ul>
 <p>As observed in the list above, many of the features of a service mesh are already provided by Kubernetes. Service discovery, load balancing, fault tolerance and - though limited - traffic monitoring is already possible with Kubernetes. Introducing a service mesh into a cluster enables administrators to build more complex scenarios and deployments.</p>
 <h2 id="authentication-and-authorization">Authentication and Authorization</h2>
-<h3 id="sec:basic_auth">Basic</h3>
-<p>The <code>Basic</code> authentication scheme is a trivial authentication that accepts a username and a password encoded in Base64. To transmit the credentials, a construct with the schematics of <code>&lt;username&gt;:&lt;password&gt;</code> is created and inserted into the http request as the <code>Authorization</code> header with the prefix <code>Basic</code> <span class="citation" data-cites="reschke:BasicAuth">(Reschke 2015, sec. 2)</span>. An example with the username <code>ChristophBuehler</code> and password <code>SuperSecure</code> would result in the following header: <code>Authorization: Basic Q2hyaXN0b3BoQnVlaGxlcjpTdXBlclNlY3VyZQ==</code>.</p>
+<h3 id="sec:basic_auth">Basic (RFC7617)</h3>
+<p>The <code>Basic</code> authentication scheme is a trivial authentication that accepts a username and a password encoded in Base64. To transmit the credentials, a construct with the schematics of <code>&lt;username&gt;:&lt;password&gt;</code> is created and inserted into the http request as the <code>Authorization</code> header with the prefix <code>Basic</code> <span class="citation" data-cites="RFC7617">(Reschke 2015, sec. 2)</span>. An example with the username <code>ChristophBuehler</code> and password <code>SuperSecure</code> would result in the following header:</p>
+<blockquote>
+<p><code>Authorization: Basic Q2hyaXN0b3BoQnVlaGxlcjpTdXBlclNlY3VyZQ==</code></p>
+</blockquote>
 <h3 id="sec:auth_oidc">OpenID Connect (OIDC)</h3>
-<p>OpenID Connect is an authenticating mechanism, that builds upon the <code>OAuth 2.0</code> authorization protocol. OAuth 2.0 deals with authorization only and grants access to data and features on a specific application. OAuth by itself does not define <em>how</em> the credentials are transmitted and exchanged <span class="citation" data-cites="hardt:OAuth2.0Spec">(Hardt and others 2012)</span>. OIDC adds a layer on top of OAuth 2.0 that defines <em>how</em> these credentials must be exchanged. This adds login and profile capabilities to any application that uses OIDC <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014)</span>.</p>
+<p>OpenID Connect is not defined in a RFC, the specification is provided by the OpenID Foundation (OIDF). OIDC however, builds on top of OAuth, which is defined by <strong>RFC6749</strong>.</p>
+<p>OpenID Connect is an authenticating scheme, that builds upon the <code>OAuth 2.0</code> authorization protocol. OAuth itself is an authorization framework, that enables applications to gain access to a service (API or other) <span class="citation" data-cites="RFC6749">(Hardt and others 2012, abstract)</span>. OAuth 2.0 deals with authorization only and grants access to data and features on a specific application. OAuth by itself does not define <em>how</em> the credentials are transmitted and exchanged <span class="citation" data-cites="RFC6749">(Hardt and others 2012)</span>. OIDC adds a layer on top of OAuth 2.0 that defines <em>how</em> these credentials must be exchanged. This adds login and profile capabilities to any application that uses OIDC <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014)</span>.</p>
 <div id="fig:oidc_code_flow" class="fignos">
 <figure>
-<img src="diagrams/sequences/b45156f65349258d13a013f27e003332.png" data-short-caption="OIDC code flow" alt="Figure 4: OIDC code authorization flow (Sakimura et al. 2014)." /><figcaption aria-hidden="true"><span>Figure 4:</span> OIDC code authorization flow <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014)</span>.</figcaption>
+<img src="diagrams/sequences/41c9b09f4e1f4ab638e875ce4e6c8e37.png" data-short-caption="OIDC code flow" alt="Figure 4: OIDC code authorization flow (Sakimura et al. 2014). Only contains the credential flow, without the explicit OAuth part. OAuth handles the authorization whereas OIDC handles the authentication." /><figcaption aria-hidden="true"><span>Figure 4:</span> OIDC code authorization flow <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014)</span>. Only contains the credential flow, without the explicit OAuth part. OAuth handles the authorization whereas OIDC handles the authentication.</figcaption>
 </figure>
 </div>
-<p>When a user wants to authenticate himself with OIDC, one of the possible “flows” is the “Authorization Code Flow” <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 3.1)</span>. Other possible flows are the “Implicit Flow” <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 3.2)</span> and the “Hybrid Flow” <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 3.3)</span>. In Figure <a href="#fig:oidc_code_flow">4</a>, the “Authorization Code Flow” is depicted. A user that wants to access a certain resource on a relying party (i.e. something that relies on the information about the user) and is not authenticated and authorized, the relying party forwards the user to the identity provider (IdP). The user provides his credentials to the IdP and is returned to the relying party with an authorization code. The relying party can then exchange the authorization code to valid tokens on the token endpoint of the IdP. Typically, <code>access_token</code> and <code>id_token</code> are provided. While the <code>id_token</code> must be a JSON Web Token (JWT) <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 2)</span>, the <code>access_token</code> can be in any format <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014, sec. 3.3.3.8)</span>.</p>
+<p>When a user wants to authenticate himself with OIDC, one of the possible “flows” is the “Authorization Code Flow” <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014, sec. 3.1)</span>. Other possible flows are the “Implicit Flow” <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014, sec. 3.2)</span> and the “Hybrid Flow” <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014, sec. 3.3)</span>. Figure <a href="#fig:oidc_code_flow">4</a> depicts the “Authorization Code Flow.” A user that wants to access a certain resource on a relying party (i.e. something that relies on the information about the user) and is not authenticated and authorized, the relying party forwards the user to the identity provider (IdP). The user provides his credentials to the IdP and is returned to the relying party with an authorization code. The relying party can then exchange the authorization code to valid tokens on the token endpoint of the IdP. Typically, <code>access_token</code> and <code>id_token</code> are provided. While the <code>id_token</code> must be a JSON Web Token (JWT) <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014, sec. 2)</span>, the <code>access_token</code> can be in any format <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014, sec. 3.3.3.8)</span>.</p>
+<p>An example of an <code>id_token</code> in JWT format may be:</p>
+<pre><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.
+SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
+<p>The stated JWT token contains:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;alg&quot;</span><span class="fu">:</span> <span class="st">&quot;HS256&quot;</span><span class="fu">,</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;typ&quot;</span><span class="fu">:</span> <span class="st">&quot;JWT&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sub&quot;</span><span class="fu">:</span> <span class="st">&quot;1234567890&quot;</span><span class="fu">,</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;John Doe&quot;</span><span class="fu">,</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;iat&quot;</span><span class="fu">:</span> <span class="dv">1516239022</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <h1 id="state-of-the-art-the-practice-and-deficiencies">State of the Art, the Practice and Deficiencies</h1>
 <p>This section gives an overview over the current state of the art, the practice, as well as the deficiencies to an optimal situation. Furthermore this section states an assessment of the current practice and the solutions found.</p>
 <h2 id="state-of-the-art">State of the Art</h2>
-<p>In cloud environments, a problem that is well solved is the transmission of data from one point to another. Kubernetes, for example, uses “Services” that provide a DNS name for a specified workload. In terms of authentication and authorization, there exist a variety of schemes that enable an application to authenticate and authorize their users. OpenID Connect (OIDC) (see Section <a href="#sec:auth_oidc">2.3.2</a>) is a modern authentication scheme, that builds upon OAuth 2.0, that in turn handles authorization <span class="citation" data-cites="sakimura:OIDCCore">(Sakimura et al. 2014)</span>.</p>
+<p>In cloud environments, a problem which is well solved is the transmission of data from one point to another. Kubernetes, for example, uses “Services” that provide a DNS name for a specified workload. In terms of authentication and authorization, there exist a variety of schemes that enable an application to authenticate and authorize their users. OpenID Connect (OIDC) (see Section <a href="#sec:auth_oidc">2.3.2</a>) is a modern authentication scheme, that builds upon OAuth 2.0, that in turn handles authorization <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014)</span>.</p>
 <p>Modern software architectures that are specifically designed for the cloud are called “Cloud Native Applications” (CNA). <span class="citation" data-cites="kratzke:CloudNativeApplications">Kratzke and Peinl (2016)</span> define a CNA as:</p>
 <blockquote>
 <p>“A cloud-native application is a distributed, elastic and horizontal scalable system composed of (micro)services which isolates state in a minimum of stateful components. The application and each self-contained deployment unit of that application is designed according to cloud-focused design patterns and operated on a self-service elastic platform.” <span class="citation" data-cites="kratzke:CloudNativeApplications">(Kratzke and Peinl 2016, sec. 3)</span>.</p>
@@ -358,7 +490,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <p>However, with CNAs and the general movement to cloud environments, not all applications get that chance to adjust. For various reasons like budget, time or complexity, legacy applications and monoliths are not refactored or re-written before they are deployed into a cloud environment. If the legacy applications are mixed with modern systems, then the need of “translation” arises. Assuming, that the modern part is a secure application, that uses OIDC to authorize its users and the application needs to fetch data from the legacy system that does not understand OIDC, code changes must be made. Following the previous assumption, the code changes will likely be introduced into the modern application, since it is better maintainable and deployable than the legacy monolith. Hence, the modern application receives changes that may introduce new bugs or security vulnerabilities.</p>
 <div id="fig:is_solution_components" class="fignos">
 <figure>
-<img src="diagrams/component/227922acac1ebbd8575475cb4e34cc24.png" data-short-caption="Microservice Architecture with legacy components" alt="Figure 5: Microservice Architecture that contains modern applications as well as legacy services." /><figcaption aria-hidden="true"><span>Figure 5:</span> Microservice Architecture that contains modern applications as well as legacy services.</figcaption>
+<img src="diagrams/component/32d39edc1a049309b9656b207affa129.png" data-short-caption="Microservice Architecture with legacy components" alt="Figure 5: Microservice Architecture that contains modern applications as well as legacy services." /><figcaption aria-hidden="true"><span>Figure 5:</span> Microservice Architecture that contains modern applications as well as legacy services.</figcaption>
 </figure>
 </div>
 <p>We consider the components in Figure <a href="#fig:is_solution_components">5</a>:</p>
@@ -372,18 +504,187 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <p>The stated scenario is quite common. Legacy services may not be the primary use-case, but there exist other reasons to have the need of using a translation of credentials. Another case is the usage of third party applications which only support certain authentication mechanisms.</p>
 <div id="fig:is_solution_process" class="fignos">
 <figure>
-<img src="diagrams/sequences/abf568f8e377caa7c2c463d28331ee60.png" data-short-caption="Current process of legacy communication" alt="Figure 6: Current state of the art of accessing legacy systems from modern services with differing authentication schemes." /><figcaption aria-hidden="true"><span>Figure 6:</span> Current state of the art of accessing legacy systems from modern services with differing authentication schemes.</figcaption>
+<img src="diagrams/sequences/6faa74afc76899917ebd60382cc3b148.png" data-short-caption="Current process of legacy communication" alt="Figure 6: Current state of the art of accessing legacy systems from modern services with differing authentication schemes." /><figcaption aria-hidden="true"><span>Figure 6:</span> Current state of the art of accessing legacy systems from modern services with differing authentication schemes.</figcaption>
 </figure>
 </div>
 <p>The process in Figure <a href="#fig:is_solution_process">6</a> shows the process of communication in such a described scenario. In Figure <a href="#fig:is_solution_process">6</a>, the “Client” is the single page application (SPA), that authenticates against an arbitrary Identity and Access Management System (IAM). “Service A” is the modern backend that supports the client as backend API. Therefore, “Service A” provides functionality for the client. “Service B” is a legacy application, for example an old ERP with order information, that was moved into the cloud, but is not refactored nor rewritten to communicate with modern authentication technologies.</p>
 <p>In this scenario, the client calls some API on “Service A” that then will call “Service B” to get additional information to present to the user. Since the client and “Service A” communicate with the same authentication technology, the call is straight forward. The client authenticates himself and obtains an access token. When calling the service (“Service A”), the token is transmitted and the service can check with the IAM if the user is authorized to access the system. When “Service A” then calls “Service B” for additional information, it needs to translate the user provided credentials to a format that “Service B” understands. In the provided example, “Service B” is only able to handle Basic Authentication, as explained in Section <a href="#sec:basic_auth">2.3.1</a>. This means, if “Service A” wants to communicate with “Service B,” it must implement some translation logic to change the credentials to a format that B understands. This introduces code changes to “Service A,” since “Service B” is a legacy application that is not maintainable.</p>
 <h2 id="the-practice">The Practice</h2>
-<p>In practice, a Service Mesh (see Section <a href="#sec:service_mesh">2.2.5</a>) may be able to perform such credential transformation.</p>
-<p>TODO: describe isio approach to shared auth. TODO: describe in deficiencies that service mesh are complicated and therefore not a solution</p>
-<h2 id="deficiencies">Deficiencies</h2>
+<p>In practice, no current solution exists, that allows credentials to be transformed between authentication schemes. The service mesh “Istio” provides a mechanism to secure services that communicate with mTLS (mutual TLS) as well as an external mechanism to provide authentication and authorization capabilities. This works well when all applications in the system share the same authentication scheme. As soon as two or more schemes are in place, the need for transformation arises again.</p>
+<h2 id="sec:deficiencies">Deficiencies</h2>
 <p>The situation described in the previous sections introduces several problems. It does not matter if “Service B” is a third party application to which no code changes can be applied to, or if it is a legacy application that cannot be updated for the time being. Most likely, the code change to provide the ability to communicate will be introduced into “Service A.” This adds the risk of errors since new code must be produced, which would not be necessary if the legacy service would be refactored. Also, changing “Service A” to communicate with B may be a feasible solution in a small setup. But as the landscape of the microservice architecture grows, this solution does not scale well. The matrix problem <span class="math inline"><em>X</em> services * <em>Y</em> authentication methods</span> describes this problematic. As the landscape and the different methods of authentication grows, it is not a feasible solution to implement each and every authentication scheme in all the services.</p>
 <p>Another issue that emerges with this transformation of credentials: The credentials leak into the trust zone. As long as each service is in the same trust zone (for example in the same data-center in the same cluster behind the same API gateway), this may not be problematic. As soon as communication is between data centers, the communication and the credentials must be protected. It is not possible to create a zero trust environment with the need of knowledge about the targets authentication schemes.</p>
-<p>TODO: conditional access?</p>
+<p>The usage of a service mesh to mitigate the problem is not an option since the initial problem of transforming credential still persists. Service meshes may provide a way to secure communication between services, but they are not able to transform credentials to a required format for any legacy application. Furthermore, service meshes introduce configurational complexity to the system which, in our opinion, is not needed without a clear usecase for a service mesh.</p>
+<h1 id="distributed-authentication-mesh">Distributed Authentication Mesh</h1>
+<p>This section gives a general overview of the proposed solution. Furthermore, boundaries of the solution are provided along with common software engineering elements like requirements, non-functional requirements and the documentation of the architecture.</p>
+<p>The proposed architecture may be used as generic description for a solution to the described problem. For this project, the solution is implemented specifically to work within a Kubernetes cluster.</p>
+<h2 id="definition">Definition</h2>
+<p>The solution to solve the stated problems in Section <a href="#sec:deficiencies">3.3</a> must be able to transform arbitrary credentials into a format that the target service understands. For this purpose, the architecture contains a service which runs as a sidecar among the target service. This sidecar intercepts requests to the target and transforms the Authorization HTTP header. The sidecar is - like in a service mesh - used to intercept inbound and outbound traffic.</p>
+<p>However, the solution <strong>must not</strong> interfere with the data flow itself. The problem of proxying data from point A to B is a well solved problem. In the given work, an Envoy proxy is used to deliver data between the services. Envoy allows the usage of an external service to modify requests in-flight.</p>
+<h2 id="requirements">Requirements</h2>
+<p>In Table <a href="#tbl:functional-requirements">2</a>, we present the list of requirements (REQ) for the proposed solution.</p>
+<div id="tbl:functional-requirements" class="tablenos">
+<table id="tbl:functional-requirements" style="width:89%;">
+<caption><span>Table 2:</span> Functional Requirements </caption>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 78%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>REQ 1</td>
+<td>The translator module must be able to transform given credentials into the specified common language and the common format back into valid credentials.</td>
+</tr>
+<tr class="even">
+<td>REQ 2</td>
+<td>The translator is injected as a sidecar into the solution. In Kubernetes this is done via an operator.</td>
+</tr>
+<tr class="odd">
+<td>REQ 3</td>
+<td>Beside the translator, an Envoy proxy is injected to the service inquestion to handle the data flow. This injection is also performed by the operator.</td>
+</tr>
+<tr class="even">
+<td>REQ 4</td>
+<td>Translators do only modify HTTP headers, they do not interfere with the data that is transmitted. Any information that needs to be forwarded must be within the HTTP headers.</td>
+</tr>
+<tr class="odd">
+<td>REQ 5</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>REQ 6</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>It is important to note that the implemented proof of concept (PoC) will not meet all requierements. Further work is needed to implement a solution according to the architecture that adheres the stated requirements.</p>
+<h2 id="non-functional-requirements">Non-Functional Requirements</h2>
+<p>In Table <a href="#tbl:non-functional-requirements">3</a>, we show the non-functional requirements (NFR) for the proposed solution.</p>
+<div id="tbl:non-functional-requirements" class="tablenos">
+<table id="tbl:non-functional-requirements" style="width:89%;">
+<caption><span>Table 3:</span> Non-Functional Requirements </caption>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 78%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NFR 1</td>
+<td>First and foremost, the solution <strong>must not</strong> be less secure than current solutions.</td>
+</tr>
+<tr class="even">
+<td>NFR 2</td>
+<td>The solution must adhere to current best practices and security mechanisms. Furthermore, it <strong>must</strong> be implemented with security issues as stated in the OWASP Top Ten (<a href="https://owasp.org/www-project-top-ten" class="uri">https://owasp.org/www-project-top-ten</a>) in mind.</td>
+</tr>
+<tr class="odd">
+<td>NFR 3</td>
+<td>The concept of the solution is applicable to cluster orchestration software other than Kubernetes. The architecture provides a general way of solving the stated problem instead of giving a proprietary solution for one vendor.</td>
+</tr>
+<tr class="even">
+<td>NFR 4</td>
+<td>The translation of the credentials should not extensively impact the timeframe of an arbitrary request. In production mode, the additional time to check and transform the credentials should not extend 100ms.</td>
+</tr>
+<tr class="odd">
+<td>NFR 5</td>
+<td>The solution is modular. It can be extended with additional “translators” which provide the means of transforming the given credentials to other target formats.</td>
+</tr>
+<tr class="even">
+<td>NFR 6</td>
+<td>The solution may run with or without a service mesh. It is a goal that the solution can run without a service mesh to reduce the overall complexity, but if a service mesh is already in place, the solution must be able to work with the provided elements.</td>
+</tr>
+<tr class="odd">
+<td>NFR 7</td>
+<td>The architecture must be scaleable. The provided software must be able to scale according to the business needs of the overall system.</td>
+</tr>
+<tr class="even">
+<td>NFR 8</td>
+<td>Each translator should only handle one authentication scheme to ensure separation of concerns and scalability of the whole solution.</td>
+</tr>
+<tr class="odd">
+<td>NFR 9</td>
+<td>The solution</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Like the requirements in Table <a href="#tbl:functional-requirements">2</a>, the PoC will not meet all NFRs that are stated in Table <a href="#tbl:non-functional-requirements">3</a>. Further work is needed to complete the PoC to a production ready software.</p>
+<h2 id="standards-and-best-practices">Standards and Best Practices</h2>
+<h2 id="contrast">Contrast</h2>
+<h3 id="saml">SAML</h3>
+<h3 id="ws-">WS-*</h3>
+<p>Show that this project is not a protocol contract like WS-*.</p>
+<h2 id="architecture">Architecture</h2>
+<h3 id="brief-description">Brief Description</h3>
+<h3 id="usecases">UseCases</h3>
+<h3 id="application-domain">Application Domain</h3>
+<h3 id="sequences">Sequences</h3>
+<h3 id="communication">Communication</h3>
+<h2 id="implementation-proof-of-concept-poc">Implementation Proof of Concept (PoC)</h2>
+<p>To provide a proof that the general idea of the solution is possible, a PoC is implemented during the work of this project. The PoC addresses the following risks and questions:</p>
+<ul>
+<li>Is it possible intercept HTTP requests to an arbitrary service</li>
+<li>Is it further possible to modify the HTTP headers of the request</li>
+<li>Can a sidecar service transform given credentials from one format to another
+<ul>
+<li>In the PoC, an OIDC access token is translated into static basic auth credentials</li>
+<li>No common language format is implemented or used in the PoC</li>
+</ul></li>
+<li>Can a custom operator inject the following elements
+<ul>
+<li>The correct configuration for Envoy to use external authentication</li>
+<li>The translator module to transform the credentials</li>
+</ul></li>
+</ul>
+<p>Based on the results of the PoC, the following further work may be realized:</p>
+<ul>
+<li>Specify the concrete common domain language to transport identities</li>
+<li>Implement a secure way of transporting identities that is tamper-proof</li>
+<li>Provide a production ready solution of some translators and the operator</li>
+<li>Integrate the solution with a service mesh</li>
+<li>Provide a production ready documentation of the solution</li>
+<li>Further investiage the possibility of hardening the communication between services (e.g. with mTLS)</li>
+</ul>
+<p>The following sections will describe the parts of the PoC and their specific implementation details.</p>
+<h3 id="showcase-application">Showcase Application</h3>
+<p>The showcase application is a demo application to show the need and the particular usecase of the solution. The application resides in an open source repository under <a href="https://github.com/WirePact/poc-showcase-app" class="uri">https://github.com/WirePact/poc-showcase-app</a>.</p>
+<p>When installed in a Kubernetes cluster, the user can open (depending on the local configuration) the URL to the frontend application<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a>.</p>
+<div id="fig:impl_components_showcase_app" class="fignos">
+<figure>
+<img src="diagrams/component/cca01766db54ff649e950b7c09fb6c53.png" alt="Figure 7: Component Diagram of the Showcase Application" /><figcaption aria-hidden="true"><span>Figure 7:</span> Component Diagram of the Showcase Application</figcaption>
+</figure>
+</div>
+<p>Figure <a href="#fig:impl_components_showcase_app">7</a> gives an overview over the components in the showcase application. The system contains an ASP.Net Razor Page<a href="#fn10" class="footnote-ref" id="fnref10" role="doc-noteref"><sup>10</sup></a> application as the frontend, an ASP.Net API application with configured Zitadel<a href="#fn11" class="footnote-ref" id="fnref11" role="doc-noteref"><sup>11</sup></a> OIDC authentication as “modern” backend service and another ASP.Net API application that only supports basic authentication as “legacy” backend. The frontend can only communicate with the modern API and the modern API is able to call an additional service on the legacy API.</p>
+<div id="fig:seq_showcase_call" class="fignos">
+<figure>
+<img src="diagrams/sequences/42709d8c02bb2a77c85b152d106214b0.png" alt="Figure 8: Sequence Diagram of the Showcase Call" /><figcaption aria-hidden="true"><span>Figure 8:</span> Sequence Diagram of the Showcase Call</figcaption>
+</figure>
+</div>
+<p>In Figure <a href="#fig:seq_showcase_call">8</a>, we show the process of a user call in the showcase application. The user opens the web application and authenticates himself with Zitadel. After that, the user is presented with the application and can click the “Call API” button. The frontend application will call the modern backend API with the OIDC token and asks for customer and order data. The customer data is present on the modern API so it is directly returned. To query order data, the modern service relies on a legacy application which is only capable of basic authentication. Depending on the configuration (i.e. the environment variable <code>USE_WIREPACT</code>), the modern service will call the legacy one with either transformed basic auth credentials (when <code>USE_WIREPACT=false</code>) or with the presented OIDC token (otherwise). Either way, the legacy API receives basic auth credentials and returns the data which then in turn is returned and presented to the user.</p>
+<p>To install and run the showcase application without any interference of the operator or the rest of the solution, follow the installation guide in the readme on <a href="https://github.com/WirePact/poc-showcase-app" class="uri">https://github.com/WirePact/poc-showcase-app</a>.</p>
+<h3 id="envoy-sidecar">Envoy Sidecar</h3>
+<h3 id="translator">Translator</h3>
+<h3 id="operator">Operator</h3>
+<h3 id="poc-composition">PoC Composition</h3>
+<blockquote>
+<p>TODO: Explain the whole PoC composition (how to run and stuff with operator).</p>
+</blockquote>
+<h1 id="evaluation">Evaluation</h1>
+<blockquote>
+<p>TODO: show in an evaluation, that the provided solution is working and improves the situation</p>
+</blockquote>
 <h1 id="further-work">Further work</h1>
 <ul>
 <li>create common domain model for user</li>
@@ -430,7 +731,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </ul></li>
 </ol>
 <h1 id="todos">Todos</h1>
-<p>Following the description of the current situation, a definition of the should situation gives an overview of the purposed solution.</p>
+<p>Following the description of the current situation, a definition of the should situation gives an overview of the proposed solution.</p>
 <ul>
 <li>Describe the IS situation.</li>
 <li>Describe the SHOULD situation.</li>
@@ -438,8 +739,8 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </ul>
 <h1 class="unnumbered" id="bibliography">Bibliography</h1>
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
-<div id="ref-bryan:JSONPatch" class="csl-entry" role="doc-biblioentry">
-Bryan, Paul, and Mark Nottingham. 2013. <span>“Javascript Object Notation (Json) Patch.”</span> <em>RFC 6902 (Proposed Standard)</em>.
+<div id="ref-RFC6902" class="csl-entry" role="doc-biblioentry">
+Bryan, Paul, and Mark Nottingham. 2013. <span>“Javascript Object Notation (<span>JSON</span>) Patch.”</span> RFC. Internet Engineering Task Force <span>IETF</span>. <a href="https://tools.ietf.org/html/rfc6902">https://tools.ietf.org/html/rfc6902</a>.
 </div>
 <div id="ref-burns:DesignPatternsForContainerSystems" class="csl-entry" role="doc-biblioentry">
 Burns, Brendan, and David Oppenheimer. 2016. <span>“Design Patterns for Container-Based Distributed Systems.”</span> In <em>8th <span>USENIX</span> Workshop on Hot Topics in Cloud Computing (HotCloud 16)</em>. Denver, CO: <span>USENIX</span> Association. <a href="https://www.usenix.org/conference/hotcloud16/workshop-program/presentation/burns">https://www.usenix.org/conference/hotcloud16/workshop-program/presentation/burns</a>.
@@ -453,8 +754,8 @@ Creative Commons. 2021. <span>“Attribution 4.0 International (CC BY 4.0).”</
 <div id="ref-dobies:KubernetesOperators" class="csl-entry" role="doc-biblioentry">
 Dobies, Jason, and Joshua Wood. 2020. <em>Kubernetes Operators: Automating the Container Orchestration Platform</em>. " O’Reilly Media, Inc.".
 </div>
-<div id="ref-hardt:OAuth2.0Spec" class="csl-entry" role="doc-biblioentry">
-Hardt, Dick, and others. 2012. <span>“The OAuth 2.0 Authorization Framework.”</span> RFC 6749, October.
+<div id="ref-RFC6749" class="csl-entry" role="doc-biblioentry">
+Hardt, Dick, and others. 2012. <span>“The <span>OAuth</span> 2.0 Authorization Framework.”</span> RFC. Internet Engineering Task Force <span>IETF</span>. <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>.
 </div>
 <div id="ref-kratzke:CloudNativeApplications" class="csl-entry" role="doc-biblioentry">
 Kratzke, N., and R. Peinl. 2016. <span>“ClouNS - a Cloud-Native Application Reference Model for Enterprise Architects.”</span> In <em>2016 IEEE 20th International Enterprise Distributed Object Computing Workshop (EDOCW)</em>, 1–10. <a href="https://doi.org/10.1109/EDOCW.2016.7584353">https://doi.org/10.1109/EDOCW.2016.7584353</a>.
@@ -465,11 +766,11 @@ Li, W., Y. Lemieux, J. Gao, Z. Zhao, and Y. Han. 2019. <span>“Service Mesh: Ch
 <div id="ref-montesi:CircuitBreakers" class="csl-entry" role="doc-biblioentry">
 Montesi, Fabrizio, and Janine Weber. 2016. <span>“Circuit Breakers, Discovery, and <span>API</span> Gateways in Microservices.”</span> <em>CoRR</em> abs/1609.05830. <a href="http://arxiv.org/abs/1609.05830">http://arxiv.org/abs/1609.05830</a>.
 </div>
-<div id="ref-reschke:BasicAuth" class="csl-entry" role="doc-biblioentry">
-Reschke, Julian. 2015. <span>“The’basic’http Authentication Scheme.”</span> <em>Work in Progress, Draft-Ietf-Httpauth-Basicauth-Update-07</em>.
+<div id="ref-RFC7617" class="csl-entry" role="doc-biblioentry">
+Reschke, Julian. 2015. <span>“The ’Basic’ <span>HTTP</span> Authentication Scheme.”</span> RFC. Internet Engineering Task Force <span>IETF</span>. <a href="https://tools.ietf.org/html/rfc7617">https://tools.ietf.org/html/rfc7617</a>.
 </div>
-<div id="ref-sakimura:OIDCCore" class="csl-entry" role="doc-biblioentry">
-Sakimura, Natsuhiko, John Bradley, Mike Jones, Breno De Medeiros, and Chuck Mortimore. 2014. <span>“Openid Connect Core 1.0.”</span> <em>The OpenID Foundation</em>, S3.
+<div id="ref-spec:OIDC" class="csl-entry" role="doc-biblioentry">
+Sakimura, Natsuhiko, John Bradley, Mike Jones, Breno De Medeiros, and Chuck Mortimore. 2014. <span>“Openid Connect Core 1.0.”</span> Spec. The <span>OpenID</span> Foundation <span>OIDF</span>. <a href="https://openid.net/specs/openid-connect-core-1_0.html">https://openid.net/specs/openid-connect-core-1_0.html</a>.
 </div>
 </div>
 <section class="footnotes" role="doc-endnotes">
@@ -483,6 +784,9 @@ Sakimura, Natsuhiko, John Bradley, Mike Jones, Breno De Medeiros, and Chuck Mort
 <li id="fn6" role="doc-endnote"><p><a href="https://github.com/zalando/postgres-operator" class="uri">https://github.com/zalando/postgres-operator</a><a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn7" role="doc-endnote"><p><a href="https://github.com/GoogleCloudPlatform/cloudsql-proxy" class="uri">https://github.com/GoogleCloudPlatform/cloudsql-proxy</a><a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn8" role="doc-endnote"><p><a href="https://istio.io/" class="uri">https://istio.io/</a><a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn9" role="doc-endnote"><p>In the example it is https://kubernetes.docker.internal since this is the local configured URL for “Docker Desktop”<a href="#fnref9" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn10" role="doc-endnote"><p> <a href="https://docs.microsoft.com/en-us/aspnet/core/razor-pages/" class="uri">https://docs.microsoft.com/en-us/aspnet/core/razor-pages/</a><a href="#fnref10" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn11" role="doc-endnote"><p><a href="https://zitadel.ch" class="uri">https://zitadel.ch</a><a href="#fnref11" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 </body>

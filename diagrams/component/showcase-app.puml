@@ -2,12 +2,12 @@
 !include https://raw.githubusercontent.com/bschwarz/puml-themes/master/themes/materia-outline/puml-theme-materia-outline.puml
 
 actor User as u
-component [IAM] as i
+component [Zitadel IAM] as i
 
 node "Cloud Environment" {
-    component [Client (SPA)] as c
-    component [Service A] as sa
-    component [Service B] as sb
+    component [Client\n(OIDC Capable)] as c
+    component [Modern Backend\n(OIDC Capable)] as sa
+    component [Legacy Backend\n(Basic Auth Capable)] as sb
 
     c -> sa : OIDC
     sa -> sb : Basic
