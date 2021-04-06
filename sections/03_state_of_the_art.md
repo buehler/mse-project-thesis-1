@@ -7,14 +7,14 @@ practice and the solutions found.
 
 ## State of the Art
 
-In cloud environments, a problem that is well solved is the
+In cloud environments, a problem which is well solved is the
 transmission of data from one point to another. Kubernetes, for example,
 uses "Services" that provide a DNS name for a specified workload.
 In terms of authentication and authorization, there exist a variety
 of schemes that enable an application to authenticate and authorize
 their users. OpenID Connect (OIDC) (see {@sec:auth_oidc}) is a modern authentication
 scheme, that builds upon OAuth 2.0, that in turn handles authorization
-[@sakimura:OIDCCore].
+[@spec:OIDC].
 
 Modern software architectures that are specifically designed for the cloud are called
 "Cloud Native Applications" (CNA). @kratzke:CloudNativeApplications define
@@ -27,8 +27,8 @@ a CNA as:
 > operated on a self-service elastic platform." [@kratzke:CloudNativeApplications, sec. 3].
 
 However, with CNAs and the general movement to cloud environments, not all applications
-get that chance to adjust. For various reasons
-like budget, time or complexity, legacy applications and monoliths are not refactored
+get that chance to adjust. For various reasons like budget, time or complexity,
+legacy applications and monoliths are not refactored
 or re-written before they are deployed into a cloud environment. If the legacy applications
 are mixed with modern systems, then the need of "translation" arises. Assuming, that
 the modern part is a secure application, that uses OIDC to authorize its users
@@ -87,11 +87,12 @@ application that is not maintainable.
 
 ## The Practice
 
-In practice, a Service Mesh (see {@sec:service_mesh}) may be able to perform
-such credential transformation.
-
-TODO: describe isio approach to shared auth.
-TODO: describe in deficiencies that service mesh are complicated and therefore not a solution
+In practice, no current solution exists, that allows credentials to be transformed
+between authentication schemes. The service mesh "Istio" provides a mechanism to
+secure services that communicate with mTLS (mutual TLS) as well as an external
+mechanism to provide authentication and authorization capabilities. This works well
+when all applications in the system share the same authentication scheme. As soon
+as two or more schemes are in place, the need for transformation arises again.
 
 ## Deficiencies
 
@@ -118,4 +119,9 @@ as communication is between data centers, the communication and the credentials
 must be protected. It is not possible to create a zero trust environment with
 the need of knowledge about the targets authentication schemes.
 
-TODO: conditional access?
+The usage of a service mesh to mitigate the problem is not an option since the
+initial problem of transforming credential still persists. Service meshes may
+provide a way to secure communication between services, but they are not able
+to transform credentials to a required format for any legacy application.
+Furthermore, service meshes introduce configurational complexity to the system which, in our
+opinion, is not needed without a clear usecase for a service mesh.

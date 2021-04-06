@@ -7,7 +7,9 @@ and general definitions.
 
 ## Context
 
-This project aims at the specific problem of declarative conversion
+> TODO: restructure to have better reading flow
+
+This project addresses the specific problem of declarative conversion
 of credentials to ensure authorized communication between services.
 The solution may be runnable on various platforms but will be implemented
 according to Kubernetes standards. Kubernetes^[<https://kubernetes.io/>] is an
@@ -15,7 +17,7 @@ orchestration platform that works with containerized applications.
 The solution introduces an operator pattern, as explained in
 {@sec:kubernetes_operator}
 
-The deliverables of this and further projects may aid services to
+The deliverables of this and further projects may aid applications or APIs to
 communicate with each other despite different authentication
 mechanisms. As an example, this could be used to enable a modern
 web application that uses OpenID Connect (OIDC) as the authentication and authorization
@@ -37,7 +39,7 @@ internal DNS capabilities of Kubernetes are sufficient.
 
 ## Kubernetes
 
-### What is Kubernetes
+### Introduction
 
 Kubernetes is an open source platform that manages containerized
 workloads and applications. Workloads may be accessed via "Services"
@@ -50,7 +52,7 @@ This image is licensed under the CC BY 4.0 license [@cc:CCBY4.0].
 ](images/Kubernetes/Container_Evolution.png){#fig:kubernetes_container_evolution
 short-caption="Kubernetes Container Evolution"}
 
-According to the Kubernetes team, the way of deploying applications
+According to Kubernetes, the way of deploying applications
 has evolved. As shown in {@fig:kubernetes_container_evolution}, the
 "Traditional Era" was the time, when applications were deployed
 via FTP access and started manually (e.g. on an Apache webserver).
@@ -61,7 +63,8 @@ a new way deploying workloads by virtualizing processes instead of
 operating systems and therefore better use the given resources
 [@github:kubernetesWebsite].
 
-Kubernetes is a major player in "Container Deployment" as seen in
+Kubernetes is a major player, among others like "Docker Swarm" or "Cloud Foundry",
+in "Container Deployment" as seen in
 {@fig:kubernetes_container_evolution} and supports teams with the following
 features according to the documentation [@github:kubernetesWebsite]:
 
@@ -87,9 +90,14 @@ The list of features is not complete. There are many concepts in Kubernetes
 which help to build complex deployment scenarios and enable teams
 to ship their applications in an agile manner.
 
+Kubernetes works with containerized applications. In contrast to "plain" Docker,
+it orchestrates the applications and is responsible to reach the desired state
+depicted in the applications manifest files. Examples of such manifests can
+be viewed at: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment.
+
 ### Terminology
 
-Find the common Kubernetes terminology attached in {@tbl:kubernetes_terminology}.
+In {@tbl:kubernetes_terminology}, we state the most common Kubernetes terminology.
 The table provides a list of terms that will be used to explain concepts like
 the operator pattern in {@sec:kubernetes_operator}.
 
@@ -118,7 +126,7 @@ viewed on [operatorhub.io](https://operatorhub.io/).
 
 ![Kubernetes Operator Workflow](diagrams/sequences/kubernetes-operator-process.puml){#fig:kubernetes_operator_workflow}
 
-{@fig:kubernetes_operator_workflow} shows the general workflow of an event that
+In {@fig:kubernetes_operator_workflow}, we depict the general workflow of an event that
 is managed by an operator. When an operator is installed and running on a
 Kubernetes cluster, it registers "Resource Watchers" with the API and receives notifications
 when the master node modifies resources a watched resource. The overviewed events
@@ -136,8 +144,10 @@ action may include to update resources, create more resources or even delete oth
 
 ### Sidecar {#sec:kubernetes_sidecar}
 
-The sidecar pattern is the most common pattern for multi-container
-deployments. Sidecars are containers that enhance the functionality
+According to @burns:DesignPatternsForContainerSystems,
+the sidecar pattern is the most common pattern for multi-container
+deployments [@burns:DesignPatternsForContainerSystems, section 4.1].
+Sidecars are containers that enhance the functionality
 of the main container in a pod. An example for such a sidecar is
 a log collector, that collects log files written to the file system
 and forwards them towards some log processing software [@burns:DesignPatternsForContainerSystems, section 4.1].
@@ -153,6 +163,12 @@ short-caption="Example of a sidecar container"}
 The example shown in {@fig:kubernetes_sidecar} is extensible.
 Such sidecars may be injected by a mutator or an operator to extend
 functionality.
+
+Common usecases for sidecars are controlling the data flow in a cluster in service mesh,
+providing access to secure locations or performing additional tasks such as collecting logs
+of an application. Since sidecars are tightly coupled to the original application, they scale
+with the Pod. It is not possible to scale a sidecar without scaling the Pod - and therefore the
+application - itself.
 
 ### Service Mesh {#sec:service_mesh}
 
@@ -197,40 +213,71 @@ enables administrators to build more complex scenarios and deployments.
 
 ## Authentication and Authorization
 
-### Basic {#sec:basic_auth}
+### Basic (RFC7617) {#sec:basic_auth}
 
 The `Basic` authentication scheme is a trivial authentication that accepts
 a username and a password encoded in Base64. To transmit the credentials,
 a construct with the schematics of `<username>:<password>` is created and
 inserted into the http request as the `Authorization` header with the prefix
-`Basic` [@reschke:BasicAuth, section 2]. An example with the username
+`Basic` [@RFC7617, section 2]. An example with the username
 `ChristophBuehler` and password `SuperSecure` would result in the following header:
-`Authorization: Basic Q2hyaXN0b3BoQnVlaGxlcjpTdXBlclNlY3VyZQ==`.
+
+> `Authorization: Basic Q2hyaXN0b3BoQnVlaGxlcjpTdXBlclNlY3VyZQ==`
 
 ### OpenID Connect (OIDC) {#sec:auth_oidc}
 
-OpenID Connect is an authenticating mechanism, that builds upon
-the `OAuth 2.0` authorization protocol. OAuth 2.0 deals with authorization
-only and grants access to data and features on a specific application.
+OpenID Connect is not defined in a RFC, the specification is provided
+by the OpenID Foundation (OIDF). OIDC however, builds on top of
+OAuth, which is defined by **RFC6749**.
+
+OpenID Connect is an authenticating scheme, that builds upon
+the `OAuth 2.0` authorization protocol. OAuth itself is an authorization framework,
+that enables applications to gain access to a service (API or other) [@RFC6749, abstract].
+OAuth 2.0 deals with authorization only and grants access to data and features on a specific application.
 OAuth by itself does not define _how_ the credentials are transmitted
-and exchanged [@hardt:OAuth2.0Spec]. OIDC adds a layer on top of
+and exchanged [@RFC6749]. OIDC adds a layer on top of
 OAuth 2.0 that defines _how_ these credentials must be exchanged. This
 adds login and profile capabilities to any application that uses OIDC
-[@sakimura:OIDCCore].
+[@spec:OIDC].
 
-![OIDC code authorization flow [@sakimura:OIDCCore].
+![OIDC code authorization flow [@spec:OIDC]. Only contains the credential flow,
+without the explicit OAuth part. OAuth handles the authorization whereas OIDC handles
+the authentication.
 ](diagrams/sequences/oidc-code-flow.puml){#fig:oidc_code_flow
 short-caption="OIDC code flow"}
 
 When a user wants to authenticate himself with OIDC, one of the possible
-"flows" is the "Authorization Code Flow" [@sakimura:OIDCCore, sec. 3.1]. Other possible flows
-are the "Implicit Flow" [@sakimura:OIDCCore, sec. 3.2] and the "Hybrid Flow"
-[@sakimura:OIDCCore, sec. 3.3]. In {@fig:oidc_code_flow}, the "Authorization Code Flow" is
-depicted. A user that wants to access a certain resource on a relying party (i.e. something
+"flows" is the "Authorization Code Flow" [@spec:OIDC, sec. 3.1]. Other possible flows
+are the "Implicit Flow" [@spec:OIDC, sec. 3.2] and the "Hybrid Flow"
+[@spec:OIDC, sec. 3.3]. {@fig:oidc_code_flow} depicts the "Authorization Code Flow".
+A user that wants to access a certain resource on a relying party (i.e. something
 that relies on the information about the user) and is not authenticated and authorized, the
 relying party forwards the user to the identity provider (IdP). The user provides his
 credentials to the IdP and is returned to the relying party with an authorization code.
 The relying party can then exchange the authorization code to valid tokens on the
 token endpoint of the IdP. Typically, `access_token` and `id_token` are provided. While
-the `id_token` must be a JSON Web Token (JWT) [@sakimura:OIDCCore, sec. 2],
-the `access_token` can be in any format [@sakimura:OIDCCore, sec. 3.3.3.8].
+the `id_token` must be a JSON Web Token (JWT) [@spec:OIDC, sec. 2],
+the `access_token` can be in any format [@spec:OIDC, sec. 3.3.3.8].
+
+An example of an `id_token` in JWT format may be:
+
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.
+SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+```
+
+The stated JWT token contains:
+
+```json
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+
+{
+  "sub": "1234567890",
+  "name": "John Doe",
+  "iat": 1516239022
+}
+```

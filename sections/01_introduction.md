@@ -22,4 +22,9 @@ $X \text{ services} * Y \text{ authentication methods}$].
 The goal of the project "Distributed Authentication Mesh" is to provide a solution
 for this problem.
 
+Prerequisits:
+
+- Docker knowledge
+- Microservice knowledge
+
 > TODO.

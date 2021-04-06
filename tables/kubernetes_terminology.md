@@ -1,13 +1,18 @@
 +------------+------------------------------------------------------------+
 |    Term    |                        Description                         |
 +============+============================================================+
+| Docker     | Container runtime. Enables developers to create images     |
+|            | of applications. Those images are then run in an isolated  |
+|            | environment. Docker images are often used in Kubernetes    |
+|            | to define the application that Kubernetes should run.      |
++------------+------------------------------------------------------------+
 | Container  | Smallest possible unit in a deployment.                    |
 |            | Contains the definition of the workload.                   |
 |            | A container consists of a container image, arguments,      |
 |            | volumes and other specific information to carry out        |
 |            | a task.                                                    |
 +------------+------------------------------------------------------------+
-| Pod        | Composed of multiple containers. Is ran by kubernetes      |
+| Pod        | Composed of multiple containers. Is ran by Kubernetes      |
 |            | as an instance of a deployment. Pods may be scaled         |
 |            | according to definitions or "pod scalers". Highly          |
 |            | coupled tasks are deployed together in a pod               |
