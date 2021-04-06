@@ -7,7 +7,7 @@
 | NFR 2 | The solution must adhere to current best practices           |
 |       | and security mechanisms. Furthermore, it **must** be         |
 |       | implemented with security issues as stated in the OWASP      |
-|       | Top Ten^[<https://owasp.org/www-project-top-ten>] in mind.   |
+|       | Top Ten (<https://owasp.org/www-project-top-ten>) in mind.   |
 +-------+--------------------------------------------------------------+
 | NFR 3 | The concept of the solution is applicable to cluster         |
 |       | orchestration software other than Kubernetes. The            |
@@ -30,23 +30,23 @@
 |       | mesh is already in place, the solution must be able to       |
 |       | work with the provided elements.                             |
 +-------+--------------------------------------------------------------+
-| NFR 7 | The architecture must be scaleable. The provided software |
-|       | must be able to scale according to the business needs |
-|       | of the overall system. |
+| NFR 7 | The architecture must be scaleable. The provided software    |
+|       | must be able to scale according to the business needs        |
+|       | of the overall system.                                       |
 +-------+--------------------------------------------------------------+
 | NFR 8 | Each translator should only handle one authentication scheme |
-|       | to ensure separation of concerns and scalability of |
-|       | the whole solution. |
-|       |  |
-|       |  |
-|       |  |
+|       | to ensure separation of concerns and scalability of          |
+|       | the whole solution.                                          |
+|       |                                                              |
+|       |                                                              |
+|       |                                                              |
 +-------+--------------------------------------------------------------+
-| NFR 9 | The solution  |
-|       |  |
-|       |  |
-|       |  |
-|       |  |
-|       |  |
+| NFR 9 | The solution                                                 |
+|       |                                                              |
+|       |                                                              |
+|       |                                                              |
+|       |                                                              |
+|       |                                                              |
 +-------+--------------------------------------------------------------+
 
 Table: Non-Functional Requirements {#tbl:non-functional-requirements}

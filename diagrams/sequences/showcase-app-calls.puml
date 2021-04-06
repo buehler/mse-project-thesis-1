@@ -16,6 +16,7 @@ fe -> m : Call "/orders"
 alt USE_WIREPACT = true
     m -> l : Call "/orders"\nwith OIDC token
 else USE_WIREPACT = false
+    m -> m : Transform credentials
     m -> l : Call "/orders"\nwith basic auth
 end
 
