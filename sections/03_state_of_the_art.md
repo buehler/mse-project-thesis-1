@@ -94,7 +94,7 @@ mechanism to provide authentication and authorization capabilities. This works w
 when all applications in the system share the same authentication scheme. As soon
 as two or more schemes are in place, the need for transformation arises again.
 
-## Deficiencies
+## Deficiencies {#sec:deficiencies}
 
 The situation described in the previous sections introduces several problems.
 It does not matter if "Service B" is a third party application to which

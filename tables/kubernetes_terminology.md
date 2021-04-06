@@ -6,6 +6,13 @@
 |            | environment. Docker images are often used in Kubernetes    |
 |            | to define the application that Kubernetes should run.      |
 +------------+------------------------------------------------------------+
+| Kustomize  | "Kustomize" is a special templating CLI to declaratively   |
+|            | bundle Kubernetes manifests. It consists of a              |
+|            | `kustomization.yaml` and various referenced manifest       |
+|            | yaml files. It is declarative and does not allow           |
+|            | dynamic structures. It helps administrators to             |
+|            | template applications for Kubernetes.                      |
++------------+------------------------------------------------------------+
 | Container  | Smallest possible unit in a deployment.                    |
 |            | Contains the definition of the workload.                   |
 |            | A container consists of a container image, arguments,      |
@@ -60,8 +67,8 @@
 |            | modification or deletion of resources.                     |
 +------------+------------------------------------------------------------+
 | Mutator    | Mutators are called before Kubernetes validates and stores |
-|            | a resource. Mutators may return JSON patches               |
-|            | [@bryan:JSONPatch] to instruct Kubernetes to modify        |
+|            | a resource. Mutators may return JSON patches **RFC6902**   |
+|            | [@RFC6902] to instruct Kubernetes to modify                |
 |            | a resource prior to validating and storing them.           |
 +------------+------------------------------------------------------------+
 

@@ -105,6 +105,8 @@ the operator pattern in {@sec:kubernetes_operator}.
 tables/kubernetes_terminology.md
 ```
 
+> TODO: UML of kubernetes parts
+
 ### Operator {#sec:kubernetes_operator}
 
 An operator in Kubernetes is an extension
