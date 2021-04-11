@@ -28,6 +28,7 @@ clean_diagrams: $(call rwildcard,diagrams,*.png)
 
 
 clean_build:
+	@echo "Clean build directory."
 	@rm -rf ./public
 	@mkdir ./public
 
@@ -40,6 +41,7 @@ build_html:
 	@pandoc ${common_build_args} --toc --output=public/index.html ${sections}
 	@cp -R images public/
 	@cp -R diagrams public/
+	@rm -rf public/diagrams/.gitignore
 
 
 build_pdf:

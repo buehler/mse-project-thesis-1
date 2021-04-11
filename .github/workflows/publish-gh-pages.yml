@@ -11,29 +11,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - run: |
-          mkdir public
-          echo "FILELIST=$(printf '"%s" ' sections/*.md)" >> $GITHUB_ENV
       - name: Build Page
         uses: docker://ghcr.io/buehler/mse-pandoc:latest
         with:
-          args: >-
-            --lua-filter=lib/lua-filters/include-files/include-files.lua
-            --filter pandoc-xnos
-            --lua-filter=lib/custom/plantuml-converter.lua
-            --lua-filter=lib/lua-filters/short-captions/short-captions.lua
-            --metadata-file=metadata.yaml
-            --citeproc
-            --bibliography=bibliography.bib
-            --toc
-            --standalone
-            --output=public/index.html
-            ${{ env.FILELIST }}
-      - name: Copy Assets
-        run: |
-          cp -R images public/images
-          cp -R diagrams public/diagrams
-          rm -rf public/diagrams/.gitignore
+          args: make clean_build build_html
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -45,24 +26,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - run: |
-          mkdir public
-          echo "FILELIST=$(printf '"%s" ' sections/*.md)" >> $GITHUB_ENV
       - name: Build Page
         uses: docker://ghcr.io/buehler/mse-pandoc:latest
         with:
-          args: >-
-            --lua-filter=lib/lua-filters/include-files/include-files.lua
-            --filter pandoc-xnos
-            --lua-filter=lib/custom/plantuml-converter.lua
-            --lua-filter=lib/lua-filters/short-captions/short-captions.lua
-            --metadata-file=metadata.yaml
-            --citeproc
-            --bibliography=bibliography.bib
-            --toc
-            --standalone
-            --output=public/report.pdf
-            ${{ env.FILELIST }}
+          args: make clean_build build_pdf
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
