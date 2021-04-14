@@ -11,7 +11,7 @@ common_build_args = \
 	--standalone
 
 
-.PHONY: default clean clean_diagrams clean_build build build_html build_pdf force
+.PHONY: default clean clean_diagrams clean_build build build_html build_pdf build_sections force
 
 default: clean_build build
 
@@ -19,7 +19,7 @@ default: clean_build build
 force:
 
 
-clean: clean_diagrams
+clean: clean_diagrams clean_build
 
 
 clean_diagrams: $(call rwildcard,diagrams,*.png)
@@ -55,3 +55,5 @@ sections/%.md: force
 		--metadata-file=./section-metadata.yaml \
 		--output=public/$(patsubst sections/%,%,$(patsubst %.md,%.pdf,$(@))) \
 		$@
+
+build_sections: $(foreach section,$(sections),$(section))
