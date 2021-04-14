@@ -271,11 +271,10 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <li><a href="#definition">Definition</a></li>
 <li><a href="#requirements">Requirements</a></li>
 <li><a href="#non-functional-requirements">Non-Functional Requirements</a></li>
-<li><a href="#standards-and-best-practices">Standards and Best Practices</a></li>
 <li><a href="#contrast">Contrast</a>
 <ul>
 <li><a href="#saml">SAML</a></li>
-<li><a href="#ws-">WS-*</a></li>
+<li><a href="#sec:ws-deathstar">WS-*</a></li>
 </ul></li>
 <li><a href="#architecture">Architecture</a>
 <ul>
@@ -480,14 +479,15 @@ SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;iat&quot;</span><span class="fu">:</span> <span class="dv">1516239022</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <h1 id="state-of-the-art-the-practice-and-deficiencies">State of the Art, the Practice and Deficiencies</h1>
-<p>This section gives an overview over the current state of the art, the practice, as well as the deficiencies to an optimal situation. Furthermore this section states an assessment of the current practice and the solutions found.</p>
+<p>This section gives an overview over the current state of the art, the practice, as well as the deficiencies to a desired situation.</p>
 <h2 id="state-of-the-art">State of the Art</h2>
-<p>In cloud environments, a problem which is well solved is the transmission of data from one point to another. Kubernetes, for example, uses “Services” that provide a DNS name for a specified workload. In terms of authentication and authorization, there exist a variety of schemes that enable an application to authenticate and authorize their users. OpenID Connect (OIDC) (see Section <a href="#sec:auth_oidc">2.3.2</a>) is a modern authentication scheme, that builds upon OAuth 2.0, that in turn handles authorization <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014)</span>.</p>
+<p>In cloud environments, a problem that is solved is the transmission of data from one point to another. Kubernetes, for example, uses “Services” that provide a DNS name for a specified workload. For service meshes, additionally a sidecar is injected into the Pod that contains - in the case of “Istio” - an Envoy proxy to handle data transmission.</p>
+<p>In terms of authentication and authorization, there exist a variety of schemes that enable an application to authenticate and authorize their users. OpenID Connect (OIDC) (see Section <a href="#sec:auth_oidc">2.3.2</a>) is a modern authentication scheme, that builds upon OAuth 2.0, that in turn handles authorization <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014)</span>.</p>
 <p>Modern software architectures that are specifically designed for the cloud are called “Cloud Native Applications” (CNA). <span class="citation" data-cites="kratzke:CloudNativeApplications">Kratzke and Peinl (2016)</span> define a CNA as:</p>
 <blockquote>
 <p>“A cloud-native application is a distributed, elastic and horizontal scalable system composed of (micro)services which isolates state in a minimum of stateful components. The application and each self-contained deployment unit of that application is designed according to cloud-focused design patterns and operated on a self-service elastic platform.” <span class="citation" data-cites="kratzke:CloudNativeApplications">(Kratzke and Peinl 2016, sec. 3)</span>.</p>
 </blockquote>
-<p>However, with CNAs and the general movement to cloud environments, not all applications get that chance to adjust. For various reasons like budget, time or complexity, legacy applications and monoliths are not refactored or re-written before they are deployed into a cloud environment. If the legacy applications are mixed with modern systems, then the need of “translation” arises. Assuming, that the modern part is a secure application, that uses OIDC to authorize its users and the application needs to fetch data from the legacy system that does not understand OIDC, code changes must be made. Following the previous assumption, the code changes will likely be introduced into the modern application, since it is better maintainable and deployable than the legacy monolith. Hence, the modern application receives changes that may introduce new bugs or security vulnerabilities.</p>
+<p>However, with CNAs and the general movement to cloud environments and digitalization, not all applications get that chance to adjust. For various reasons like budget, time or complexity, legacy applications and monoliths are not refactored or re-written before they are deployed into a cloud environment. If the legacy applications are mixed with modern systems, then the need of “translation” arises. Assuming, that the modern part is a secure application, that uses OIDC to authorize its users and the application needs to fetch data from the legacy system that does not understand OIDC, code changes must be made. Following the previous assumption, the code changes will likely be introduced into the modern application, since it is better maintainable and deployable than the legacy monolith. Hence, the modern application receives changes that may introduce new bugs or security vulnerabilities.</p>
 <div id="fig:is_solution_components" class="fignos">
 <figure>
 <img src="diagrams/component/32d39edc1a049309b9656b207affa129.png" data-short-caption="Microservice Architecture with legacy components" alt="Figure 5: Microservice Architecture that contains modern applications as well as legacy services." /><figcaption aria-hidden="true"><span>Figure 5:</span> Microservice Architecture that contains modern applications as well as legacy services.</figcaption>
@@ -501,7 +501,7 @@ SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 <li><strong>Service A</strong>: A modern API application and primary access point for the client</li>
 <li><strong>Service B</strong>: Legacy service that is called by service a to fetch some additional data</li>
 </ul>
-<p>The stated scenario is quite common. Legacy services may not be the primary use-case, but there exist other reasons to have the need of using a translation of credentials. Another case is the usage of third party applications which only support certain authentication mechanisms.</p>
+<p>In the practice, we encountered the stated scenario at various points in time. Legacy services may not be the primary use-case, a nother case is the usage of third party applications which only support certain authentication mechanisms and the code is not accessable.</p>
 <div id="fig:is_solution_process" class="fignos">
 <figure>
 <img src="diagrams/sequences/6faa74afc76899917ebd60382cc3b148.png" data-short-caption="Current process of legacy communication" alt="Figure 6: Current state of the art of accessing legacy systems from modern services with differing authentication schemes." /><figcaption aria-hidden="true"><span>Figure 6:</span> Current state of the art of accessing legacy systems from modern services with differing authentication schemes.</figcaption>
@@ -510,14 +510,14 @@ SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 <p>The process in Figure <a href="#fig:is_solution_process">6</a> shows the process of communication in such a described scenario. In Figure <a href="#fig:is_solution_process">6</a>, the “Client” is the single page application (SPA), that authenticates against an arbitrary Identity and Access Management System (IAM). “Service A” is the modern backend that supports the client as backend API. Therefore, “Service A” provides functionality for the client. “Service B” is a legacy application, for example an old ERP with order information, that was moved into the cloud, but is not refactored nor rewritten to communicate with modern authentication technologies.</p>
 <p>In this scenario, the client calls some API on “Service A” that then will call “Service B” to get additional information to present to the user. Since the client and “Service A” communicate with the same authentication technology, the call is straight forward. The client authenticates himself and obtains an access token. When calling the service (“Service A”), the token is transmitted and the service can check with the IAM if the user is authorized to access the system. When “Service A” then calls “Service B” for additional information, it needs to translate the user provided credentials to a format that “Service B” understands. In the provided example, “Service B” is only able to handle Basic Authentication, as explained in Section <a href="#sec:basic_auth">2.3.1</a>. This means, if “Service A” wants to communicate with “Service B,” it must implement some translation logic to change the credentials to a format that B understands. This introduces code changes to “Service A,” since “Service B” is a legacy application that is not maintainable.</p>
 <h2 id="the-practice">The Practice</h2>
-<p>In practice, no current solution exists, that allows credentials to be transformed between authentication schemes. The service mesh “Istio” provides a mechanism to secure services that communicate with mTLS (mutual TLS) as well as an external mechanism to provide authentication and authorization capabilities. This works well when all applications in the system share the same authentication scheme. As soon as two or more schemes are in place, the need for transformation arises again.</p>
+<p>In practice, no current solution exists, that allows credentials to be transformed between authentication schemes. The service mesh “Istio” provides a mechanism to secure services that communicate with mTLS (mutual TLS) <span class="citation" data-cites="istio:website:mtls">(Istio Authors 2021b)</span> as well as an external mechanism to provide custom authentication and authorization capabilities <span class="citation" data-cites="istio:website:custom-authz">(Istio Authors 2021a)</span>. This works well when all applications in the system share the same authentication scheme. As soon as two or more schemes are in place, the need for transformation arises again.</p>
 <h2 id="sec:deficiencies">Deficiencies</h2>
 <p>The situation described in the previous sections introduces several problems. It does not matter if “Service B” is a third party application to which no code changes can be applied to, or if it is a legacy application that cannot be updated for the time being. Most likely, the code change to provide the ability to communicate will be introduced into “Service A.” This adds the risk of errors since new code must be produced, which would not be necessary if the legacy service would be refactored. Also, changing “Service A” to communicate with B may be a feasible solution in a small setup. But as the landscape of the microservice architecture grows, this solution does not scale well. The matrix problem <span class="math inline"><em>X</em> services * <em>Y</em> authentication methods</span> describes this problematic. As the landscape and the different methods of authentication grows, it is not a feasible solution to implement each and every authentication scheme in all the services.</p>
 <p>Another issue that emerges with this transformation of credentials: The credentials leak into the trust zone. As long as each service is in the same trust zone (for example in the same data-center in the same cluster behind the same API gateway), this may not be problematic. As soon as communication is between data centers, the communication and the credentials must be protected. It is not possible to create a zero trust environment with the need of knowledge about the targets authentication schemes.</p>
 <p>The usage of a service mesh to mitigate the problem is not an option since the initial problem of transforming credential still persists. Service meshes may provide a way to secure communication between services, but they are not able to transform credentials to a required format for any legacy application. Furthermore, service meshes introduce configurational complexity to the system which, in our opinion, is not needed without a clear usecase for a service mesh.</p>
 <h1 id="distributed-authentication-mesh">Distributed Authentication Mesh</h1>
 <p>This section gives a general overview of the proposed solution. Furthermore, boundaries of the solution are provided along with common software engineering elements like requirements, non-functional requirements and the documentation of the architecture.</p>
-<p>The proposed architecture may be used as generic description for a solution to the described problem. For this project, the solution is implemented specifically to work within a Kubernetes cluster.</p>
+<p>The proposed architecture may be used as generic description for a solution to the described problem. For this project, the solution is implemented specifically to work within a Kubernetes cluster. The delivery of this project is a proof of concept to provide insights into the general topic of manipulating HTTP requests in-flight.</p>
 <h2 id="definition">Definition</h2>
 <p>The solution to solve the stated problems in Section <a href="#sec:deficiencies">3.3</a> must be able to transform arbitrary credentials into a format that the target service understands. For this purpose, the architecture contains a service which runs as a sidecar among the target service. This sidecar intercepts requests to the target and transforms the Authorization HTTP header. The sidecar is - like in a service mesh - used to intercept inbound and outbound traffic.</p>
 <p>However, the solution <strong>must not</strong> interfere with the data flow itself. The problem of proxying data from point A to B is a well solved problem. In the given work, an Envoy proxy is used to deliver data between the services. Envoy allows the usage of an external service to modify requests in-flight.</p>
@@ -621,11 +621,33 @@ SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 </table>
 </div>
 <p>Like the requirements in Table <a href="#tbl:functional-requirements">2</a>, the PoC will not meet all NFRs that are stated in Table <a href="#tbl:non-functional-requirements">3</a>. Further work is needed to complete the PoC to a production ready software.</p>
-<h2 id="standards-and-best-practices">Standards and Best Practices</h2>
 <h2 id="contrast">Contrast</h2>
+<p>To distinguish this solution from other software, this sections gives a contrast to two specific topics. The given topics stand for a general architectural idea and the contrast to the presented solution.</p>
 <h3 id="saml">SAML</h3>
-<h3 id="ws-">WS-*</h3>
-<p>Show that this project is not a protocol contract like WS-*.</p>
+<p>The “Security Assertion Markup Language” (SAML) is a so called “Federated Identity Management” (FIdM) standard. SAML, OAuth and OIDC represent the three most popular FIdm standards <span class="citation" data-cites="naik:SAMLandFIdM">(Naik and Jenkins 2017)</span>. SAML is an XML framework for transmitting user data, such as authentication, entitlement and other attributes, between services and organizations <span class="citation" data-cites="naik:SAMLandFIdM">(Naik and Jenkins 2017)</span>.</p>
+<p>While SAML is a partial solution for the stated problem, it does not cover the use case when credentials need to be transformed to communicate with a legacy system. SAML enables services to share identities in a trustful way but all communicating partners must implement the SAML protocol to be part of the network. This project addresses the specific transformation of credentials into a format for some legacy systems. The basic idea of SAML however, may be used as a baseline of security and the general idea of processing identities.</p>
+<h3 id="sec:ws-deathstar">WS-*</h3>
+<p>The term “WS-*” contains a broad class of specifications within the WSDL/SOAP context. The specifications were created by the World Wide Web Consortium (W3C) but never finished and officially published.</p>
+<p>The “Simple Object Access Protocol” (SOAP) is a protocol to exchange information between services in an XML encoded message <span class="citation" data-cites="curbera:SOAP-and-WSDL">(Curbera et al. 2002)</span>. It provides a way of communication between web services. A SOAP consists of an “envelope” that contains a “body” and an optional “header” to transfer encoded objects <span class="citation" data-cites="curbera:SOAP-and-WSDL">(Curbera et al. 2002)</span>. An example SOAP message from <span class="citation" data-cites="curbera:SOAP-and-WSDL">Curbera et al. (2002)</span> may look like this:</p>
+<pre><code>POST /travelservice
+SOAPAction: &quot;http://www.acme-travel.com/checkin&quot;
+Content-Type: text/xml; charset=&quot;utf-8&quot;
+Content-Length: nnnn
+
+&lt;SOAP:Envelope xmlns:SOAP=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+  &lt;SOAP:Body&gt;
+    &lt;et:eTicket xmlns:et=&quot;http://www.acme-travel.com/eticket/schema&quot;&gt;
+      &lt;et:passengerName first=&quot;Joe&quot; last=&quot;Smith&quot;/&gt;
+      &lt;et:flightInfo
+        airlineName=&quot;AA&quot;
+        flightNumber=&quot;1111&quot;
+        departureDate=&quot;2002-01-01&quot;
+        departureTime=&quot;1905&quot;/&gt;
+    &lt;/et:eTicket&gt;
+  &lt;/SOAP:Body&gt;
+&lt;/SOAP:Envelope&gt;</code></pre>
+<p>The “Web Services Description Language” (WSDL), however, is an XML based description of a web service. The goal of WSDL is to provide a description of methods that may be called on a web service <span class="citation" data-cites="curbera:SOAP-and-WSDL">(Curbera et al. 2002)</span>. WSDL fills the needed endpoint description that SOAP is missing. While SOAP provides basic communication, WSDL defines the exact methods that can be called on an endpoint <span class="citation" data-cites="curbera:SOAP-and-WSDL">(Curbera et al. 2002)</span>.</p>
+<p>The proposed solution differs from WS-* such that there is no exact specification needed for the target service. While the solution contains a common domain language - a SOAP like protocol to encode data - it does not specify the endpoints of a service. The solution merely interacts with the HTTP request that targets a specific service and transforms the credentials from the common format to the specific format. Of course, certain authentication schemes need specific information to generate their credentials out of the data.</p>
 <h2 id="architecture">Architecture</h2>
 <h3 id="brief-description">Brief Description</h3>
 <h3 id="usecases">UseCases</h3>
@@ -751,11 +773,20 @@ CNCF. 2021. <span>“Kubernetes Website.”</span> <em>GitHub Repository</em>. <
 <div id="ref-cc:CCBY4.0" class="csl-entry" role="doc-biblioentry">
 Creative Commons. 2021. <span>“Attribution 4.0 International (CC BY 4.0).”</span> <a href="https://creativecommons.org/licenses/by/4.0/">https://creativecommons.org/licenses/by/4.0/</a>.
 </div>
+<div id="ref-curbera:SOAP-and-WSDL" class="csl-entry" role="doc-biblioentry">
+Curbera, F., M. Duftler, R. Khalaf, W. Nagy, N. Mukhi, and S. Weerawarana. 2002. <span>“Unraveling the Web Services Web: An Introduction to <span>SOAP</span>, <span>WSDL</span>, and <span>UDDI</span>.”</span> <em><span>IEEE</span> Internet Computing</em> 6 (2): 86–93. <a href="https://doi.org/10.1109/4236.991449">https://doi.org/10.1109/4236.991449</a>.
+</div>
 <div id="ref-dobies:KubernetesOperators" class="csl-entry" role="doc-biblioentry">
 Dobies, Jason, and Joshua Wood. 2020. <em>Kubernetes Operators: Automating the Container Orchestration Platform</em>. " O’Reilly Media, Inc.".
 </div>
 <div id="ref-RFC6749" class="csl-entry" role="doc-biblioentry">
 Hardt, Dick, and others. 2012. <span>“The <span>OAuth</span> 2.0 Authorization Framework.”</span> RFC. Internet Engineering Task Force <span>IETF</span>. <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>.
+</div>
+<div id="ref-istio:website:custom-authz" class="csl-entry" role="doc-biblioentry">
+Istio Authors. 2021a. <span>“External Authorization.”</span> <em>Istio</em>. <a href="https://istio.io/latest/docs/tasks/security/authorization/authz-custom/">https://istio.io/latest/docs/tasks/security/authorization/authz-custom/</a>.
+</div>
+<div id="ref-istio:website:mtls" class="csl-entry" role="doc-biblioentry">
+———. 2021b. <span>“Mutual TLS Migration.”</span> <em>Istio</em>. <a href="https://istio.io/latest/docs/tasks/security/authentication/mtls-migration/">https://istio.io/latest/docs/tasks/security/authentication/mtls-migration/</a>.
 </div>
 <div id="ref-kratzke:CloudNativeApplications" class="csl-entry" role="doc-biblioentry">
 Kratzke, N., and R. Peinl. 2016. <span>“ClouNS - a Cloud-Native Application Reference Model for Enterprise Architects.”</span> In <em>2016 IEEE 20th International Enterprise Distributed Object Computing Workshop (EDOCW)</em>, 1–10. <a href="https://doi.org/10.1109/EDOCW.2016.7584353">https://doi.org/10.1109/EDOCW.2016.7584353</a>.
@@ -765,6 +796,9 @@ Li, W., Y. Lemieux, J. Gao, Z. Zhao, and Y. Han. 2019. <span>“Service Mesh: Ch
 </div>
 <div id="ref-montesi:CircuitBreakers" class="csl-entry" role="doc-biblioentry">
 Montesi, Fabrizio, and Janine Weber. 2016. <span>“Circuit Breakers, Discovery, and <span>API</span> Gateways in Microservices.”</span> <em>CoRR</em> abs/1609.05830. <a href="http://arxiv.org/abs/1609.05830">http://arxiv.org/abs/1609.05830</a>.
+</div>
+<div id="ref-naik:SAMLandFIdM" class="csl-entry" role="doc-biblioentry">
+Naik, N., and P. Jenkins. 2017. <span>“Securing Digital Identities in the Cloud by Selecting an Apposite Federated Identity Management from <span>SAML</span>, <span>OAuth</span> and <span>OpenID</span> Connect.”</span> In <em>2017 11th International Conference on Research Challenges in Information Science (RCIS)</em>, 163–74. <a href="https://doi.org/10.1109/RCIS.2017.7956534">https://doi.org/10.1109/RCIS.2017.7956534</a>.
 </div>
 <div id="ref-RFC7617" class="csl-entry" role="doc-biblioentry">
 Reschke, Julian. 2015. <span>“The ’Basic’ <span>HTTP</span> Authentication Scheme.”</span> RFC. Internet Engineering Task Force <span>IETF</span>. <a href="https://tools.ietf.org/html/rfc7617">https://tools.ietf.org/html/rfc7617</a>.
