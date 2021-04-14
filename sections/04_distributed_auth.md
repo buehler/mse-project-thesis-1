@@ -6,7 +6,8 @@ like requirements, non-functional requirements and the documentation of the arch
 
 The proposed architecture may be used as generic description for a solution to the
 described problem. For this project, the solution is implemented specifically to work
-within a Kubernetes cluster.
+within a Kubernetes cluster. The delivery of this project is a proof of concept
+to provide insights into the general topic of manipulating HTTP requests in-flight.
 
 ## Definition
 
@@ -49,15 +50,72 @@ Like the requirements in {@tbl:functional-requirements}, the PoC will
 not meet all NFRs that are stated in {@tbl:non-functional-requirements}. Further
 work is needed to complete the PoC to a production ready software.
 
-## Standards and Best Practices
-
 ## Contrast
+
+To distinguish this solution from other software, this sections gives
+a contrast to two specific topics. The given topics stand for a general
+architectural idea and the contrast to the presented solution.
 
 ### SAML
 
-### WS-\*
+The "Security Assertion Markup Language" (SAML) is a so called "Federated Identity Management"
+(FIdM) standard. SAML, OAuth and OIDC represent the three most popular FIdm standards
+[@naik:SAMLandFIdM]. SAML is an XML framework for transmitting user data, such as
+authentication, entitlement and other attributes, between services and organizations [@naik:SAMLandFIdM].
 
-Show that this project is not a protocol contract like WS-\*.
+While SAML is a partial solution for the stated problem, it does not cover the use case
+when credentials need to be transformed to communicate with a legacy system. SAML enables services
+to share identities in a trustful way but all communicating partners must implement the SAML
+protocol to be part of the network. This project addresses the specific transformation
+of credentials into a format for some legacy systems. The basic idea of SAML however, may be used
+as a baseline of security and the general idea of processing identities.
+
+### WS-\* {#sec:ws-deathstar}
+
+The term "WS-\*" contains a broad class of specifications within the WSDL/SOAP context.
+The specifications were created by the World Wide Web Consortium (W3C) but never finished
+and officially published.
+
+The "Simple Object Access Protocol" (SOAP) is a protocol to
+exchange information between services in an XML encoded message [@curbera:SOAP-and-WSDL].
+It provides a way of communication between web services. A SOAP consists of an "envelope" that
+contains a "body" and an optional "header" to transfer encoded objects [@curbera:SOAP-and-WSDL].
+An example SOAP message from @curbera:SOAP-and-WSDL may look like this:
+
+```
+POST /travelservice
+SOAPAction: "http://www.acme-travel.com/checkin"
+Content-Type: text/xml; charset="utf-8"
+Content-Length: nnnn
+
+<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP:Body>
+    <et:eTicket xmlns:et="http://www.acme-travel.com/eticket/schema">
+      <et:passengerName first="Joe" last="Smith"/>
+      <et:flightInfo
+        airlineName="AA"
+        flightNumber="1111"
+        departureDate="2002-01-01"
+        departureTime="1905"/>
+    </et:eTicket>
+  </SOAP:Body>
+</SOAP:Envelope>
+```
+
+The "Web Services Description Language" (WSDL), however, is an XML based description
+of a web service. The goal of WSDL is to provide a description of methods that may be
+called on a web service [@curbera:SOAP-and-WSDL].
+WSDL fills the needed endpoint description that SOAP is missing. While SOAP provides
+basic communication, WSDL defines the exact methods that can be called on
+an endpoint [@curbera:SOAP-and-WSDL].
+
+The proposed solution differs from WS-\* such that there is no exact specification
+needed for the target service. While the solution contains a common domain language - a
+SOAP like protocol to encode data - it does not specify the endpoints of a service.
+The solution merely interacts with the HTTP request that targets a specific service
+and transforms the credentials from the common format to the specific format.
+Of course, certain authentication schemes need specific information to generate their
+credentials out of the data.
 
 ## Architecture
 

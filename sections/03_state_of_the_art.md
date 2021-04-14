@@ -1,15 +1,17 @@
 # State of the Art, the Practice and Deficiencies
 
 This section gives an overview over the current state of the
-art, the practice, as well as the deficiencies to an optimal situation.
-Furthermore this section states an assessment of the current
-practice and the solutions found.
+art, the practice, as well as the deficiencies to a desired situation.
 
 ## State of the Art
 
-In cloud environments, a problem which is well solved is the
+In cloud environments, a problem that is solved is the
 transmission of data from one point to another. Kubernetes, for example,
 uses "Services" that provide a DNS name for a specified workload.
+For service meshes, additionally a sidecar is injected into the Pod
+that contains - in the case of "Istio" - an Envoy proxy to handle data
+transmission.
+
 In terms of authentication and authorization, there exist a variety
 of schemes that enable an application to authenticate and authorize
 their users. OpenID Connect (OIDC) (see {@sec:auth_oidc}) is a modern authentication
@@ -26,7 +28,7 @@ a CNA as:
 > of that application is designed according to cloud-focused design patterns and
 > operated on a self-service elastic platform." [@kratzke:CloudNativeApplications, sec. 3].
 
-However, with CNAs and the general movement to cloud environments, not all applications
+However, with CNAs and the general movement to cloud environments and digitalization, not all applications
 get that chance to adjust. For various reasons like budget, time or complexity,
 legacy applications and monoliths are not refactored
 or re-written before they are deployed into a cloud environment. If the legacy applications
@@ -50,10 +52,10 @@ We consider the components in {@fig:is_solution_components}:
 - **Service A**: A modern API application and primary access point for the client
 - **Service B**: Legacy service that is called by service a to fetch some additional data
 
-The stated scenario is quite common. Legacy services may not be the primary use-case,
-but there exist other reasons to have the need of using a translation of credentials.
-Another case is the usage of third party applications which only support
-certain authentication mechanisms.
+In the practice, we encountered the stated scenario at various points in time.
+Legacy services may not be the primary use-case,
+a nother case is the usage of third party applications which only support
+certain authentication mechanisms and the code is not accessable.
 
 ![Current state of the art of accessing legacy systems from
 modern services with differing authentication schemes.
@@ -89,10 +91,10 @@ application that is not maintainable.
 
 In practice, no current solution exists, that allows credentials to be transformed
 between authentication schemes. The service mesh "Istio" provides a mechanism to
-secure services that communicate with mTLS (mutual TLS) as well as an external
-mechanism to provide authentication and authorization capabilities. This works well
-when all applications in the system share the same authentication scheme. As soon
-as two or more schemes are in place, the need for transformation arises again.
+secure services that communicate with mTLS (mutual TLS) [@istio:website:mtls] as well as an external
+mechanism to provide custom authentication and authorization capabilities [@istio:website:custom-authz].
+This works well when all applications in the system share the same authentication scheme.
+As soon as two or more schemes are in place, the need for transformation arises again.
 
 ## Deficiencies {#sec:deficiencies}
 
