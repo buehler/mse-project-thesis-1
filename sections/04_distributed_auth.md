@@ -78,9 +78,9 @@ and officially published.
 
 The "Simple Object Access Protocol" (SOAP) is a protocol to
 exchange information between services in an XML encoded message [@curbera:SOAP-and-WSDL].
-It provides a way of communication between web services. A SOAP consists of an "envelope" that
+It provides a way of communication between web services. A SOAP message consists of an "envelope" that
 contains a "body" and an optional "header" to transfer encoded objects [@curbera:SOAP-and-WSDL].
-An example SOAP message from @curbera:SOAP-and-WSDL may look like this:
+An example SOAP message from @curbera:SOAP-and-WSDL looks like this:
 
 ```
 POST /travelservice
@@ -119,15 +119,80 @@ credentials out of the data.
 
 ## Architecture
 
+The following sections provide an architectural overview over the proposed solution.
+The solution is described in prosa text, as well as usual software engineering
+diagrams with explanations. First, a description of the solution gives an intro
+about the idea, then the architecture shows the general overview of the solution
+followed by sequence and communication definitions.
+
+The reader should note, that the proposed architecture does not match the implementation
+of the PoC to the full extent. The goal of this project is to provide a generalizable idea
+to implement such a solution, while the PoC proves the ability of modifying HTTP requests
+in-flight.
+
 ### Brief Description
 
-### UseCases
+In general, when some service wants to communicate with another service and the user does not
+need to authenticate himself for every service, a federated identity is used. This means, that
+at some point, the user validates his own identity and is then authenticated in the whole zone of
+trust.
 
-### Application Domain
+To achieve such a federated identity with diverging authentication schemes, the solution
+converts validated credentials to a common language format. This format, in conjunction with
+a proof of the sender, validates the identity over the wire in the communication between services
+without the need of additional authentication. When all parties of a communication are trusted
+through verification, no information about
+the effective credentials may leak into the communication between services.
+
+The basic idea of the solution is to remove any credentials from an outgoing HTTP request with
+the common format of the users identity and replace the common format in the ingoing HTTP
+request into the valid credentials of the given scheme.
+
+In the case of Kubernetes, this additional software is injected via an operator as a sidecar.
+The operator watches for creation of deployments and services and orchestrates the configuration
+of the sidecars. The application gets a sidecar for the communication (an Envoy proxy) and
+for each authentication scheme that the target service supports, it receives a "translator"
+sidecar that handles the conversion from the common format to the specific scheme.
+
+### Use Case
+
+The usefulness of such a solution shows when "older" or monolythic software moves to the cloud
+or when third party software is used that provides no accessable source code.
+
+**Communicate with legacy software**
+
+Precondition: Cloud native application and legacy software are deployed with
+their respective manifests and the sidecars are running.
+
+1. The user is authenticated against the CNA
+2. The user tries to access a resource on the legacy software
+3. The CNA creates a request and "forwards" the credentials of the user
+4. The envoy proxy intercepts the request and forwards the credentials to the transformer
+5. The transformer verifies the credentials and transforms them into a common format
+6. The envoy proxy replaces the headers and forwards the request
+7. The receiving envoy proxy forwards the common format to the translator of the target
+8. The translator casts the credentials into the specific authentication scheme credentials
+9. The receiving envoy proxy forwards the request with the updated HTTP headers
+
+Postcondition: The communication has taken place and no credentials have left the source
+service (CNA). Furthermore, the legacy service does not know, what credentials or what specific
+authentication scheme was used.
+
+This use case can be changed such that the receiving service is not a legacy software but
+an old and non-maintained application that is deployed into a cloud environment without refactoring.
+
+### System Architecture
 
 ### Sequences
 
 ### Communication
+
+The communication between the envoy proxies must be secured. Furthermore, the identity that
+is transformed over the wire must be tamper proof. Two established formats would suffice:
+"SAML" and "JWT Tokens". While both contain the possibility to hash their contents and
+thus secure them against modification, JWT tokens are better designed for HTTP headers.
+In current OIDC environments, JWT tokens are used as access and/or identity tokens.
+They provide a secure environment with public and private claim names [@RFC7519, sec. 4.2, sec. 4.3].
 
 ## Implementation Proof of Concept (PoC)
 
