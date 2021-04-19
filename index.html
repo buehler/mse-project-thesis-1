@@ -279,8 +279,8 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <li><a href="#architecture">Architecture</a>
 <ul>
 <li><a href="#brief-description">Brief Description</a></li>
-<li><a href="#usecases">UseCases</a></li>
-<li><a href="#application-domain">Application Domain</a></li>
+<li><a href="#use-case">Use Case</a></li>
+<li><a href="#system-architecture">System Architecture</a></li>
 <li><a href="#sequences">Sequences</a></li>
 <li><a href="#communication">Communication</a></li>
 </ul></li>
@@ -628,7 +628,7 @@ SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 <p>While SAML is a partial solution for the stated problem, it does not cover the use case when credentials need to be transformed to communicate with a legacy system. SAML enables services to share identities in a trustful way but all communicating partners must implement the SAML protocol to be part of the network. This project addresses the specific transformation of credentials into a format for some legacy systems. The basic idea of SAML however, may be used as a baseline of security and the general idea of processing identities.</p>
 <h3 id="sec:ws-deathstar">WS-*</h3>
 <p>The term “WS-*” contains a broad class of specifications within the WSDL/SOAP context. The specifications were created by the World Wide Web Consortium (W3C) but never finished and officially published.</p>
-<p>The “Simple Object Access Protocol” (SOAP) is a protocol to exchange information between services in an XML encoded message <span class="citation" data-cites="curbera:SOAP-and-WSDL">(Curbera et al. 2002)</span>. It provides a way of communication between web services. A SOAP consists of an “envelope” that contains a “body” and an optional “header” to transfer encoded objects <span class="citation" data-cites="curbera:SOAP-and-WSDL">(Curbera et al. 2002)</span>. An example SOAP message from <span class="citation" data-cites="curbera:SOAP-and-WSDL">Curbera et al. (2002)</span> may look like this:</p>
+<p>The “Simple Object Access Protocol” (SOAP) is a protocol to exchange information between services in an XML encoded message <span class="citation" data-cites="curbera:SOAP-and-WSDL">(Curbera et al. 2002)</span>. It provides a way of communication between web services. A SOAP message consists of an “envelope” that contains a “body” and an optional “header” to transfer encoded objects <span class="citation" data-cites="curbera:SOAP-and-WSDL">(Curbera et al. 2002)</span>. An example SOAP message from <span class="citation" data-cites="curbera:SOAP-and-WSDL">Curbera et al. (2002)</span> looks like this:</p>
 <pre><code>POST /travelservice
 SOAPAction: &quot;http://www.acme-travel.com/checkin&quot;
 Content-Type: text/xml; charset=&quot;utf-8&quot;
@@ -649,11 +649,34 @@ Content-Length: nnnn
 <p>The “Web Services Description Language” (WSDL), however, is an XML based description of a web service. The goal of WSDL is to provide a description of methods that may be called on a web service <span class="citation" data-cites="curbera:SOAP-and-WSDL">(Curbera et al. 2002)</span>. WSDL fills the needed endpoint description that SOAP is missing. While SOAP provides basic communication, WSDL defines the exact methods that can be called on an endpoint <span class="citation" data-cites="curbera:SOAP-and-WSDL">(Curbera et al. 2002)</span>.</p>
 <p>The proposed solution differs from WS-* such that there is no exact specification needed for the target service. While the solution contains a common domain language - a SOAP like protocol to encode data - it does not specify the endpoints of a service. The solution merely interacts with the HTTP request that targets a specific service and transforms the credentials from the common format to the specific format. Of course, certain authentication schemes need specific information to generate their credentials out of the data.</p>
 <h2 id="architecture">Architecture</h2>
+<p>The following sections provide an architectural overview over the proposed solution. The solution is described in prosa text, as well as usual software engineering diagrams with explanations. First, a description of the solution gives an intro about the idea, then the architecture shows the general overview of the solution followed by sequence and communication definitions.</p>
+<p>The reader should note, that the proposed architecture does not match the implementation of the PoC to the full extent. The goal of this project is to provide a generalizable idea to implement such a solution, while the PoC proves the ability of modifying HTTP requests in-flight.</p>
 <h3 id="brief-description">Brief Description</h3>
-<h3 id="usecases">UseCases</h3>
-<h3 id="application-domain">Application Domain</h3>
+<p>In general, when some service wants to communicate with another service and the user does not need to authenticate himself for every service, a federated identity is used. This means, that at some point, the user validates his own identity and is then authenticated in the whole zone of trust.</p>
+<p>To achieve such a federated identity with diverging authentication schemes, the solution converts validated credentials to a common language format. This format, in conjunction with a proof of the sender, validates the identity over the wire in the communication between services without the need of additional authentication. When all parties of a communication are trusted through verification, no information about the effective credentials may leak into the communication between services.</p>
+<p>The basic idea of the solution is to remove any credentials from an outgoing HTTP request with the common format of the users identity and replace the common format in the ingoing HTTP request into the valid credentials of the given scheme.</p>
+<p>In the case of Kubernetes, this additional software is injected via an operator as a sidecar. The operator watches for creation of deployments and services and orchestrates the configuration of the sidecars. The application gets a sidecar for the communication (an Envoy proxy) and for each authentication scheme that the target service supports, it receives a “translator” sidecar that handles the conversion from the common format to the specific scheme.</p>
+<h3 id="use-case">Use Case</h3>
+<p>The usefulness of such a solution shows when “older” or monolythic software moves to the cloud or when third party software is used that provides no accessable source code.</p>
+<p><strong>Communicate with legacy software</strong></p>
+<p>Precondition: Cloud native application and legacy software are deployed with their respective manifests and the sidecars are running.</p>
+<ol type="1">
+<li>The user is authenticated against the CNA</li>
+<li>The user tries to access a resource on the legacy software</li>
+<li>The CNA creates a request and “forwards” the credentials of the user</li>
+<li>The envoy proxy intercepts the request and forwards the credentials to the transformer</li>
+<li>The transformer verifies the credentials and transforms them into a common format</li>
+<li>The envoy proxy replaces the headers and forwards the request</li>
+<li>The receiving envoy proxy forwards the common format to the translator of the target</li>
+<li>The translator casts the credentials into the specific authentication scheme credentials</li>
+<li>The receiving envoy proxy forwards the request with the updated HTTP headers</li>
+</ol>
+<p>Postcondition: The communication has taken place and no credentials have left the source service (CNA). Furthermore, the legacy service does not know, what credentials or what specific authentication scheme was used.</p>
+<p>This use case can be changed such that the receiving service is not a legacy software but an old and non-maintained application that is deployed into a cloud environment without refactoring.</p>
+<h3 id="system-architecture">System Architecture</h3>
 <h3 id="sequences">Sequences</h3>
 <h3 id="communication">Communication</h3>
+<p>The communication between the envoy proxies must be secured. Furthermore, the identity that is transformed over the wire must be tamper proof. Two established formats would suffice: “SAML” and “JWT Tokens.” While both contain the possibility to hash their contents and thus secure them against modification, JWT tokens are better designed for HTTP headers. In current OIDC environments, JWT tokens are used as access and/or identity tokens. They provide a secure environment with public and private claim names <span class="citation" data-cites="RFC7519">(Jones, Bradley, and Sakimura 2015, sec. 4.2, sec. 4.3)</span>.</p>
 <h2 id="implementation-proof-of-concept-poc">Implementation Proof of Concept (PoC)</h2>
 <p>To provide a proof that the general idea of the solution is possible, a PoC is implemented during the work of this project. The PoC addresses the following risks and questions:</p>
 <ul>
@@ -787,6 +810,9 @@ Istio Authors. 2021a. <span>“External Authorization.”</span> <em>Istio</em>.
 </div>
 <div id="ref-istio:website:mtls" class="csl-entry" role="doc-biblioentry">
 ———. 2021b. <span>“Mutual TLS Migration.”</span> <em>Istio</em>. <a href="https://istio.io/latest/docs/tasks/security/authentication/mtls-migration/">https://istio.io/latest/docs/tasks/security/authentication/mtls-migration/</a>.
+</div>
+<div id="ref-RFC7519" class="csl-entry" role="doc-biblioentry">
+Jones, Michael B., Bradley John, and Nat Sakimura. 2015. <span>“<span>JSON</span> Web Token (<span>JWT</span>).”</span> RFC. Internet Engineering Task Force <span>IETF</span>. <a href="https://tools.ietf.org/html/rfc7519">https://tools.ietf.org/html/rfc7519</a>.
 </div>
 <div id="ref-kratzke:CloudNativeApplications" class="csl-entry" role="doc-biblioentry">
 Kratzke, N., and R. Peinl. 2016. <span>“ClouNS - a Cloud-Native Application Reference Model for Enterprise Architects.”</span> In <em>2016 IEEE 20th International Enterprise Distributed Object Computing Workshop (EDOCW)</em>, 1–10. <a href="https://doi.org/10.1109/EDOCW.2016.7584353">https://doi.org/10.1109/EDOCW.2016.7584353</a>.
