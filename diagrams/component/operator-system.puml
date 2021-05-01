@@ -1,0 +1,16 @@
+@startuml
+!include https://raw.githubusercontent.com/bschwarz/puml-themes/master/themes/materia-outline/puml-theme-materia-outline.puml
+!include <kubernetes/k8s-sprites-unlabeled-25pct>
+
+component "Operator" as op
+
+component "<$deploy>\ndeploy" as dep
+component "<$svc>\nsvc" as svc
+component "<$pod>\npod" as po
+
+op --> dep : watches
+op --> svc : watches
+
+op --> po : creates sidecars
+
+@enduml

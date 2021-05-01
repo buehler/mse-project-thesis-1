@@ -281,15 +281,14 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <li><a href="#brief-description">Brief Description</a></li>
 <li><a href="#use-case">Use Case</a></li>
 <li><a href="#system-architecture">System Architecture</a></li>
-<li><a href="#sequences">Sequences</a></li>
 <li><a href="#communication">Communication</a></li>
 </ul></li>
 <li><a href="#implementation-proof-of-concept-poc">Implementation Proof of Concept (PoC)</a>
 <ul>
 <li><a href="#showcase-application">Showcase Application</a></li>
 <li><a href="#envoy-sidecar">Envoy Sidecar</a></li>
-<li><a href="#translator">Translator</a></li>
-<li><a href="#operator">Operator</a></li>
+<li><a href="#translator-1">Translator</a></li>
+<li><a href="#operator-1">Operator</a></li>
 <li><a href="#poc-composition">PoC Composition</a></li>
 </ul></li>
 </ul></li>
@@ -674,9 +673,41 @@ Content-Length: nnnn
 <p>Postcondition: The communication has taken place and no credentials have left the source service (CNA). Furthermore, the legacy service does not know, what credentials or what specific authentication scheme was used.</p>
 <p>This use case can be changed such that the receiving service is not a legacy software but an old and non-maintained application that is deployed into a cloud environment without refactoring.</p>
 <h3 id="system-architecture">System Architecture</h3>
-<h3 id="sequences">Sequences</h3>
+<p>In this section, we describe the system architecture of the proposed solution. The architecture is shown in a diagram and then broken down to the individual parts.</p>
+<div id="fig:system_architecture" class="fignos">
+<figure>
+<img src="diagrams/component/262fb864e458a2f1867accf308ba349d.png" alt="Figure 7: System Architecture" /><figcaption aria-hidden="true"><span>Figure 7:</span> System Architecture</figcaption>
+</figure>
+</div>
+<p>As can be seen in Figure <a href="#fig:system_architecture">7</a>, the overall structure is within a cloud environment. The proposed solution may not only run in cloud environments, but the initial idea orginates from the stated problem which occurs in cloud environments. Inside the cloud environment an operator that has access to the deployments manages the additional sidecars. The operator is responsible for adding the different needed sidecars as well as the configuration of them.</p>
+<p>The “Key Manager” operates as public and private key store and orchestrator of those keys. Whenever a new service joins the authentication mesh, the key manager creates a new public / private key pair for the service and securely stores them. The public key will be available for access for other services to validate the signature of the transmitted identity.</p>
+<p>Within the deployment there exist two sidecars, one “Envoy” proxy and a “Credential Translator.” Envoy acts as inbound and outbound proxy for the software and intercepts HTTP calls from and to the software to manipulate the HTTP headers. The translator will transform the identity in the given common domain format into the needed format of the software. If multiple formats are configurable, then multiple transformer will be present since one transformer may only handle one format to reduce the load impact.</p>
+<h4 id="operator">Operator</h4>
+<blockquote>
+<p>TODO: describe the operator</p>
+</blockquote>
+<h4 id="key-manager">Key Manager</h4>
+<blockquote>
+<p>TODO: describe the key manager</p>
+</blockquote>
+<h4 id="envoy-proxy">Envoy Proxy</h4>
+<blockquote>
+<p>TODO: describe the envoy config</p>
+</blockquote>
+<h4 id="translator">Translator</h4>
+<blockquote>
+<p>TODO: describe the translator architecture</p>
+</blockquote>
 <h3 id="communication">Communication</h3>
-<p>The communication between the envoy proxies must be secured. Furthermore, the identity that is transformed over the wire must be tamper proof. Two established formats would suffice: “SAML” and “JWT Tokens.” While both contain the possibility to hash their contents and thus secure them against modification, JWT tokens are better designed for HTTP headers. In current OIDC environments, JWT tokens are used as access and/or identity tokens. They provide a secure environment with public and private claim names <span class="citation" data-cites="RFC7519">(Jones, Bradley, and Sakimura 2015, sec. 4.2, sec. 4.3)</span>.</p>
+<p>The communication between the envoy proxies must be secured. Furthermore, the identity that is transformed over the wire must be tamper proof. Two established formats would suffice: “SAML” and “JWT Tokens.” While both contain the possibility to hash their contents and thus secure them against modification, JWT tokens are better designed for HTTP headers, since in current OIDC environments, JWT tokens are already used as access and/or identity tokens. They provide a secure environment with public and private claim names <span class="citation" data-cites="RFC7519">(Jones, Bradley, and Sakimura 2015, sec. 4.2, sec. 4.3)</span>.</p>
+<p>Other options could be:</p>
+<ul>
+<li>Simple JSON</li>
+<li>YAML</li>
+<li>XML</li>
+<li>Any other structured format</li>
+</ul>
+<p>The problem with other structured formats is that tamper proofing must be done manually. JWT tokens provide a specified way of attaching a hashed version of the whole content <span class="citation" data-cites="RFC7519">(Jones, Bradley, and Sakimura 2015)</span> and therefore provide a method of validating a JWT token if it is still valid and if the sender is trusted. The receiving end can fetch a public key from the origin and then validates the signature. If the signature is correct, the JWT token has been issued by a trusted and registered instance of the authentication network.</p>
 <h2 id="implementation-proof-of-concept-poc">Implementation Proof of Concept (PoC)</h2>
 <p>To provide a proof that the general idea of the solution is possible, a PoC is implemented during the work of this project. The PoC addresses the following risks and questions:</p>
 <ul>
@@ -708,20 +739,20 @@ Content-Length: nnnn
 <p>When installed in a Kubernetes cluster, the user can open (depending on the local configuration) the URL to the frontend application<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a>.</p>
 <div id="fig:impl_components_showcase_app" class="fignos">
 <figure>
-<img src="diagrams/component/cca01766db54ff649e950b7c09fb6c53.png" alt="Figure 7: Component Diagram of the Showcase Application" /><figcaption aria-hidden="true"><span>Figure 7:</span> Component Diagram of the Showcase Application</figcaption>
+<img src="diagrams/component/cca01766db54ff649e950b7c09fb6c53.png" alt="Figure 8: Component Diagram of the Showcase Application" /><figcaption aria-hidden="true"><span>Figure 8:</span> Component Diagram of the Showcase Application</figcaption>
 </figure>
 </div>
-<p>Figure <a href="#fig:impl_components_showcase_app">7</a> gives an overview over the components in the showcase application. The system contains an ASP.Net Razor Page<a href="#fn10" class="footnote-ref" id="fnref10" role="doc-noteref"><sup>10</sup></a> application as the frontend, an ASP.Net API application with configured Zitadel<a href="#fn11" class="footnote-ref" id="fnref11" role="doc-noteref"><sup>11</sup></a> OIDC authentication as “modern” backend service and another ASP.Net API application that only supports basic authentication as “legacy” backend. The frontend can only communicate with the modern API and the modern API is able to call an additional service on the legacy API.</p>
+<p>Figure <a href="#fig:impl_components_showcase_app">8</a> gives an overview over the components in the showcase application. The system contains an ASP.Net Razor Page<a href="#fn10" class="footnote-ref" id="fnref10" role="doc-noteref"><sup>10</sup></a> application as the frontend, an ASP.Net API application with configured Zitadel<a href="#fn11" class="footnote-ref" id="fnref11" role="doc-noteref"><sup>11</sup></a> OIDC authentication as “modern” backend service and another ASP.Net API application that only supports basic authentication as “legacy” backend. The frontend can only communicate with the modern API and the modern API is able to call an additional service on the legacy API.</p>
 <div id="fig:seq_showcase_call" class="fignos">
 <figure>
-<img src="diagrams/sequences/42709d8c02bb2a77c85b152d106214b0.png" alt="Figure 8: Sequence Diagram of the Showcase Call" /><figcaption aria-hidden="true"><span>Figure 8:</span> Sequence Diagram of the Showcase Call</figcaption>
+<img src="diagrams/sequences/42709d8c02bb2a77c85b152d106214b0.png" alt="Figure 9: Sequence Diagram of the Showcase Call" /><figcaption aria-hidden="true"><span>Figure 9:</span> Sequence Diagram of the Showcase Call</figcaption>
 </figure>
 </div>
-<p>In Figure <a href="#fig:seq_showcase_call">8</a>, we show the process of a user call in the showcase application. The user opens the web application and authenticates himself with Zitadel. After that, the user is presented with the application and can click the “Call API” button. The frontend application will call the modern backend API with the OIDC token and asks for customer and order data. The customer data is present on the modern API so it is directly returned. To query order data, the modern service relies on a legacy application which is only capable of basic authentication. Depending on the configuration (i.e. the environment variable <code>USE_WIREPACT</code>), the modern service will call the legacy one with either transformed basic auth credentials (when <code>USE_WIREPACT=false</code>) or with the presented OIDC token (otherwise). Either way, the legacy API receives basic auth credentials and returns the data which then in turn is returned and presented to the user.</p>
+<p>In Figure <a href="#fig:seq_showcase_call">9</a>, we show the process of a user call in the showcase application. The user opens the web application and authenticates himself with Zitadel. After that, the user is presented with the application and can click the “Call API” button. The frontend application will call the modern backend API with the OIDC token and asks for customer and order data. The customer data is present on the modern API so it is directly returned. To query order data, the modern service relies on a legacy application which is only capable of basic authentication. Depending on the configuration (i.e. the environment variable <code>USE_WIREPACT</code>), the modern service will call the legacy one with either transformed basic auth credentials (when <code>USE_WIREPACT=false</code>) or with the presented OIDC token (otherwise). Either way, the legacy API receives basic auth credentials and returns the data which then in turn is returned and presented to the user.</p>
 <p>To install and run the showcase application without any interference of the operator or the rest of the solution, follow the installation guide in the readme on <a href="https://github.com/WirePact/poc-showcase-app" class="uri">https://github.com/WirePact/poc-showcase-app</a>.</p>
 <h3 id="envoy-sidecar">Envoy Sidecar</h3>
-<h3 id="translator">Translator</h3>
-<h3 id="operator">Operator</h3>
+<h3 id="translator-1">Translator</h3>
+<h3 id="operator-1">Operator</h3>
 <h3 id="poc-composition">PoC Composition</h3>
 <blockquote>
 <p>TODO: Explain the whole PoC composition (how to run and stuff with operator).</p>
