@@ -3,6 +3,7 @@
 
 node "Cloud Environment" {
     component [Operator] as op
+    component [Key Manager] as km
 
     package "Deployment A" as da {
         component [Software] as sw_a
@@ -16,8 +17,11 @@ node "Cloud Environment" {
         component [Credential\nTranslator] as t_b
     }
     
-    op -[dashed]-> da : manages
-    op -[dashed]-> db : manages
+    op -[dashed]--> da : manages
+    op -[dashed]--> db : manages
+
+    km -[dashed]--> t_a : provides keys
+    km -[dashed]--> t_b : provides keys
 
     envoy_a <---> envoy_b : communicate
     envoy_a <--> t_a : map credentials
@@ -25,7 +29,5 @@ node "Cloud Environment" {
     envoy_a <-> sw_a : relay
     envoy_b <--> sw_b : relay
 }
-
-
 
 @enduml

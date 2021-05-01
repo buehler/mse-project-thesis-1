@@ -183,16 +183,67 @@ an old and non-maintained application that is deployed into a cloud environment 
 
 ### System Architecture
 
-### Sequences
+In this section, we describe the system architecture of the proposed solution.
+The architecture is shown in a diagram and then broken down to the individual parts.
+
+![System Architecture](diagrams/component/system-architecture.puml){#fig:system_architecture}
+
+As can be seen in {@fig:system_architecture}, the overall structure is within a cloud environment.
+The proposed solution may not only run in cloud environments, but the initial idea orginates from
+the stated problem which occurs in cloud environments. Inside the cloud environment an operator that
+has access to the deployments manages the additional sidecars. The operator is responsible for
+adding the different needed sidecars as well as the configuration of them.
+
+The "Key Manager" operates as public and private key store and orchestrator of those keys.
+Whenever a new service joins the authentication mesh, the key manager creates a new public / private
+key pair for the service and securely stores them. The public key will be available for access for
+other services to validate the signature of the transmitted identity.
+
+Within the deployment there exist two sidecars, one "Envoy" proxy and a "Credential Translator".
+Envoy acts as inbound and outbound proxy for the software and intercepts HTTP calls from and to the software
+to manipulate the HTTP headers. The translator will transform the identity in the given common
+domain format into the needed format of the software. If multiple formats are configurable,
+then multiple transformer will be present since one transformer may only handle one format to
+reduce the load impact.
+
+#### Operator
+
+> TODO: describe the operator
+
+#### Key Manager
+
+> TODO: describe the key manager
+
+#### Envoy Proxy
+
+> TODO: describe the envoy config
+
+#### Translator
+
+> TODO: describe the translator architecture
 
 ### Communication
 
 The communication between the envoy proxies must be secured. Furthermore, the identity that
 is transformed over the wire must be tamper proof. Two established formats would suffice:
 "SAML" and "JWT Tokens". While both contain the possibility to hash their contents and
-thus secure them against modification, JWT tokens are better designed for HTTP headers.
-In current OIDC environments, JWT tokens are used as access and/or identity tokens.
+thus secure them against modification, JWT tokens are better designed for HTTP headers,
+since in current OIDC environments, JWT tokens are already used as access and/or identity tokens.
 They provide a secure environment with public and private claim names [@RFC7519, sec. 4.2, sec. 4.3].
+
+Other options could be:
+
+- Simple JSON
+- YAML
+- XML
+- Any other structured format
+
+The problem with other structured formats is that tamper proofing must be done manually.
+JWT tokens provide a specified way of attaching a hashed version of the whole
+content [@RFC7519] and therefore provide a method of validating a JWT token if it is
+still valid and if the sender is trusted. The receiving end can fetch a public key
+from the origin and then validates the signature. If the signature is correct, the JWT
+token has been issued by a trusted and registered instance of the authentication network.
 
 ## Implementation Proof of Concept (PoC)
 
