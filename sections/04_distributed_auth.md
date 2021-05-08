@@ -121,7 +121,7 @@ credentials out of the data.
 
 The following sections provide an architectural overview over the proposed solution.
 The solution is described in prosa text, as well as usual software engineering
-diagrams with explanations. First, a description of the solution gives an intro
+diagrams with explanations. First, a description of the solution gives an introduction
 about the idea, then the architecture shows the general overview of the solution
 followed by sequence and communication definitions.
 
@@ -133,7 +133,7 @@ in-flight.
 ### Brief Description
 
 In general, when some service wants to communicate with another service and the user does not
-need to authenticate himself for every service, a federated identity is used. This means, that
+need to authenticate himself for every service, probably a federated identity is used. This means, that
 at some point, the user validates his own identity and is then authenticated in the whole zone of
 trust.
 
@@ -142,17 +142,11 @@ converts validated credentials to a common language format. This format, in conj
 a proof of the sender, validates the identity over the wire in the communication between services
 without the need of additional authentication. When all parties of a communication are trusted
 through verification, no information about
-the effective credentials may leak into the communication between services.
+the effective credentials leak into the communication between services.
 
 The basic idea of the solution is to remove any credentials from an outgoing HTTP request with
 the common format of the users identity and replace the common format in the ingoing HTTP
 request into the valid credentials of the given scheme.
-
-In the case of Kubernetes, this additional software is injected via an operator as a sidecar.
-The operator watches for creation of deployments and services and orchestrates the configuration
-of the sidecars. The application gets a sidecar for the communication (an Envoy proxy) and
-for each authentication scheme that the target service supports, it receives a "translator"
-sidecar that handles the conversion from the common format to the specific scheme.
 
 ### Use Case
 
@@ -167,60 +161,135 @@ their respective manifests and the sidecars are running.
 1. The user is authenticated against the CNA
 2. The user tries to access a resource on the legacy software
 3. The CNA creates a request and "forwards" the credentials of the user
-4. The envoy proxy intercepts the request and forwards the credentials to the transformer
+4. The proxy intercepts the request and forwards the credentials to the transformer
 5. The transformer verifies the credentials and transforms them into a common format
-6. The envoy proxy replaces the headers and forwards the request
-7. The receiving envoy proxy forwards the common format to the translator of the target
+6. The proxy replaces the headers and forwards the request
+7. The receiving proxy forwards the common format to the translator of the target
 8. The translator casts the credentials into the specific authentication scheme credentials
-9. The receiving envoy proxy forwards the request with the updated HTTP headers
+9. The receiving proxy forwards the request with the updated HTTP headers
 
 Postcondition: The communication has taken place and no credentials have left the source
-service (CNA). Furthermore, the legacy service does not know, what credentials or what specific
+service (CNA). Furthermore, the legacy service does not know what credentials or what specific
 authentication scheme was used.
 
 This use case can be changed such that the receiving service is not a legacy software but
 an old and non-maintained application that is deployed into a cloud environment without refactoring.
+Another possibility could be some third party application where the source code is not
+accessable.
 
-### System Architecture
+### Solution Architecture
 
 In this section, we describe the system architecture of the proposed solution.
 The architecture is shown in a diagram and then broken down to the individual parts.
 
-![System Architecture](diagrams/component/system-architecture.puml){#fig:system_architecture}
+![Solution Architecture](diagrams/component/solution-architecture.puml){#fig:solution_architecture}
 
-As can be seen in {@fig:system_architecture}, the overall structure is within a cloud environment.
-The proposed solution may not only run in cloud environments, but the initial idea orginates from
-the stated problem which occurs in cloud environments. Inside the cloud environment an operator that
-has access to the deployments manages the additional sidecars. The operator is responsible for
-adding the different needed sidecars as well as the configuration of them.
+{@fig:solution_architecture} shows the general solution architecture. In the "support" package,
+general available elements are presented. The solution needs a public key infrastructure (PKI)
+to deliver key material for signing and validation purposes. Furthermore a configuration and
+secret storage must be provided.
 
-The "Key Manager" operates as public and private key store and orchestrator of those keys.
-Whenever a new service joins the authentication mesh, the key manager creates a new public / private
-key pair for the service and securely stores them. The public key will be available for access for
-other services to validate the signature of the transmitted identity.
+Additionally, an optional automation component watches and manages applications. In case of
+cloud environments, this component is strongly suggested to automate deployment configuration.
+The automation does inject the proxies, translators and the specific needed configurations for
+the managed components.
 
-Within the deployment there exist two sidecars, one "Envoy" proxy and a "Credential Translator".
-Envoy acts as inbound and outbound proxy for the software and intercepts HTTP calls from and to the software
-to manipulate the HTTP headers. The translator will transform the identity in the given common
-domain format into the needed format of the software. If multiple formats are configurable,
-then multiple transformer will be present since one transformer may only handle one format to
-reduce the load impact.
+An application service consists of three parts. First, the source (or destination) service, which
+represents the deployed application itself, a translator that manages the transformation between
+the common language format of the identity and the implementation specific authentication format
+and a proxy that manages the communication from and to the application.
 
-#### Operator
+For the further sections, the architecture shows elements of a Kubernetes cloud environment.
+The reason is to describe the specific architecture in a practical way. However, the general
+idea of the solution may be deployed in various environments and is not bound to a cloud
+infrastructure.
 
-> TODO: describe the operator
+#### Automation
 
-#### Key Manager
+In case of a Kubernetes infrastructure, the automation part is done by an operator as
+explained in {@sec:kubernetes_operator}.
 
-> TODO: describe the key manager
+![Automation Architecture](diagrams/component/automation-architecture.puml){#fig:automation_architecture}
 
-#### Envoy Proxy
+The operator in {@fig:automation_architecture} watches the Kubernetes API for changes. When
+deployments or services are created, the operator enhances the respective elements. "Enhancing"
+in this context means, that additional pods (see {@tbl:kubernetes_terminology})
+are injected into a deployment as sidecars. The additional sidecars are the proxy and
+the translator. While the proxy manages incomming ("ingress") and outgoing ("egress")
+communication, the translator manages the transformation of credentials from and to a common
+format.
 
-> TODO: describe the envoy config
+![Automation Process](diagrams/sequences/automation-process.puml){#fig:automation_process}
+
+The process that enhances deployments is shown in {@fig:automation_process}. The operator
+registers a "watcher" for deployments and services with the Kubernetes API. Whenever
+a deployment or a service is created or modified, the operator receives a notification.
+Then, the operator checks of the object in question "is relevant" by checking if it
+is part of the authentication mesh. This participation can be configured - in the example
+of Kubernetes - via annotations, labels or any other means of configuration.
+If the object is relevant, depending on the type, the operator injects sidecars
+into the deployment or reconfigures the service to use the proxy as targeting
+port for the service communication.
+
+#### Public Key Infrastructure (PKI)
+
+The role of the public key infrastructure in the solution is to build the trust anchor in
+the system.
+
+![PKI Architecture](diagrams/component/pki-architecture.puml){#fig:pki_architecture}
+
+{@fig:pki_architecture} depicts the relation of the translators and the PKI.
+When a translator starts, it aquires trusted key material from the PKI (for example with
+a certificate signing request). This key material is then used to sign the identity
+that is transmitted to the receiving party. The receiving translator can validate the
+signature of the identity and the sending party. The proxies are responsible for the
+communication between the instances.
+
+![PKI Process](diagrams/sequences/pki-process.puml){#fig:pki_process}
+
+The sequence in {@fig:pki_process} shows how the PKI is used by the translator
+to create key material for itself. When a translator starts, it checks if it
+already generated a private key and obtains the key (either by creating a new one
+or fetching the existing one). Then, a certificate signing request (CSR) is sent
+to the PKI. The PKI will then create a certificate with the CSR and return
+the signed certificate.
+
+When communication happens, the proxy will forward the HTTP headers of the
+request to the translator which contains the transfered identity of the
+user in the DSL. In case of a JWT token, the transformer may now confirm
+the signature of the JWT token with the obtained certificate since it is signed
+by the same Certificate Authority (CA). Then the transformation may happen and
+the proxy forwards the communication to the destination.
+
+To increase the security and mitigate the problem of leaking certificates,
+it is adviced to create short living certificates in the PKI and resign certificates
+periodically.
+
+#### Networking
+
+Networking in the proposed solution works with a combination of routing and
+communication proxing. The general purpose of the networking element is to manage
+data transport between instances of the authentication mesh and route the traffic to
+the source / destination.
+
+![Networking Architecture](diagrams/component/networking-architecture.puml){#fig:networking_architecture}
+
+As seen in {@fig:networking_architecture} the proxy is the
+mediator between source and destination of a communication.
+Furthermore, the proxy manages the translation by communicating with the translator
+to transform the identity of the authenticated user and transmit it to the destination
+where it gets transformed again.
+Additionally, with the aid of the PKI, the proxy can verify the identity of the sender via mTLS.
 
 #### Translator
 
-> TODO: describe the translator architecture
+The translator is responsible for transforming the identity from and to the common domain
+specific language.
+
+![Translator Architecture](diagrams/component/translator-architecture.puml){#fig:translator_architecture}
+
+In conjunction with the PKI, the translator can verify the validity and integrity
+of the incomming identity.
 
 ### Communication
 
@@ -236,14 +305,20 @@ Other options could be:
 - Simple JSON
 - YAML
 - XML
+- X509 Certificates
 - Any other structured format
 
-The problem with other structured formats is that tamper proofing must be done manually.
+The problem with other structured formats is that tamper protection must be done manually.
 JWT tokens provide a specified way of attaching a hashed version of the whole
 content [@RFC7519] and therefore provide a method of validating a JWT token if it is
 still valid and if the sender is trusted. The receiving end can fetch a public key
 from the origin and then validates the signature. If the signature is correct, the JWT
 token has been issued by a trusted and registered instance of the authentication network.
+
+While X509 certificates could be used instead of JWT to transport this data,
+it often is cumberstone to extract the needed information from the certificates.
+From our experience, extracting and manipulating certificates, for example in C\#,
+is not a task done lightely.
 
 ## Implementation Proof of Concept (PoC)
 

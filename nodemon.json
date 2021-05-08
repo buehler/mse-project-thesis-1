@@ -1,0 +1,7 @@
+{
+  "ignore": [".git", "diagrams/**/*.png"],
+  "verbose": true,
+  "exed": "make build_html",
+  "watch": ["diagrams", "sections", "images"],
+  "ext": "md,bib,yaml,png,puml"
+}

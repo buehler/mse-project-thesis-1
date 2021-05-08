@@ -1,0 +1,21 @@
+@startuml
+
+component "Public Key Infrastructure (PKI)" as pki
+
+component "Translator" as t_a
+component "Translator" as t_b
+
+component "Proxy" as p_a
+component "Proxy" as p_b
+
+pki <--> t_a : Key Material
+pki <--> t_b : Key Material
+
+t_a <--> p_a : Communication
+t_b <--> p_b : Communication
+
+t_a <.> t_b : Validation\nof Trust
+
+p_a <-> p_b : Communication
+
+@enduml

@@ -38,6 +38,15 @@
 |            | The name is typically a combination of the servicename and |
 |            | the namespace (e.g. `my-service.namespace`).               |
 +------------+------------------------------------------------------------+
+| Ingress    | Incomming communication and data-flow into a component.    |
+|            | Furthermore an "Ingress" is a Kubernetes object            |
+|            | that defines incomming communication and configures        |
+|            | an API gateway to route traffic to specific services.      |
++------------+------------------------------------------------------------+
+| Egress     | Outgoing communication. Egress means communication from    |
+|            | a component to another (when the component is the          |
+|            | source).                                                   |
++------------+------------------------------------------------------------+
 | Resource   | A resource is something that can be managed by             |
 |            | Kubernetes. It defines an API endpoint on the master       |
 |            | node and allows Kubernetes to store a collection of        |

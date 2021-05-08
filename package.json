@@ -4,7 +4,7 @@
   "scripts": {
     "prestart": "make clean_build",
     "start": "concurrently -k npm:nodemon npm:server",
-    "nodemon": "nodemon -e md,bib,yaml,png -w diagrams -w sections -w images --exec \"make build_html\"",
+    "nodemon": "nodemon --config nodemon.json --exec \"make build_html\"",
     "server": "http-server public -o"
   },
   "dependencies": {

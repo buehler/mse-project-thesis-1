@@ -1,0 +1,31 @@
+@startuml
+
+participant "Translator" as t
+participant "Secret\nStorage" as sec
+participant "Proxy" as p
+participant "PKI" as k
+
+alt key exists
+    t -> sec : Fetch Key
+    t <- sec : Return Private Key
+else key does not exist
+    t -> t : Generate Private Key
+    t -> sec : Store Key
+end
+
+t -> k : Certificate Signing Request
+activate k
+    k -> k : Sign Certificate
+return Signed Certificate
+
+[-> p : Communication
+activate p
+    p -> t : Provide HTTP Request Headers\nRequest Translation
+    activate t
+        t -> t : Check if DSL is valid
+        t -> t : Transform DSL
+    return Transformed Credentials
+    p ->] : Forward to Destination
+deactivate p
+
+@enduml
