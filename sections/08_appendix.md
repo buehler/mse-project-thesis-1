@@ -1,7 +1,7 @@
 # Appendix A: Installation Guide for PoC {-}
 
-foobar
+> TODO
 
 # Appendix B: Teaching Material for Kubernetes Operators {-}
 
-foobar
+> TODO

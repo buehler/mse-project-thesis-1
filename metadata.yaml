@@ -28,6 +28,9 @@ bibliography: bibliography.bib
 thanks: |
   I would like to thank Dr. Olaf Zimmermann
   and Florian Forster. TODO.
+header-includes:
+  - \usepackage{fvextra}
+  - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\}}
 
 # Tool configuration
 fignos-cleveref: true

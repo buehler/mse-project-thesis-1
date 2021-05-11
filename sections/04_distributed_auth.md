@@ -365,7 +365,7 @@ from the same PKI (and therefore the same CA), it can check the certificate
 and the integrity of the JWT token. If the signature is correct, the JWT
 token has been issued by a trusted and registered instance of the authentication network.
 
-X509 certificates - as defined in **RFC5280** [@RFC5280] - define another valid way
+X509 certificates - as defined in **RFC5280** [@RFC5280] - introduce another valid way
 of transporting data and properties about something to another party.
 "Certificate Extensions" can be defined by "private communities" and
 are attached to the certificate itself [@RFC5280, sec. 4.2, sec. 4.2.2].
@@ -387,7 +387,7 @@ The solution is implemented with the following technologies and environments:
 
 - Environment: The PoC is implemented on a Kubernetes environment to
   enable automation and easy deployment for testing
-- "Automation": A Kubernetes operator, written in .NET (F\#) with the
+- "Automation": A Kubernetes operator, written in .NET (C\#) with the
   "Dotnet Operator SDK"^[<https://github.com/buehler/dotnet-operator-sdk>]
 - "Proxy": Envoy proxy which gets the needed configuration
   injected as Kubernetes ConfigMap file
@@ -477,7 +477,63 @@ in the Appendix.
 
 ### Envoy Sidecar
 
-> TODO
+In the PoC, the proxy sidecar is an Envoy proxy with an injected configuration.
+The operator injects the sidecar whenever a `Deployment` is created or updated
+via the Kubernetes API. The operator attaches the proxy and adds several annotations
+that are used for communication with a `Mutation Webhook`. Furthermore, a `ConfigMap`
+with the envoy configuration is created during the webhook.
+
+Two parts of the envoy configuration are crucial. First, the `filter_chain` of the
+inbound traffic listener contains a list of `http_filters`. Within this list
+of filters, the external authorization filter is added to force Envoy to check
+if an arbitrary request is allowed or not:
+
+```yaml
+# ... more config
+http_filters:
+  - name: envoy.filters.http.ext_authz
+    typed_config:
+      '@type': type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+      transport_api_version: v3
+      grpc_service:
+        envoy_grpc:
+          cluster_name: auth_translator
+        timeout: 1s
+      include_peer_certificate: true
+  - name: envoy.filters.http.router
+# ... more config
+```
+
+Second, the external authorization service must be added to the `clusters` list
+to be access via the configured name (`auth_translator`):
+
+```yaml
+# ... more config
+- name: auth_translator
+  connect_timeout: 0.25s
+  type: STATIC
+  typed_extension_protocol_options:
+    envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+      '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+      explicit_http_config:
+        http2_protocol_options: {}
+  load_assignment:
+    cluster_name: auth_translator
+    endpoints:
+      - lb_endpoints:
+          - endpoint:
+              address:
+                socket_address:
+                  address: 127.0.0.1
+                  port_value: <<PORT_VALUE>>
+# ... more config
+```
+
+This configures Envoy to find the external authorization service
+on the local loopback IP on the configured port. Since gRPC is configured
+(`grpc_service: envoy_grpc: ...` in the filter config), http2 must be
+enabled for the communication. In a productive environment, timeouts
+should be set accordingly.
 
 ### Translator
 
