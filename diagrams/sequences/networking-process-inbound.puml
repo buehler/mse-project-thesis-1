@@ -1,0 +1,18 @@
+@startuml
+
+participant "Proxy" as p
+participant "Translator" as t
+participant "Destination" as dest
+
+[-> p : Incomming\nCommunication
+activate p
+    p -> t : Forward HTTP Headers
+    activate t
+    return Translated Credentials
+    p -> dest : Forward Communication\nwith Credentials
+    activate dest
+        dest -> dest : Execute Request
+    return Result
+return Result
+
+@enduml

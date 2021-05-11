@@ -281,6 +281,41 @@ to transform the identity of the authenticated user and transmit it to the desti
 where it gets transformed again.
 Additionally, with the aid of the PKI, the proxy can verify the identity of the sender via mTLS.
 
+##### Ingress
+
+![Inbound Networking Process](diagrams/sequences/networking-process-inbound.puml){#fig:inbound_networking_process}
+
+{@fig:inbound_networking_process} shows the general process during inbound request processing.
+When the proxy receives a request (in the given example by the configured Kubernetes service),
+it calls the translator with the HTTP request detail. The PoC is implemented with the "Envoy" proxy.
+Envoy allows an external service to perform "external authorization"^[
+<https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter>]
+during which the external service may:
+
+- Add new headers before reaching the destination
+- Overwrite headers before reaching the destination
+- Remove headers before reaching the destination
+- Add new headers before returning the result to the caller
+- Overwrite headers before returning the result to the caller
+
+The translator uses this concept to consume a specific and well-known header to read
+the identity of the authorized user in the common format. The identity is then validated
+and transformed to the authentication credentials needed by the destination. Then, the
+translator instructs Envoy to set the credentials for the upstream. In the PoC, this
+is done by setting the `Authorization` header to static Basic Auth credentials.
+
+##### Egress
+
+![Outbound Networking Process](diagrams/sequences/networking-process-outbound.puml){#fig:outbound_networking_process}
+
+In {@fig:outbound_networking_process} the outbound (egress) traffic is described.
+The proxy needs to catch all traffic from the source and performs the reversed process
+(of {@fig:inbound_networking_process}) by transforming the provided
+information from the source to generate the common format with the users identity.
+This identity is then inserted into the HTTP headers and sent to the destination.
+At the sink, the process of {@fig:inbound_networking_process} takes place - if the
+sink is part of the authentication mesh.
+
 #### Translator
 
 The translator is responsible for transforming the identity from and to the common domain
@@ -291,9 +326,23 @@ specific language.
 In conjunction with the PKI, the translator can verify the validity and integrity
 of the incomming identity.
 
+![Translator Process](diagrams/sequences/translator-process.puml){#fig:translator_process}
+
+When the translator receives a request to create the needed credentials, it performs
+the sequence of actions as stated in {@fig:translator_process}. First, the proxy
+will forward the needed data to the translator. Afterwards, the translator will check if the
+transported identity is valid and signed by an authorized party in the authentication mesh.
+When the credentials are valid, they are translated according to the implementation of the
+translator. The proxy is then instructed with the actions to replace the transported
+identity with the correct credentials to access the destination.
+
+In the PoC, the proof of integrity is not implemented, but the transformation takes
+place, where a "Bearer Token"^[Opaque OIDC Token of an IDP.] is used to check if the user
+may access and then replaces the token with static Basic Auth credentials.
+
 ### Communication
 
-The communication between the envoy proxies must be secured. Furthermore, the identity that
+The communication between the proxies must be secured. Furthermore, the identity that
 is transformed over the wire must be tamper proof. Two established formats would suffice:
 "SAML" and "JWT Tokens". While both contain the possibility to hash their contents and
 thus secure them against modification, JWT tokens are better designed for HTTP headers,
@@ -308,17 +357,27 @@ Other options could be:
 - X509 Certificates
 - Any other structured format
 
-The problem with other structured formats is that tamper protection must be done manually.
+The problem with other structured formats is that tamper protection and encoding must be done manually.
 JWT tokens provide a specified way of attaching a hashed version of the whole
 content [@RFC7519] and therefore provide a method of validating a JWT token if it is
-still valid and if the sender is trusted. The receiving end can fetch a public key
-from the origin and then validates the signature. If the signature is correct, the JWT
+still valid and if the sender is trusted. If the receiving end has his key material
+from the same PKI (and therefore the same CA), it can check the certificate
+and the integrity of the JWT token. If the signature is correct, the JWT
 token has been issued by a trusted and registered instance of the authentication network.
 
+X509 certificates - as defined in **RFC5280** [@RFC5280] - define another valid way
+of transporting data and properties about something to another party.
+"Certificate Extensions" can be defined by "private communities" and
+are attached to the certificate itself [@RFC5280, sec. 4.2, sec. 4.2.2].
+
 While X509 certificates could be used instead of JWT to transport this data,
-it often is cumberstone to extract the needed information from the certificates.
-From our experience, extracting and manipulating certificates, for example in C\#,
-is not a task done lightely.
+using certificates would enforce the translator to act as intermediate CA
+and create new certificates for each request.
+From our experience, creating, extracting and manipulating certificates, for example in C\#,
+is not a task done easily. Since this solution should be as easy to use as it can be,
+manipulating certificates in translators does not seem to be a feasible option.
+For the sake of simplicity and the well known usage, further work to this project
+will probably use JWT tokens to transmit the users identity.
 
 ## Implementation Proof of Concept (PoC)
 

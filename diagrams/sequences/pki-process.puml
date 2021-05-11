@@ -7,7 +7,8 @@ participant "PKI" as k
 
 alt key exists
     t -> sec : Fetch Key
-    t <- sec : Return Private Key
+    activate sec
+    return Return Private Key
 else key does not exist
     t -> t : Generate Private Key
     t -> sec : Store Key
@@ -22,8 +23,6 @@ return Signed Certificate
 activate p
     p -> t : Provide HTTP Request Headers\nRequest Translation
     activate t
-        t -> t : Check if DSL is valid
-        t -> t : Transform DSL
     return Transformed Credentials
     p ->] : Forward to Destination
 deactivate p

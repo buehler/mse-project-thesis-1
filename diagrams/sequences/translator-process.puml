@@ -1,0 +1,16 @@
+@startuml
+
+participant "Proxy" as p
+participant "Translator" as t
+
+[-> p : Incomming Communication
+activate p
+    p -> t : Forward HTTP Headers
+    activate t
+        t -> t : Validate Identity
+        t -> t : Translate to\nCredentials
+    return Translated Credentials\nin HTTP Headers
+    p -> p : Replace Headers
+return Forward to Destination
+
+@enduml
