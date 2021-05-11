@@ -8,12 +8,12 @@ node "Cloud Environment" {
     component [Modern Backend\n(OIDC Capable)] as sa
     component [Legacy Backend\n(Basic Auth Capable)] as sb
 
-    c -> sa : OIDC
-    sa -> sb : Basic
+    c -> sa : Call with\nOIDC Token
+    sa -> sb : Call with\nBasic Auth Credentials
 }
 
-u --> c
-c <--> i
-i <--> sa
+u --> c : Uses with OIDC
+c <--> i : Checks Credentials
+i <--> sa : Checks Credentials
 
 @enduml

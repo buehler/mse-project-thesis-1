@@ -382,34 +382,52 @@ will probably use JWT tokens to transmit the users identity.
 ## Implementation Proof of Concept (PoC)
 
 To provide a proof that the general idea of the solution is possible,
-a PoC is implemented during the work of this project. The PoC addresses
-the following risks and questions:
+a PoC is implemented during the work of this project.
+The solution is implemented with the following technologies and environments:
+
+- Environment: The PoC is implemented on a Kubernetes environment to
+  enable automation and easy deployment for testing
+- "Automation": A Kubernetes operator, written in .NET (F\#) with the
+  "Dotnet Operator SDK"^[<https://github.com/buehler/dotnet-operator-sdk>]
+- "Proxy": Envoy proxy which gets the needed configuration
+  injected as Kubernetes ConfigMap file
+- "Translator": A .NET (F\#) application that uses the Envoy gRPC defintions
+  to react to Envoy's requests and poses as the external service for the
+  external authorization
+- "Showcase App": A solution of three applications that pose as demo case with:
+  - "Frontend": An ASP.NET static site application that authenticates itself against
+    "Zitadel"^[<https://zitadel.ch>]
+  - "Modern Service": A modern ASP.NET api application that can verify an OIDC token from Zitadel
+  - "Legacy Service": A "legacy" ASP.NET api application that is only able to verify
+    `Basic Auth` (RFC7617, see {@sec:basic_auth})
+
+The PoC addresses the following questions:
 
 - Is it possible intercept HTTP requests to an arbitrary service
 - Is it further possible to modify the HTTP headers of the request
 - Can a sidecar service transform given credentials from one format to another
-  - In the PoC, an OIDC access token is translated into static basic auth credentials
-  - No common language format is implemented or used in the PoC
-- Can a custom operator inject the following elements
+- Can a custom operator inject the following elements:
   - The correct configuration for Envoy to use external authentication
   - The translator module to transform the credentials
 
 Based on the results of the PoC, the following further work may be realized:
 
 - Specify the concrete common domain language to transport identities
-- Implement a secure way of transporting identities that is tamper-proof
+- Implement a secure way of transporting identities with validation of integrity
 - Provide a production ready solution of some translators and the operator
 - Integrate the solution with a service mesh
 - Provide a production ready documentation of the solution
 - Further investiage the possibility of hardening the communication between services
   (e.g. with mTLS)
 
-The following sections will describe the parts of the PoC and their specific
-implementation details.
+For the solution to be production ready, at least the secure communication channel
+between elements of the mesh as well as the common language format must be implemented.
+To be used in current cloud environments, an implementation in Kubernetes can provide
+insights on how to develop the solution for other orchestrators than Kubernetes.
 
 ### Showcase Application
 
-The showcase application is a demo application to show the need and the particular
+The showcase application is a demo to show the need and the particular
 usecase of the solution. The application resides in an open source repository
 under <https://github.com/WirePact/poc-showcase-app>.
 
@@ -422,11 +440,11 @@ this is the local configured URL for "Docker Desktop"].
 ](diagrams/component/showcase-app.puml){#fig:impl_components_showcase_app}
 
 {@fig:impl_components_showcase_app} gives an overview over the components
-in the showcase application. The system contains an ASP.Net Razor Page^[
+in the showcase application. The system contains an ASP.NET Razor Page^[
 <https://docs.microsoft.com/en-us/aspnet/core/razor-pages/>]
-application as the frontend, an ASP.Net API application with
-configured Zitadel^[<https://zitadel.ch>] OIDC authentication as "modern" backend
-service and another ASP.Net API application that only supports basic authentication
+application as the frontend, an ASP.NET API application with
+configured Zitadel OIDC authentication as "modern" backend
+service and another ASP.NET API application that only supports basic authentication
 as "legacy" backend. The frontend can only communicate with the modern API and
 the modern API is able to call an additional service on the legacy API.
 
@@ -440,6 +458,7 @@ the "Call API" button. The frontend application will call the modern backend API
 with the OIDC token and asks for customer and order data. The customer data is present
 on the modern API so it is directly returned. To query order data, the modern service
 relies on a legacy application which is only capable of basic authentication.
+
 Depending on the configuration (i.e. the environment variable `USE_WIREPACT`),
 the modern service will call the legacy one with either transformed basic auth
 credentials (when `USE_WIREPACT=false`) or with the presented OIDC token (otherwise).
@@ -449,13 +468,17 @@ then in turn is returned and presented to the user.
 To install and run the showcase application without any interference of
 the operator or the rest of the solution, follow the installation guide
 in the readme on <https://github.com/WirePact/poc-showcase-app>.
-
-### Envoy Sidecar
-
-### Translator
+To install and use the whole PoC solution, please refer to the installation guide
+in the Appendix.
 
 ### Operator
 
-### PoC Composition
+> TODO
 
-> TODO: Explain the whole PoC composition (how to run and stuff with operator).
+### Envoy Sidecar
+
+> TODO
+
+### Translator
+
+> TODO
