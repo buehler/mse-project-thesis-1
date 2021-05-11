@@ -1,0 +1,8 @@
+@startuml
+
+component "Translator" as t
+
+DSL -> t
+t -> Target
+
+@enduml

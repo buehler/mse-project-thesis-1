@@ -1,5 +1,4 @@
 @startgantt
-!include https://raw.githubusercontent.com/bschwarz/puml-themes/master/themes/materia-outline/puml-theme-materia-outline.puml
 printscale weekly
 project starts on 2021-03-01
 

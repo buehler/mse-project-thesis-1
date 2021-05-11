@@ -1,0 +1,30 @@
+@startuml
+!define KubernetesPuml https://raw.githubusercontent.com/dcasati/kubernetes-PlantUML/master/dist
+
+!include KubernetesPuml/kubernetes_Common.puml
+!include KubernetesPuml/kubernetes_Context.puml
+!include KubernetesPuml/kubernetes_Container.puml
+!include KubernetesPuml/kubernetes_Simplified.puml
+
+!include KubernetesPuml/OSS/KubernetesApi.puml
+!include KubernetesPuml/OSS/KubernetesSvc.puml
+!include KubernetesPuml/OSS/KubernetesPod.puml
+!include KubernetesPuml/OSS/KubernetesDeploy.puml
+
+KubernetesApi(api, "Kubernetes API", "")
+
+component "Operator" as op
+
+Cluster_Boundary(dep, "Deployment"){
+    KubernetesPod(app, "Application", "")
+    KubernetesPod(proxy, "Proxy", "")
+    KubernetesPod(translator, "Translator", "")
+}
+KubernetesSvc(svc, "Service", "")
+
+api <-- op : watches
+
+op --> dep : enhances
+op --> svc : enhances
+
+@enduml

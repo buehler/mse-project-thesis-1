@@ -1,5 +1,4 @@
 @startuml
-!include https://raw.githubusercontent.com/bschwarz/puml-themes/master/themes/materia-outline/puml-theme-materia-outline.puml
 
 actor User as u
 participant "API" as api
