@@ -1,7 +1,5 @@
 # Conclusion
 
-> TODO
+> TODO : Conclusion
 
-## Further Work
-
-> TODO
+> TODO : Further work

@@ -1,4 +1,6 @@
 @startgantt
+skinparam backgroundcolor transparent
+
 printscale weekly
 project starts on 2021-03-01
 
@@ -6,7 +8,7 @@ project starts on 2021-03-01
 [Section 2 first draft finished] happens 2021-03-31
 [Section 3 first draft finished] happens 2021-04-18
 [Solution Description first draft finished] happens 2021-05-30
-[PoC Code finished] happens 2021-05-30
-[PoC Documentation finished] happens 2021-06-13
+[POC Code finished] happens 2021-05-30
+[POC Documentation finished] happens 2021-06-13
 
 @endgantt

@@ -76,10 +76,10 @@ The project is expected to deliver the following results:
 
 - Report of the state of the art, the practice and a critical assessment of it
 - Specification of the proposed solution
-- Proof of concept (PoC) of the given scenario in \*@fig:should_situation
+- Proof of concept (POC) of the given scenario in \*@fig:should_situation
 - Evaluation report of the proposed solution
-- Initial release in an open source repository of the PoC
-- Developer documentation of the PoC
+- Initial release in an open source repository of the POC
+- Developer documentation of the POC
 
 Additionally, a tutorial into one or more topics of the project is published
 onto a to be defined platform to provide reading material into

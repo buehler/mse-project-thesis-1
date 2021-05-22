@@ -1,4 +1,4 @@
-# Appendix A: Installation Guide for PoC {-}
+# Appendix A: Installation Guide for POC {-}
 
 > TODO
 

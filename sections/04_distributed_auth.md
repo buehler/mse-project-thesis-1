@@ -33,7 +33,7 @@ for the proposed solution.
 tables/requirements.md
 ```
 
-It is important to note that the implemented proof of concept (PoC)
+It is important to note that the implemented proof of concept (POC)
 will not meet all requierements. Further work is needed to implement a solution
 according to the architecture that adheres the stated requirements.
 
@@ -46,9 +46,9 @@ for the proposed solution.
 tables/non-functional-requirements.md
 ```
 
-Like the requirements in {@tbl:functional-requirements}, the PoC will
+Like the requirements in {@tbl:functional-requirements}, the POC will
 not meet all NFRs that are stated in {@tbl:non-functional-requirements}. Further
-work is needed to complete the PoC to a production ready software.
+work is needed to complete the POC to a production ready software.
 
 ## Contrast
 
@@ -126,8 +126,8 @@ about the idea, then the architecture shows the general overview of the solution
 followed by sequence and communication definitions.
 
 The reader should note, that the proposed architecture does not match the implementation
-of the PoC to the full extent. The goal of this project is to provide a generalizable idea
-to implement such a solution, while the PoC proves the ability of modifying HTTP requests
+of the POC to the full extent. The goal of this project is to provide a generalizable idea
+to implement such a solution, while the POC proves the ability of modifying HTTP requests
 in-flight.
 
 ### Brief Description
@@ -287,7 +287,7 @@ Additionally, with the aid of the PKI, the proxy can verify the identity of the 
 
 {@fig:inbound_networking_process} shows the general process during inbound request processing.
 When the proxy receives a request (in the given example by the configured Kubernetes service),
-it calls the translator with the HTTP request detail. The PoC is implemented with the "Envoy" proxy.
+it calls the translator with the HTTP request detail. The POC is implemented with the "Envoy" proxy.
 Envoy allows an external service to perform "external authorization"^[
 <https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter>]
 during which the external service may:
@@ -301,7 +301,7 @@ during which the external service may:
 The translator uses this concept to consume a specific and well-known header to read
 the identity of the authorized user in the common format. The identity is then validated
 and transformed to the authentication credentials needed by the destination. Then, the
-translator instructs Envoy to set the credentials for the upstream. In the PoC, this
+translator instructs Envoy to set the credentials for the upstream. In the POC, this
 is done by setting the `Authorization` header to static Basic Auth credentials.
 
 ##### Egress
@@ -336,7 +336,7 @@ When the credentials are valid, they are translated according to the implementat
 translator. The proxy is then instructed with the actions to replace the transported
 identity with the correct credentials to access the destination.
 
-In the PoC, the proof of integrity is not implemented, but the transformation takes
+In the POC, the proof of integrity is not implemented, but the transformation takes
 place, where a "Bearer Token"^[Opaque OIDC Token of an IDP.] is used to check if the user
 may access and then replaces the token with static Basic Auth credentials.
 
@@ -379,13 +379,13 @@ manipulating certificates in translators does not seem to be a feasible option.
 For the sake of simplicity and the well known usage, further work to this project
 will probably use JWT tokens to transmit the users identity.
 
-## Implementation Proof of Concept (PoC)
+## Implementation Proof of Concept (POC)
 
 To provide a proof that the general idea of the solution is possible,
-a PoC is implemented during the work of this project.
+a POC is implemented during the work of this project.
 The solution is implemented with the following technologies and environments:
 
-- Environment: The PoC is implemented on a Kubernetes environment to
+- Environment: The POC is implemented on a Kubernetes environment to
   enable automation and easy deployment for testing
 - "Automation": A Kubernetes operator, written in .NET (C\#) with the
   "Dotnet Operator SDK"^[<https://github.com/buehler/dotnet-operator-sdk>]
@@ -401,7 +401,7 @@ The solution is implemented with the following technologies and environments:
   - "Legacy Service": A "legacy" ASP.NET api application that is only able to verify
     `Basic Auth` (RFC7617, see {@sec:basic_auth})
 
-The PoC addresses the following questions:
+The POC addresses the following questions:
 
 - Is it possible intercept HTTP requests to an arbitrary service
 - Is it further possible to modify the HTTP headers of the request
@@ -410,7 +410,7 @@ The PoC addresses the following questions:
   - The correct configuration for Envoy to use external authentication
   - The translator module to transform the credentials
 
-Based on the results of the PoC, the following further work may be realized:
+Based on the results of the POC, the following further work may be realized:
 
 - Specify the concrete common domain language to transport identities
 - Implement a secure way of transporting identities with validation of integrity
@@ -428,7 +428,7 @@ insights on how to develop the solution for other orchestrators than Kubernetes.
 ### Showcase Application
 
 The showcase application is a demo to show the need and the particular
-usecase of the solution. The application resides in an open source repository
+use-case of the solution. The application resides in an open source repository
 under <https://github.com/WirePact/poc-showcase-app>.
 
 When installed in a Kubernetes cluster,
@@ -468,7 +468,7 @@ then in turn is returned and presented to the user.
 To install and run the showcase application without any interference of
 the operator or the rest of the solution, follow the installation guide
 in the readme on <https://github.com/WirePact/poc-showcase-app>.
-To install and use the whole PoC solution, please refer to the installation guide
+To install and use the whole POC solution, please refer to the installation guide
 in the Appendix.
 
 ### Operator
@@ -477,7 +477,7 @@ in the Appendix.
 
 ### Envoy Sidecar
 
-In the PoC, the proxy sidecar is an Envoy proxy with an injected configuration.
+In the POC, the proxy sidecar is an Envoy proxy with an injected configuration.
 The operator injects the sidecar whenever a `Deployment` is created or updated
 via the Kubernetes API. The operator attaches the proxy and adds several annotations
 that are used for communication with a `Mutation Webhook`. Furthermore, a `ConfigMap`
