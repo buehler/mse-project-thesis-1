@@ -1,0 +1,22 @@
+@startuml
+skinparam backgroundcolor transparent
+
+package "Trust Zone A" {
+    component [Service] as 1
+    component [Service] as 1.5
+}
+
+package "Trust Zone B" {
+    component [Service] as 2
+}
+
+package "Trust Zone C" {
+    component [Service] as 3
+}
+
+1 <--> 1.5 : Communication
+1 <-> 2 : Communication
+2 <-> 3 : Communication
+3 <--> 1 : Communication
+
+@enduml

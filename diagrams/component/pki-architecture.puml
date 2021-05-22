@@ -1,4 +1,5 @@
 @startuml
+skinparam backgroundcolor transparent
 
 component "Public Key Infrastructure (PKI)" as pki
 

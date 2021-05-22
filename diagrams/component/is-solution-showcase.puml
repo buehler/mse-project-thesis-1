@@ -1,19 +1,20 @@
 @startuml
+skinparam backgroundcolor transparent
 
 actor User as u
-component [IAM] as i
+component [Identity and Access Management] as i
 
 node "Cloud Environment" {
-    component [Client (SPA)] as c
-    component [Service A] as sa
-    component [Service B] as sb
+    component [Single Page Application] as c
+    component [Cloud Native Application] as sa
+    component [Legacy System] as sb
 
     c -> sa : OIDC
-    sa -> sb : Basic
+    sa -> sb : Basic\nAuthentication
 }
 
-u --> c
-c <--> i
+u --> c : Accesses the App
+c <--> i : Check Credentials / Tokens
 i <--> sa
 
 @enduml

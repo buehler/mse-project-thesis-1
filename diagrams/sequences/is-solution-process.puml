@@ -1,13 +1,14 @@
 @startuml
+skinparam backgroundcolor transparent
 
 actor Client as c
-participant IAM as i
-participant "Service A" as a
-participant "Service B" as b
+participant "Identity and Access\nManagement" as i
+participant "Cloud Native\nApplication" as a
+participant "Legacy System" as b
 
 c -> i : Authenticate with OIDC
 i --> c : Return Credentials
 c -> a : Call Service with OIDC
-a -> a : Transform Credentials to Basic
-a -> b : Call with Basic Credentials
+a -> a : Transform Credentials to\nBasic Authentication format
+a -> b : Call with\nBasic Authentication
 @enduml

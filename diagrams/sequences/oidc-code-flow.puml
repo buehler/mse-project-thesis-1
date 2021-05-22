@@ -1,4 +1,5 @@
 @startuml
+skinparam backgroundcolor transparent
 
 actor User as c
 participant "Relying Party" as s

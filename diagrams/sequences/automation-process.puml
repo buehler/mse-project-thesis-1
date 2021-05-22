@@ -1,4 +1,5 @@
 @startuml
+skinparam backgroundcolor transparent
 
 participant "Kubernetes API" as api
 participant "Operator" as op

@@ -1,4 +1,5 @@
 @startuml
+skinparam backgroundcolor transparent
 
 node "Application Pod" {
     component [Main Container] as m

@@ -1,0 +1,26 @@
+@startuml
+skinparam backgroundcolor transparent
+
+component [Service 1] as 3
+component [Service 2] as 4
+component [Service 3] as 5
+component [Service 4] as 6
+
+component [Caller 1] as 1
+component [Caller 2] as 2
+
+3 -[hidden]-> 4
+4 -[hidden]-> 5
+5 -[hidden]-> 6
+
+1 -r-> 3 : Access with OIDC
+1 --> 4 : Access with Basic Authentication
+1 --> 5 : Access with LDAP
+1 --> 6 : Access with Azure AD
+
+2 -l-> 3 : Access with OIDC
+2 --> 4 : Access with Basic Authentication
+2 --> 5 : Access with LDAP
+2 --> 6 : Access with Azure AD
+
+@enduml

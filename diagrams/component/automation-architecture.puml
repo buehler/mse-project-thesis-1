@@ -1,4 +1,5 @@
 @startuml
+skinparam backgroundcolor transparent
 !define KubernetesPuml https://raw.githubusercontent.com/dcasati/kubernetes-PlantUML/master/dist
 
 !include KubernetesPuml/kubernetes_Common.puml

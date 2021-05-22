@@ -243,27 +243,28 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction">Introduction</a></li>
-<li><a href="#definitions-and-boundaries">Definitions and Boundaries</a>
+<li><a href="#definitions-and-clarification-of-the-scope">Definitions and Clarification of the Scope</a>
 <ul>
-<li><a href="#context">Context</a></li>
-<li><a href="#kubernetes">Kubernetes</a>
+<li><a href="#scope-of-the-project">Scope of the Project</a></li>
+<li><a href="#kubernetes-as-an-orchestration-engine">Kubernetes as an Orchestration Engine</a>
 <ul>
 <li><a href="#introduction-1">Introduction</a></li>
 <li><a href="#terminology">Terminology</a></li>
-<li><a href="#sec:kubernetes_operator">Operator</a></li>
-<li><a href="#sec:kubernetes_sidecar">Sidecar</a></li>
-<li><a href="#sec:service_mesh">Service Mesh</a></li>
 </ul></li>
-<li><a href="#authentication-and-authorization">Authentication and Authorization</a>
+<li><a href="#sec:kubernetes_operator">The Operator Pattern</a></li>
+<li><a href="#sec:kubernetes_sidecar">The Sidecar Pattern</a></li>
+<li><a href="#sec:service_mesh">Controlling the Data with a Service Mesh</a></li>
+<li><a href="#authentication-authorization-and-security">Authentication, Authorization, and Security</a>
 <ul>
-<li><a href="#sec:basic_auth">Basic (RFC7617)</a></li>
+<li><a href="#sec:basic_auth">Basic Authentication (RFC7617)</a></li>
 <li><a href="#sec:auth_oidc">OpenID Connect (OIDC)</a></li>
+<li><a href="#sec:zero-trust">Zero Trust Environment</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#state-of-the-art-the-practice-and-deficiencies">State of the Art, the Practice and Deficiencies</a>
+<li><a href="#state-of-the-art-and-the-practice">State of the Art and the Practice</a>
 <ul>
 <li><a href="#state-of-the-art">State of the Art</a></li>
-<li><a href="#the-practice">The Practice</a></li>
+<li><a href="#current-software-and-concepts">Current Software and Concepts</a></li>
 <li><a href="#sec:deficiencies">Deficiencies</a></li>
 </ul></li>
 <li><a href="#distributed-authentication-mesh">Distributed Authentication Mesh</a>
@@ -283,7 +284,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <li><a href="#solution-architecture">Solution Architecture</a></li>
 <li><a href="#communication">Communication</a></li>
 </ul></li>
-<li><a href="#implementation-proof-of-concept-poc">Implementation Proof of Concept (PoC)</a>
+<li><a href="#implementation-proof-of-concept-poc">Implementation Proof of Concept (POC)</a>
 <ul>
 <li><a href="#showcase-application">Showcase Application</a></li>
 <li><a href="#operator">Operator</a></li>
@@ -292,65 +293,53 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </ul></li>
 </ul></li>
 <li><a href="#evaluation">Evaluation</a></li>
-<li><a href="#conclusion">Conclusion</a>
-<ul>
-<li><a href="#further-work">Further Work</a></li>
-</ul></li>
+<li><a href="#conclusion">Conclusion</a></li>
 <li><a href="#bibliography">Bibliography</a></li>
-<li><a href="#appendix-a-installation-guide-for-poc">Appendix A: Installation Guide for PoC</a></li>
+<li><a href="#appendix-a-installation-guide-for-poc">Appendix A: Installation Guide for POC</a></li>
 <li><a href="#appendix-b-teaching-material-for-kubernetes-operators">Appendix B: Teaching Material for Kubernetes Operators</a></li>
 </ul>
 </nav>
 <h1 id="introduction">Introduction</h1>
-<p>Modern cloud environments solve many problems like the discovery of services and data transfer or communiation between services in general. One modern way of solving service discovery and communication is a Service Mesh, which introduces an additional infrastructure layer that manages the communication between services <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>.</p>
-<p>However, a specific problem is not solved yet: “dynamic” trusted communication between services. When a service, that is capable of handling OpenID Connect (OIDC) credentials, wants to communicate with a service that only knows Basic Authentication that originating service must implement some sort of conversion or know static credentials to communicate with the basic auth service. Generally, this introduces changes to the software of services. In small applications which consist of one or two services, implementing this conversion may be a feasable option. If we look at an application which spans over a big landscape and a multitude of services, implementing each and every possible authentication mechanism and the according conversions will be error prone work and does not scale well<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
-<p>The goal of the project “Distributed Authentication Mesh” is to provide a solution for this problem.</p>
-<p>Prerequisits:</p>
-<ul>
-<li>Docker knowledge</li>
-<li>Microservice knowledge</li>
-</ul>
-<blockquote>
-<p>TODO.</p>
-</blockquote>
-<h1 id="definitions-and-boundaries">Definitions and Boundaries</h1>
-<p>This section provides general information about the project, the context and prerequisite knowledge. It gives an overview of the context as well as terminology and general definitions.</p>
-<h2 id="context">Context</h2>
-<blockquote>
-<p>TODO: restructure to have better reading flow</p>
-</blockquote>
-<p>This project addresses the specific problem of declarative conversion of credentials to ensure authorized communication between services. The solution may be runnable on various platforms but will be implemented according to Kubernetes standards. Kubernetes<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> is an orchestration platform that works with containerized applications. The solution introduces an operator pattern, as explained in Section <a href="#sec:kubernetes_operator">2.2.3</a></p>
-<p>The deliverables of this and further projects may aid applications or APIs to communicate with each other despite different authentication mechanisms. As an example, this could be used to enable a modern web application that uses OpenID Connect (OIDC) as the authentication and authorization mechanism to communicate with a legacy application that was deployed on the Kubernetes cluster but not yet rewritten. This transformation of credentials (from OIDC to Basic Auth) is done by the solution of the projects instead of manual work which may introduc code changes to either service.</p>
-<p>This specific project provides a proof of concept (PoC) with an initial version on a GitHub repository. The PoC demonstrates that it is possible to instruct an Envoy<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> proxy to communicate with an injected service to modify authentication credentials in-flight.</p>
-<p>To use the proposed solution of this project, no service mesh or other complex layer is needed. The solution runs without those additional parts on a Kubernetes cluster. To provide service discovery, the default internal DNS capabilities of Kubernetes are sufficient.</p>
-<h2 id="kubernetes">Kubernetes</h2>
+<p>Modern cloud environments solve many problems like the discovery of services and data transfer or communication between services in general. As the development of cloud-native applications (CNA) evolves, older applications move to the cloud as well.</p>
+<p>However, a specific problem is not yet solved: “dynamic” trusted communication between services. For example, a service that is capable of handling OpenID Connect (OIDC) credentials wants to communicate with a service that only knows Basic Authentication. The source service must implement some conversion mechanism or know static credentials to communicate with the basic auth service. In general, this introduces changes to the software. In small applications which consist of one or two services, implementing this conversion may be a feasible option. However, if we look at an application that spans over a big landscape and a multitude of services, implementing every possible authentication mechanism and the according to conversions will be error-prone work and does not scale well<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. In practice, we encountered the given scenario at various points in time when older applications were migrated into a cloud environment and newer applications were built around it. In almost all cases, the modern software was changed to communicate with the legacy systems, not the other way around.</p>
+<p>The goal of the project “Distributed Authentication Mesh” is to provide a solution for this exact problem. By introducing multiple elements, like a translator in conjunction with a proxy that is capable of modifying HTTP headers in-flight, the described problem can be solved. The proposed concept uses a common domain language to transfer the authenticated identity of a user between services of a microservice application. The proxy then intercepts the requests and instructs the translator to transform the common language into the valid authentication format of the destination.</p>
+<p>For further reading, basic knowledge about “Docker” and microservices is required. Furthermore, the implementation of the proof of concept (POC) is based on “Kubernetes” to display the concepts of the solution in a practical manner. In terms of authentication and authorization, the POC uses OpenID Connect and Basic Authentication, which are both described in later sections.</p>
+<p>The remainder of the report describes used technologies, terminology, and concepts. Furthermore, the state of the art gives an overview of the current situation and the present solutions in practice. With the description of the distributed authentication mesh, the report shows the proposed solution and the architecture. Then, some elements of the solution are tested with an implementation of a POC on the Kubernetes platform. After the description of the solution, the evaluation checks if the goals and non-goals of the solution are valid. The conclusion then gives an overview of the work and a summary of the project.</p>
+<h1 id="definitions-and-clarification-of-the-scope">Definitions and Clarification of the Scope</h1>
+<p>This section provides general information about the project, the context, and prerequisite knowledge. It gives an overview of the context as well as terminology and general definitions.</p>
+<h2 id="scope-of-the-project">Scope of the Project</h2>
+<p>This project addresses the specific problem of declarative conversion of user credentials, for example an access token, to ensure authorized communication between services. When multiple services with different authentication mechanisms communicate with each other, the services need to translate the credentials and send them to their counterpart. The goal of this project is to prevent user credentials from being transmitted to other services.</p>
+<p>To solve this problem, an automation component enhances services that are part of the application with additional functionality. A proxy in front of the service captures in-, and outgoing traffic to modify the <code>Authorization</code> HTTP header. Additionally, a translator transforms the original authentication data into a form of identity and encodes it with a common language format. The receiving service can validate this encoded identity and transforms the identity into valid user credentials again. This automatical transformation of credentials (e.g. from OIDC to Basic Auth) replaces manual work which may introduce code changes to either service. The deliverables of this and further projects may aid applications or APIs to communicate with each other despite different authentication mechanisms.</p>
+<p>The solution may be runnable on various platforms but to provide a practical demo application, the proof of concept (POC) runs on Kubernetes. Kubernetes<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> is an orchestration platform that works with containerized applications. The POC resides in an initial version in an open-source GitHub repository. The POC demonstrates that it is possible to instruct an Envoy<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> proxy to communicate with an injected service to modify authentication credentials in-flight. To separate the proposed solution from complexer concepts like a service mesh, the POC is able to run without a service mesh on a Kubernetes cluster and uses the built in service discovery of Kubernetes to communicate.</p>
+<h2 id="kubernetes-as-an-orchestration-engine">Kubernetes as an Orchestration Engine</h2>
+<p>This section provides a general overview of Kubernetes. Kubernetes is a prominent orchestration engine that manages workloads on worker-nodes.</p>
 <h3 id="introduction-1">Introduction</h3>
-<p>Kubernetes is an open source platform that manages containerized workloads and applications. Workloads may be accessed via “Services” that use a DNS naming system. Kubernetes uses declarative definitions to compare the actual state of the system with the expected state <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span>.</p>
+<p>Kubernetes is an open-source platform that manages containerized workloads and applications. Workloads may be accessed via “Services” that use a DNS naming system. Kubernetes uses declarative definitions to compare the actual state of the system with the expected state <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span>.</p>
 <div id="fig:kubernetes_container_evolution" class="fignos">
 <figure>
 <img src="images/Kubernetes/Container_Evolution.png" data-short-caption="Kubernetes Container Evolution" alt="Figure 1: Container and Deployment Evolution. Description of the evolution of deployments as found on the documentation website of Kubernetes (CNCF 2021). This image is licensed under the CC BY 4.0 license (Creative Commons 2021)." /><figcaption aria-hidden="true"><span>Figure 1:</span> Container and Deployment Evolution. Description of the evolution of deployments as found on the documentation website of Kubernetes <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span>. This image is licensed under the CC BY 4.0 license <span class="citation" data-cites="cc:CCBY4.0">(Creative Commons 2021)</span>.</figcaption>
 </figure>
 </div>
-<p>According to Kubernetes, the way of deploying applications has evolved. As shown in Figure <a href="#fig:kubernetes_container_evolution">1</a>, the “Traditional Era” was the time, when applications were deployed via FTP access and started manually (e.g. on an Apache webserver). Then the revolution to virtual machines came and technologies that could virtualize a whole operating system, such as VMWare, were born. The latest stage, “Container Era,” defines a new way deploying workloads by virtualizing processes instead of operating systems and therefore better use the given resources <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span>.</p>
-<p>Kubernetes is a major player, among others like “Docker Swarm” or “Cloud Foundry,” in “Container Deployment” as seen in Figure <a href="#fig:kubernetes_container_evolution">1</a> and supports teams with the following features according to the documentation <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span>:</p>
+<p>According to Kubernetes, the way of deploying applications has evolved. As shown in Figure <a href="#fig:kubernetes_container_evolution">1</a>, the “Traditional Era” was the time when applications were deployed via FTP access and started manually (e.g. on an Apache webserver). Then the revolution to virtual machines came and technologies that could virtualize a whole operating system, such as VMWare, were born. The latest stage, “Container Era,” defines a new way deploying workloads by virtualizing processes instead of operating systems and therefore better use the given resources <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span>.</p>
+<p>Kubernetes is a major player among others like “OpenShift” or “Cloud Foundry” in “Container Deployment” as seen in Figure <a href="#fig:kubernetes_container_evolution">1</a> and supports teams with the following features according to the documentation <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span>:</p>
 <ul>
 <li><strong>Service discovery and load balancing</strong>: Use DNS names or IP addresses to route traffic to a container and if the traffic is high and multiple instances are available, Kubernetes does load balance the traffic</li>
 <li><strong>Storage orchestration</strong>: Automatically provide storage in the form of mountable volumes</li>
 <li><strong>Automated rollouts and rollbacks</strong>: When a new desired state is provided Kubernetes tries to achieve the state at a controlled rate and has the possibility of performing rollbacks</li>
-<li><strong>Automatec bin packing</strong>: Kubernetes only needs to know how much CPU and RAM a workload needs and then takes care of placing the workload on a fitting node in the cluster</li>
+<li><strong>Automatic bin packing</strong>: Kubernetes only needs to know how much CPU and RAM a workload needs and then takes care of placing the workload on a fitting node in the cluster</li>
 <li><strong>Self-healing</strong>: If workloads are failing, Kubernetes tries to restart the applications and even kills services that do not respond to the configured health checks</li>
-<li><strong>Secret and configuration management</strong>: Kubernetes has a store for sensitive data as well as configurational data that may change the behaviour of a workload</li>
+<li><strong>Secret and configuration management</strong>: Kubernetes has a store for sensitive data as well as configurational data that may change the behavior of a workload</li>
 </ul>
-<p>The list of features is not complete. There are many concepts in Kubernetes which help to build complex deployment scenarios and enable teams to ship their applications in an agile manner.</p>
-<p>Kubernetes works with containerized applications. In contrast to “plain” Docker, it orchestrates the applications and is responsible to reach the desired state depicted in the applications manifest files. Examples of such manifests can be viewed at: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment.</p>
+<p>The list of features is not complete. There are many concepts in Kubernetes that help to build complex deployment scenarios and enable teams to ship their applications in an agile manner.</p>
+<p>Kubernetes works with containerized applications. In contrast to “plain” Docker, it orchestrates the applications and is responsible to achieve the desired state depicted in the application manifest files. Examples of such deployments and other Kubernetes objects are available online in the documentation <span class="citation" data-cites="github:kubernetesWebsite">(CNCF 2021)</span><a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>.</p>
 <h3 id="terminology">Terminology</h3>
-<p>In Table <a href="#tbl:kubernetes_terminology">1</a>, we state the most common Kubernetes terminology. The table provides a list of terms that will be used to explain concepts like the operator pattern in Section <a href="#sec:kubernetes_operator">2.2.3</a>.</p>
+<p>In Table <a href="#tbl:kubernetes_terminology">1</a>, we state the most common Kubernetes terminology. The table provides a list of terms that is used to explain concepts like the operator pattern in Section <a href="#sec:kubernetes_operator">2.3</a>.</p>
 <div id="tbl:kubernetes_terminology" class="tablenos">
-<table id="tbl:kubernetes_terminology" style="width:92%;">
+<table id="tbl:kubernetes_terminology" style="width:95%;">
 <caption><span>Table 1:</span> Common Kubernetes Terminology </caption>
 <colgroup>
-<col style="width: 16%" />
-<col style="width: 76%" />
+<col style="width: 17%" />
+<col style="width: 77%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -365,7 +354,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </tr>
 <tr class="even">
 <td>Kustomize</td>
-<td>“Kustomize” is a special templating CLI to declaratively bundle Kubernetes manifests. It consists of a <code>kustomization.yaml</code> and various referenced manifest yaml files. It is declarative and does not allow dynamic structures. It helps administrators to template applications for Kubernetes.</td>
+<td>“Kustomize” is a special templating CLI to declaratively bundle Kubernetes manifests. It consists of a <code>kustomization.yaml</code> and various referenced manifest <code>yaml</code> files. It is declarative and does not allow dynamic structures. It helps administrators to template applications for Kubernetes.</td>
 </tr>
 <tr class="odd">
 <td>Container</td>
@@ -376,16 +365,16 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <td>Composed of multiple containers. Is ran by Kubernetes as an instance of a deployment. Pods may be scaled according to definitions or “pod scalers.” Highly coupled tasks are deployed together in a pod (i.e. multiple coupled containers in a pod).</td>
 </tr>
 <tr class="odd">
-<td>Deployment</td>
-<td>A deployment is a managed instance of a pod. Kubernetes will run the described pod with the desired replica count on the best possible worker node. Deployments may be scaled with auto-scaling mechanisms.</td>
+<td>Deployment Daemonset Statefulset</td>
+<td>A deployment is a managed instance of a pod. Daemonsets and Statefulsets are variants of deployments. Kubernetes will run the described pod with the desired replica count on the best possible worker node. Deployments may be scaled with auto-scaling mechanisms.</td>
 </tr>
 <tr class="even">
 <td>Service</td>
-<td>A service enables communciation with one or multiple pods. The service contains a selector that points to a certain number of pods and then ensures that the pods are accessable via a DNS name. The name is typically a combination of the servicename and the namespace (e.g. <code>my-service.namespace</code>).</td>
+<td>A service enables communication with one or multiple pods. The service contains a selector that points to a certain number of pods and then ensures that the pods are accessible via a DNS name. The name is typically a combination of the service name and the namespace (e.g. <code>my-service.namespace</code>).</td>
 </tr>
 <tr class="odd">
 <td>Ingress</td>
-<td>Incomming communication and data-flow into a component. Furthermore an “Ingress” is a Kubernetes object that defines incomming communication and configures an API gateway to route traffic to specific services.</td>
+<td>Incoming communication and data flow into a component. Furthermore an “Ingress” is a Kubernetes object that defines incoming communication and configures an API gateway to route traffic to specific services.</td>
 </tr>
 <tr class="even">
 <td>Egress</td>
@@ -397,15 +386,15 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </tr>
 <tr class="even">
 <td>CRD</td>
-<td>A Custom Resource Definition (CRD) enables developers to extend the default Kubernetes API. With a CRD, it is possible to create own resources which creates an API endpoint on the Kubernetes API. An example of such a CRD is the <code>Mapping</code> resource of Ambassador<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>.</td>
+<td>A Custom Resource Definition (CRD) enables developers to extend the default Kubernetes API. With a CRD, it is possible to create own resources which create an API endpoint on the Kubernetes API. An example of such a CRD is the <code>Mapping</code> resource of Ambassador<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>.</td>
 </tr>
 <tr class="odd">
 <td>Operator</td>
-<td>An operator is a software that manages Kubernetes resources and their lifecycle. Operators may use CRDs to define custom objects on which they react when some event (<code>Added</code>, <code>Modified</code> or <code>Deleted</code>) triggers on a resource. For a more in-depth description, see Section <a href="#sec:kubernetes_operator">2.2.3</a>.</td>
+<td>An operator is a software that manages Kubernetes resources and their lifecycle. Operators may use CRDs to define custom objects on which they react when some event (<code>Added</code>, <code>Modified</code> or <code>Deleted</code>) triggers on a resource. For a more in-depth description, see Section <a href="#sec:kubernetes_operator">2.3</a>.</td>
 </tr>
 <tr class="even">
 <td>Watcher</td>
-<td>A watcher is a constant connection from a client to the Kubernetes API. The watcher defines some search and filter parameters and receives events for the found resources.</td>
+<td>A watcher is a constant connection from a client to the Kubernetes API. The watcher defines some search and filter parameters and receives events for found resources.</td>
 </tr>
 <tr class="odd">
 <td>Validator</td>
@@ -421,32 +410,32 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <blockquote>
 <p>TODO: UML of kubernetes parts</p>
 </blockquote>
-<h3 id="sec:kubernetes_operator">Operator</h3>
-<p>An operator in Kubernetes is an extension to the Kubernetes API itself. A custom operator typically manages the whole lifecycle of an appliction it manages <span class="citation" data-cites="dobies:KubernetesOperators">(Dobies and Wood 2020)</span>. Such a custom operator can further be used to reconcile normal Kubernetes resources or any combination thereof.</p>
+<h2 id="sec:kubernetes_operator">The Operator Pattern</h2>
+<p>An operator in Kubernetes is an extension to the Kubernetes API itself. A custom operator typically manages the whole lifecycle of an application it manages <span class="citation" data-cites="dobies:KubernetesOperators">(Dobies and Wood 2020)</span>. Such a custom operator can further be used to reconcile normal Kubernetes resources or any combination thereof.</p>
 <p>Some examples of application operators are:</p>
 <ul>
-<li>Prometheus Operator<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>: Manages instances of Prometheus in a cluster</li>
-<li>Postgres Operator<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>: Manages PostgreSQL clusters inside Kubernetes, with the support of multiple instance database clusters</li>
+<li>Prometheus Operator<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>: Manages instances of Prometheus in a cluster</li>
+<li>Postgres Operator<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a>: Manages PostgreSQL clusters inside Kubernetes, with the support of multiple instance database clusters</li>
 </ul>
-<p>There exists a broad list of operators, which can be (partially) viewed on <a href="https://operatorhub.io/">operatorhub.io</a>.</p>
+<p>There exists a broad list of operators, which can be (partially) viewed on <a href="https://operatorhub.io/">https://operatorhub.io</a>.</p>
 <div id="fig:kubernetes_operator_workflow" class="fignos">
 <figure>
-<img src="diagrams/sequences/63233dbd018a21fb1e6ec4e33958bf09.png" alt="Figure 2: Kubernetes Operator Workflow" /><figcaption aria-hidden="true"><span>Figure 2:</span> Kubernetes Operator Workflow</figcaption>
+<img src="diagrams/sequences/5a178916d440c4b0874e50419ac397c8.png" alt="Figure 2: Kubernetes Operator Workflow" /><figcaption aria-hidden="true"><span>Figure 2:</span> Kubernetes Operator Workflow</figcaption>
 </figure>
 </div>
-<p>In Figure <a href="#fig:kubernetes_operator_workflow">2</a>, we depict the general workflow of an event that is managed by an operator. When an operator is installed and running on a Kubernetes cluster, it registers “Resource Watchers” with the API and receives notifications when the master node modifies resources a watched resource. The overviewed events are “Added,” “Modified” and “Deleted.” There are two additional events that may be returned by the API (“Error” and “Bookmark”) but they are typically not needed in an operator.</p>
-<p>When the user interacts with the Kubernetes API (for example via the <code>kubectl</code> executable) and creates a new instance of a resource, the API will first call any “Mutator” in a serial manner. After the mutators, the API will call any “Validators” in parallel and if no validator objects against the creation, the API will then store the resource and tries to apply the transition for the new desired state. Now, the operator receives the notification about the watched resource and may interact with the event. Such an action may include to update resources, create more resources or even delete other instances.</p>
-<h3 id="sec:kubernetes_sidecar">Sidecar</h3>
-<p>According to <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">Burns and Oppenheimer (2016)</span>, the sidecar pattern is the most common pattern for multi-container deployments <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, sec. 4.1)</span>. Sidecars are containers that enhance the functionality of the main container in a pod. An example for such a sidecar is a log collector, that collects log files written to the file system and forwards them towards some log processing software <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, sec. 4.1)</span>. Another example is the Google CloudSQL Proxy<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a>, which provides access to a CloudSQL instance from a pod without routing the whole traffic through Kubernetes services.</p>
+<p>In Figure <a href="#fig:kubernetes_operator_workflow">2</a>, we depict the general workflow of an event that is managed by an operator. When an operator is installed and runs on a Kubernetes cluster, it registers “Resource Watchers” with the API and receives notifications if the master node modifies resources. The overviewed events are “Added,” “Modified” and “Deleted.” There are two additional events that may be returned by the API (“Error” and “Bookmark”), but they are typically not needed for reconciliation.</p>
+<p>When the user interacts with the Kubernetes API (e.g. via the <code>kubectl</code> executable) and creates a new instance of a resource, the API will first call any “Mutator” in a serial manner. After the mutators, the API will call any “Validators” in parallel and if no validator objects against the creation, the API will then store the resource and tries to apply the transition for the new desired state. Now, the operator receives a notification about the watched resource and may interact with the event. Such an action may include to update resources, create more resources or even delete other instances.</p>
+<h2 id="sec:kubernetes_sidecar">The Sidecar Pattern</h2>
+<p>According to <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">Burns and Oppenheimer (2016)</span>, the sidecar pattern is the most common pattern for multi-container deployments <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, sec. 4.1)</span>. Sidecars are containers that enhance the functionality of the main container in a pod. An example for such a sidecar is a log collector, that collects log files written to the file system and forwards them towards some log processing software <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, sec. 4.1)</span>. Another example is the Google CloudSQL Proxy^[<a href="https://github.com/GoogleCloudPlatform/cloudsql-proxy" class="uri">https://github.com/GoogleCloudPlatform/cloudsql-proxy</a>, which provides access to a CloudSQL instance from a pod without routing the whole traffic through Kubernetes services.</p>
 <div id="fig:kubernetes_sidecar" class="fignos">
 <figure>
-<img src="diagrams/component/fea6395d89219670b7e904c4f382c3a5.png" data-short-caption="Example of a sidecar container" alt="Figure 3: Sidecar container extending a main container in a pod. As example, this could be a log collector , figure 1(Burns and Oppenheimer 2016, fig. 1)." /><figcaption aria-hidden="true"><span>Figure 3:</span> Sidecar container extending a main container in a pod. As example, this could be a log collector <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, fig. 1)</span>.</figcaption>
+<img src="diagrams/component/7618077b5ad439978876dcc9b5dfbf8d.png" data-short-caption="Example of a sidecar container" alt="Figure 3: Sidecar container extending a main container in a pod. As example, this could be a log collector , figure 1(Burns and Oppenheimer 2016, fig. 1)." /><figcaption aria-hidden="true"><span>Figure 3:</span> Sidecar container extending a main container in a pod. As example, this could be a log collector <span class="citation" data-cites="burns:DesignPatternsForContainerSystems">(Burns and Oppenheimer 2016, fig. 1)</span>.</figcaption>
 </figure>
 </div>
 <p>The example shown in Figure <a href="#fig:kubernetes_sidecar">3</a> is extensible. Such sidecars may be injected by a mutator or an operator to extend functionality.</p>
-<p>Common usecases for sidecars are controlling the data flow in a cluster in service mesh, providing access to secure locations or performing additional tasks such as collecting logs of an application. Since sidecars are tightly coupled to the original application, they scale with the Pod. It is not possible to scale a sidecar without scaling the Pod - and therefore the application - itself.</p>
-<h3 id="sec:service_mesh">Service Mesh</h3>
-<p>A “Service Mesh” is a dedicated infrastructure layer that handles intercommunication between services. It is responsible for the delivery of requests in a modern cloud application <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>. An example from the practice is “Istio”<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a>. When using Istio, the applications do not need to know if there is a service mesh installed or not. Istio will inject a sidecar (see Section <a href="#sec:kubernetes_sidecar">2.2.4</a>) into pods and handle the communication with the injected services.</p>
+<p>Common use-cases for sidecars include controlling the data flow in a cluster in service mesh<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a>, providing access to secure locations<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a> or performing additional tasks such as collecting logs of an application. Since sidecars are tightly coupled to the original application, they scale with the pod. It is not possible to scale a sidecar without scaling the pod - and therefore the application - itself.</p>
+<h2 id="sec:service_mesh">Controlling the Data with a Service Mesh</h2>
+<p>A “Service Mesh” is a dedicated infrastructure layer that handles intercommunication between services. It is responsible for the delivery of requests in a modern cloud application <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>. An example from the practice is “Istio”<a href="#fn10" class="footnote-ref" id="fnref10" role="doc-noteref"><sup>10</sup></a>. When using Istio, the applications do not need to know if there is a service mesh installed or not. Istio will inject a sidecar (see Section <a href="#sec:kubernetes_sidecar">2.4</a>) into the deployments to handle the communication between services.</p>
 <p>The service mesh provides a set of features <span class="citation" data-cites="li:ServiceMesh">(Li et al. 2019, sec. 2)</span>:</p>
 <ul>
 <li><strong>Service discovery</strong>: The mechanism to locate and communicate with a workload / service. In a cloud environment, the location of services will likely change, thus the service mesh provides a way to access the services in the cloud.</li>
@@ -457,73 +446,89 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <li><strong>Authentication and access control</strong>: Through the control plane, a service mesh may define the rules of communication. It defines which services can communicate with one another.</li>
 </ul>
 <p>As observed in the list above, many of the features of a service mesh are already provided by Kubernetes. Service discovery, load balancing, fault tolerance and - though limited - traffic monitoring is already possible with Kubernetes. Introducing a service mesh into a cluster enables administrators to build more complex scenarios and deployments.</p>
-<h2 id="authentication-and-authorization">Authentication and Authorization</h2>
-<h3 id="sec:basic_auth">Basic (RFC7617)</h3>
-<p>The <code>Basic</code> authentication scheme is a trivial authentication that accepts a username and a password encoded in Base64. To transmit the credentials, a construct with the schematics of <code>&lt;username&gt;:&lt;password&gt;</code> is created and inserted into the http request as the <code>Authorization</code> header with the prefix <code>Basic</code> <span class="citation" data-cites="RFC7617">(Reschke 2015, sec. 2)</span>. An example with the username <code>ChristophBuehler</code> and password <code>SuperSecure</code> would result in the following header:</p>
+<h2 id="authentication-authorization-and-security">Authentication, Authorization, and Security</h2>
+<p>This section provides an introduction in the used authentication mechanisms. The proposed solution is capable of handling more than the described schemes but for the implementation of the POC, Basic Authentication and OIDC were used.</p>
+<h3 id="sec:basic_auth">Basic Authentication (RFC7617)</h3>
+<p>The <code>Basic</code> authentication is a trivial authentication scheme (i.e. a way to prove the identity of an entity) that accepts a username and a password encoded in Base64. To transmit the credentials, a construct with the schematics of <code>&lt;username&gt;:&lt;password&gt;</code> is created and inserted into the HTTP request as the <code>Authorization</code> header with the prefix <code>Basic</code> <span class="citation" data-cites="RFC7617">(Reschke 2015, sec. 2)</span>. An example with the username <code>ChristophBuehler</code> and password <code>SuperSecure</code> would result in the following header:</p>
 <blockquote>
 <p><code>Authorization: Basic Q2hyaXN0b3BoQnVlaGxlcjpTdXBlclNlY3VyZQ==</code></p>
 </blockquote>
 <h3 id="sec:auth_oidc">OpenID Connect (OIDC)</h3>
 <p>OpenID Connect is not defined in a RFC, the specification is provided by the OpenID Foundation (OIDF). OIDC however, builds on top of OAuth, which is defined by <strong>RFC6749</strong>.</p>
-<p>OpenID Connect is an authenticating scheme, that builds upon the <code>OAuth 2.0</code> authorization protocol. OAuth itself is an authorization framework, that enables applications to gain access to a service (API or other) <span class="citation" data-cites="RFC6749">(Hardt and others 2012, abstract)</span>. OAuth 2.0 deals with authorization only and grants access to data and features on a specific application. OAuth by itself does not define <em>how</em> the credentials are transmitted and exchanged <span class="citation" data-cites="RFC6749">(Hardt and others 2012)</span>. OIDC adds a layer on top of OAuth 2.0 that defines <em>how</em> these credentials must be exchanged. This adds login and profile capabilities to any application that uses OIDC <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014)</span>.</p>
+<p>OpenID Connect is an authentication scheme, that builds upon the <code>OAuth 2.0</code> authorization protocol. OAuth itself is an authorization framework, that enables applications to gain access to a service (API or other) <span class="citation" data-cites="RFC6749">(Hardt and others 2012, abstract)</span>. OAuth 2.0 only deals with authorization and grants access to data and features on a specific application. OAuth by itself does not define <em>how</em> the credentials are transmitted and exchanged <span class="citation" data-cites="RFC6749">(Hardt and others 2012)</span>. OIDC adds a layer on top of OAuth 2.0 that defines <em>how</em> these credentials must be exchanged. This adds login and profile capabilities to any application that uses OIDC <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014)</span>.</p>
 <div id="fig:oidc_code_flow" class="fignos">
 <figure>
-<img src="diagrams/sequences/120c5686c778e2c9541dd4fa276c6cf5.png" data-short-caption="OIDC code flow" alt="Figure 4: OIDC code authorization flow (Sakimura et al. 2014). Only contains the credential flow, without the explicit OAuth part. OAuth handles the authorization whereas OIDC handles the authentication." /><figcaption aria-hidden="true"><span>Figure 4:</span> OIDC code authorization flow <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014)</span>. Only contains the credential flow, without the explicit OAuth part. OAuth handles the authorization whereas OIDC handles the authentication.</figcaption>
+<img src="diagrams/sequences/d5594020a93a4bfd931b27633547116f.png" data-short-caption="OIDC code flow" alt="Figure 4: OIDC code authorization flow (Sakimura et al. 2014). Only contains the credential flow, without the explicit OAuth part. OAuth handles the authorization whereas OIDC handles the authentication." /><figcaption aria-hidden="true"><span>Figure 4:</span> OIDC code authorization flow <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014)</span>. Only contains the credential flow, without the explicit OAuth part. OAuth handles the authorization whereas OIDC handles the authentication.</figcaption>
 </figure>
 </div>
-<p>When a user wants to authenticate himself with OIDC, one of the possible “flows” is the “Authorization Code Flow” <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014, sec. 3.1)</span>. Other possible flows are the “Implicit Flow” <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014, sec. 3.2)</span> and the “Hybrid Flow” <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014, sec. 3.3)</span>. Figure <a href="#fig:oidc_code_flow">4</a> depicts the “Authorization Code Flow.” A user that wants to access a certain resource on a relying party (i.e. something that relies on the information about the user) and is not authenticated and authorized, the relying party forwards the user to the identity provider (IdP). The user provides his credentials to the IdP and is returned to the relying party with an authorization code. The relying party can then exchange the authorization code to valid tokens on the token endpoint of the IdP. Typically, <code>access_token</code> and <code>id_token</code> are provided. While the <code>id_token</code> must be a JSON Web Token (JWT) <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014, sec. 2)</span>, the <code>access_token</code> can be in any format <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014, sec. 3.3.3.8)</span>.</p>
+<p>When a user wants to authenticate himself with OIDC, one of the possible “flows” is the “Authorization Code Flow.” Other possible flows are the “Implicit Flow” and the “Hybrid Flow” <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014, sec. 3.1, sec. 3.2, sec. 3.3)</span>. Figure <a href="#fig:oidc_code_flow">4</a> depicts the “Authorization Code Flow.” A user that wants to access a certain resource (e.g. an API) on a relying party (i.e. something that relies on the information about the user) and is not authenticated and authorized, the relying party forwards the user to the identity provider (IdP). The user provides his credentials to the IdP and is returned to the relying party with an authorization code. The relying party can then exchange the authorization code to valid tokens on the token endpoint of the IdP. Typically, <code>access_token</code> and <code>id_token</code> are provided. While the <code>id_token</code> must be a JSON Web Token (JWT), the <code>access_token</code> can be in any format <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014, sec. 2, sec. 3.3.3.8)</span>.</p>
 <p>An example of an <code>id_token</code> in JWT format may be:</p>
-<pre><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
-eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.
-SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
+<pre><code>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 <p>The stated JWT token contains:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;alg&quot;</span><span class="fu">:</span> <span class="st">&quot;HS256&quot;</span><span class="fu">,</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;typ&quot;</span><span class="fu">:</span> <span class="st">&quot;JWT&quot;</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sub&quot;</span><span class="fu">:</span> <span class="st">&quot;1234567890&quot;</span><span class="fu">,</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;John Doe&quot;</span><span class="fu">,</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;iat&quot;</span><span class="fu">:</span> <span class="dv">1516239022</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
-<h1 id="state-of-the-art-the-practice-and-deficiencies">State of the Art, the Practice and Deficiencies</h1>
-<p>This section gives an overview over the current state of the art, the practice, as well as the deficiencies to a desired situation.</p>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;sub&quot;</span><span class="fu">:</span> <span class="st">&quot;1234567890&quot;</span><span class="fu">,</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;John Doe&quot;</span><span class="fu">,</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;iat&quot;</span><span class="fu">:</span> <span class="dv">1516239022</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h3 id="sec:zero-trust">Zero Trust Environment</h3>
+<p>“Zero Trust” is a security model with its focus on protecting data and user credentials. The basic idea of zero trust is to assume that an attacker is always present. It does not matter if the application resides within an enterprise network, zero trust assumes that enterprise networks are no more trustworthy than any other public network. As a consequence of zero trust, applications are not implicitly trusted. Therefore, user credentials must be presented and validated for each access to a resource <span class="citation" data-cites="rose:zero-trust">(Rose et al. 2019)</span>.</p>
+<h1 id="state-of-the-art-and-the-practice">State of the Art and the Practice</h1>
+<p>This section gives an overview of the current state of the art and the practice. Furthermore, it states the deficiencies that this project tries to solve.</p>
 <h2 id="state-of-the-art">State of the Art</h2>
-<p>In cloud environments, a problem that is solved is the transmission of data from one point to another. Kubernetes, for example, uses “Services” that provide a DNS name for a specified workload. For service meshes, additionally a sidecar is injected into the Pod that contains - in the case of “Istio” - an Envoy proxy to handle data transmission.</p>
-<p>In terms of authentication and authorization, there exist a variety of schemes that enable an application to authenticate and authorize their users. OpenID Connect (OIDC) (see Section <a href="#sec:auth_oidc">2.3.2</a>) is a modern authentication scheme, that builds upon OAuth 2.0, that in turn handles authorization <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014)</span>.</p>
+<p>In cloud environments, a solved problem is the transmission of arbitrary data from one endpoint to another. Modern programming languages (like .NET, Python and Node.js) provide ways to handle communication with other endpoints and APIs. To transmit data between services in a cloud environment, an application can use the HTTP protocol or gRPC<a href="#fn11" class="footnote-ref" id="fnref11" role="doc-noteref"><sup>11</sup></a> to encode the requests and responses in a common format. In the case of a service mesh, a sidecar is injected into the pod that contains a proxy to handle data transmission between the services.</p>
+<p>In terms of authentication and authorization, there is a variety of schemes that enable an application to authenticate and authorize its users. OpenID Connect (OIDC) (see Section <a href="#sec:auth_oidc">2.6.2</a>) is a modern authentication scheme, that extends the OAuth 2.0 framework, which in turn handles authorization <span class="citation" data-cites="spec:OIDC">(Sakimura et al. 2014)</span>. OAuth only defines how to grant access to specific resources (like APIs) but not how they are exchanged. OIDC fills that space by introducing authentication flows (e.g. “Authorization Code Flow” in Figure <a href="#fig:oidc_code_flow">4</a>). OAuth in combination with OIDC provides a modern and secure way of authentication and authorizing users against an API.</p>
 <p>Modern software architectures that are specifically designed for the cloud are called “Cloud Native Applications” (CNA). <span class="citation" data-cites="kratzke:CloudNativeApplications">Kratzke and Peinl (2016)</span> define a CNA as:</p>
 <blockquote>
-<p>“A cloud-native application is a distributed, elastic and horizontal scalable system composed of (micro)services which isolates state in a minimum of stateful components. The application and each self-contained deployment unit of that application is designed according to cloud-focused design patterns and operated on a self-service elastic platform.” <span class="citation" data-cites="kratzke:CloudNativeApplications">(Kratzke and Peinl 2016, sec. 3)</span>.</p>
+<p>“A cloud-native application is a distributed, elastic and horizontal scalable system composed of (micro)services which isolates state in a minimum of stateful components. The application and each self-contained deployment unit of that application is designed according to cloud-focused design patterns and operated on a self-service elastic platform.”</p>
 </blockquote>
-<p>However, with CNAs and the general movement to cloud environments and digitalization, not all applications get that chance to adjust. For various reasons like budget, time or complexity, legacy applications and monoliths are not refactored or re-written before they are deployed into a cloud environment. If the legacy applications are mixed with modern systems, then the need of “translation” arises. Assuming, that the modern part is a secure application, that uses OIDC to authorize its users and the application needs to fetch data from the legacy system that does not understand OIDC, code changes must be made. Following the previous assumption, the code changes will likely be introduced into the modern application, since it is better maintainable and deployable than the legacy monolith. Hence, the modern application receives changes that may introduce new bugs or security vulnerabilities.</p>
+<p>However, with CNAs and the general movement to cloud environments and digitalization, not all applications get that chance to adjust. For various reasons like budget, time or technical risks and skill availability, legacy applications and monoliths are not always refactored or re-written before they are deployed into a cloud environment. If the legacy applications (for example an old ERP system) are mixed with modern systems, then the need of “translation” arises. Assuming that the modern part is a secure application that uses OIDC to authenticate its users and the application needs to fetch data from a legacy system. The legacy application does not understand OIDC, thus either the modern or the legacy application must receive code changes (i.e. enable the application to convert the user credentials to the scheme of the target service) to enable communication between the services. Following the previous assumption, the code changes will likely be introduced into the modern application, since it is presumably better maintainable and deployable than the legacy app. Hence, the modern application receives changes that may introduce new bugs or vulnerabilities. If new code is introduced into an application, “normal” software bugs may be created and external dependencies (such as libraries for authentication and authorziation) may import vulnerabilities caused by bugs or by deviation from the standards.</p>
 <div id="fig:is_solution_components" class="fignos">
 <figure>
-<img src="diagrams/component/185dad86b9b22e16344879cadd317645.png" data-short-caption="Microservice Architecture with legacy components" alt="Figure 5: Microservice Architecture that contains modern applications as well as legacy services." /><figcaption aria-hidden="true"><span>Figure 5:</span> Microservice Architecture that contains modern applications as well as legacy services.</figcaption>
+<img src="diagrams/component/2864ffa3a0a44cf5894cb9dd9d553bb1.png" data-short-caption="Microservice Architecture with legacy components" alt="Figure 5: Microservice Architecture that contains modern applications as well as legacy services." /><figcaption aria-hidden="true"><span>Figure 5:</span> Microservice Architecture that contains modern applications as well as legacy services.</figcaption>
 </figure>
 </div>
 <p>We consider the components in Figure <a href="#fig:is_solution_components">5</a>:</p>
 <ul>
 <li><strong>User</strong>: A person with access to the application</li>
-<li><strong>Client</strong>: A modern single page application (SPA)</li>
-<li><strong>IAM</strong>: Identity Provider for the solution (does not necessarily reside in the same cloud)</li>
-<li><strong>Service A</strong>: A modern API application and primary access point for the client</li>
-<li><strong>Service B</strong>: Legacy service that is called by service a to fetch some additional data</li>
+<li><strong>Single Page Application</strong>: A modern single page application (SPA)</li>
+<li><strong>Identity and Access Management (IAM)</strong>: Identity Provider for the solution (does not necessarily reside in the same cloud)</li>
+<li><strong>Cloud Native Application (CNA)</strong>: A modern API application and primary access point for the client</li>
+<li><strong>Legacy System</strong>: Legacy service that is called by service a to fetch some additional data</li>
 </ul>
-<p>In the practice, we encountered the stated scenario at various points in time. Legacy services may not be the primary use-case, a nother case is the usage of third party applications which only support certain authentication mechanisms and the code is not accessable.</p>
+<p>In the practice, we encountered the stated scenario at various points in time. Legacy services may not be the primary use-case, another one is the usage of third-party applications without any access to the sourcecode.</p>
 <div id="fig:is_solution_process" class="fignos">
 <figure>
-<img src="diagrams/sequences/7643f25471f1496284331c5e302b3cce.png" data-short-caption="Current process of legacy communication" alt="Figure 6: Current state of the art of accessing legacy systems from modern services with differing authentication schemes." /><figcaption aria-hidden="true"><span>Figure 6:</span> Current state of the art of accessing legacy systems from modern services with differing authentication schemes.</figcaption>
+<img src="diagrams/sequences/01935ac180bf9b8a5c1eff1773b1570f.png" data-short-caption="Current process of legacy communication" alt="Figure 6: Current state of the art of accessing legacy systems from modern services with differing authentication schemes." /><figcaption aria-hidden="true"><span>Figure 6:</span> Current state of the art of accessing legacy systems from modern services with differing authentication schemes.</figcaption>
 </figure>
 </div>
-<p>The process in Figure <a href="#fig:is_solution_process">6</a> shows the process of communication in such a described scenario. In Figure <a href="#fig:is_solution_process">6</a>, the “Client” is the single page application (SPA), that authenticates against an arbitrary Identity and Access Management System (IAM). “Service A” is the modern backend that supports the client as backend API. Therefore, “Service A” provides functionality for the client. “Service B” is a legacy application, for example an old ERP with order information, that was moved into the cloud, but is not refactored nor rewritten to communicate with modern authentication technologies.</p>
-<p>In this scenario, the client calls some API on “Service A” that then will call “Service B” to get additional information to present to the user. Since the client and “Service A” communicate with the same authentication technology, the call is straight forward. The client authenticates himself and obtains an access token. When calling the service (“Service A”), the token is transmitted and the service can check with the IAM if the user is authorized to access the system. When “Service A” then calls “Service B” for additional information, it needs to translate the user provided credentials to a format that “Service B” understands. In the provided example, “Service B” is only able to handle Basic Authentication, as explained in Section <a href="#sec:basic_auth">2.3.1</a>. This means, if “Service A” wants to communicate with “Service B,” it must implement some translation logic to change the credentials to a format that B understands. This introduces code changes to “Service A,” since “Service B” is a legacy application that is not maintainable.</p>
-<h2 id="the-practice">The Practice</h2>
-<p>In practice, no current solution exists, that allows credentials to be transformed between authentication schemes. The service mesh “Istio” provides a mechanism to secure services that communicate with mTLS (mutual TLS) <span class="citation" data-cites="istio:website:mtls">(Istio Authors 2021b)</span> as well as an external mechanism to provide custom authentication and authorization capabilities <span class="citation" data-cites="istio:website:custom-authz">(Istio Authors 2021a)</span>. This works well when all applications in the system share the same authentication scheme. As soon as two or more schemes are in place, the need for transformation arises again.</p>
+<p>The invocation sequence in Figure <a href="#fig:is_solution_process">6</a> shows the process of communication in such a scenario. In Figure <a href="#fig:is_solution_process">6</a>, the SPA authenticates against an arbitrary IAM. The CNA is the modern backend that supports the SPA as a backend API. Therefore, the CNA provides functionality for the SPA. The legacy application, for example an old ERP with order information, was moved into the cloud, but is not refactored nor rewritten to communicate with modern authentication technologies.</p>
+<p>In this scenario, the SPA calls some API on the CNA that then will call the legacy system to get additional information to present to the user. Since the SPA and the CNA communicate with the same authentication technology, the call is straightforward. The SPA authenticates itself and obtains an access token. When calling the service (the CNA), the token is transmitted and the service can check with the IAM if the user is authorized to access the system. When the CNA then calls the legacy system for additional information, it is required to translate the user-provided credentials to a format that the legacy system understands. In the example, the legacy system is only able to handle Basic Authentication (RFC7617), as explained in Section <a href="#sec:basic_auth">2.6.1</a>. This means, if the CNA wants to communicate with the legacy system, it must implement some translation logic to change the user credentials into the typical Basic Authentication Base64 encoded format of <code>&lt;Username&gt;:&lt;Password&gt;</code>. Hence, code changes are introduced to the CNA since the legacy system is not likely to be easily maintainable.</p>
+<h2 id="current-software-and-concepts">Current Software and Concepts</h2>
+<p>In practice, no current solution exists that allows credentials to be transformed between authentication schemes. The service mesh “Istio” provides a mechanism to secure services that communicate with mTLS (mutual TLS) <span class="citation" data-cites="istio:website:mtls">(Istio Authors 2021b)</span> as well as an external mechanism to provide custom authentication and authorization capabilities <span class="citation" data-cites="istio:website:custom-authz">(Istio Authors 2021a)</span>. The concept of Istio works well when all applications in the system share the same authentication scheme. As soon as two or more schemes are in place, the need for transformation arises again.</p>
+<p>In terms of API gateways, Envoy provides mTLS and the external authentication. In fact, Istio uses Envoy as sidecar proxy to use this feature. Another prominent API gateway, “NGINX”<a href="#fn12" class="footnote-ref" id="fnref12" role="doc-noteref"><sup>12</sup></a>, implements a similar external authentication mechanism <span class="citation" data-cites="nginx:website:ext-authz">(F5 Inc. Authors 2021)</span>. However, Envoy implements a more fine grained control over the HTTP request. As an external authentication service for Envoy, the result may change HTTP headers in the request and the response.</p>
+<p>There exist techniques, such as SAML (Security Assertion Markup Language), to transmit an identity of a user to other services. However, SAML only describes the format of the identity itself, not the translation between varying credentials. SAML works when all participating services understand SAML as well. If a legacy system is not able to parse and understand SAML, the same problem arises.</p>
+<p>All the discussed technologies and applications above do not support the dynamic conversion of user credentials. While Istio solves the communication and enables mTLS between services, it is not able to translate credentials between services. SAML gives a common format for an identity of a user, but it is an authentication scheme on its own and thus the “translation problem” still exists.</p>
 <h2 id="sec:deficiencies">Deficiencies</h2>
-<p>The situation described in the previous sections introduces several problems. It does not matter if “Service B” is a third party application to which no code changes can be applied to, or if it is a legacy application that cannot be updated for the time being. Most likely, the code change to provide the ability to communicate will be introduced into “Service A.” This adds the risk of errors since new code must be produced, which would not be necessary if the legacy service would be refactored. Also, changing “Service A” to communicate with B may be a feasible solution in a small setup. But as the landscape of the microservice architecture grows, this solution does not scale well. The matrix problem <span class="math inline"><em>X</em> services * <em>Y</em> authentication methods</span> describes this problematic. As the landscape and the different methods of authentication grows, it is not a feasible solution to implement each and every authentication scheme in all the services.</p>
-<p>Another issue that emerges with this transformation of credentials: The credentials leak into the trust zone. As long as each service is in the same trust zone (for example in the same data-center in the same cluster behind the same API gateway), this may not be problematic. As soon as communication is between data centers, the communication and the credentials must be protected. It is not possible to create a zero trust environment with the need of knowledge about the targets authentication schemes.</p>
-<p>The usage of a service mesh to mitigate the problem is not an option since the initial problem of transforming credential still persists. Service meshes may provide a way to secure communication between services, but they are not able to transform credentials to a required format for any legacy application. Furthermore, service meshes introduce configurational complexity to the system which, in our opinion, is not needed without a clear usecase for a service mesh.</p>
+<p>The situation described in the previous sections introduces several problems. It does not matter whether the legacy system is a third party application to which no code changes can be applied to, or if it is an application that cannot be updated for the time being. Most likely, the code change to provide the ability to communicate will be introduced into the CNA. This adds the risk of errors since new code must be produced, which would not be necessary if the legacy service was refactored. Also, changing the CNA to communicate with B may be a feasible solution in a small setup. But as the landscape of the application grows, this solution does not scale well.</p>
+<div id="fig:matrix_problem" class="fignos">
+<figure>
+<img src="diagrams/component/02c05c239b61a9f6d98dd70d835ce889.png" alt="Figure 7: Matrix Problem in Service Landscape" /><figcaption aria-hidden="true"><span>Figure 7:</span> Matrix Problem in Service Landscape</figcaption>
+</figure>
+</div>
+<p>The matrix problem, as depicted in Figure <a href="#fig:matrix_problem">7</a>, shows that the number of conversion mechanisms increases with each service and each authentication method. As the landscape and the different methods of authentication grow, it is not a feasible solution to implement every authentication scheme in all the services. In Figure <a href="#fig:matrix_problem">7</a>, “Caller 1” is required to transform the user credentials into four different formats to communicate with service one to four. When another caller enters the landscape, it must implement the same four mechanisms as well.</p>
+<p>Another issue that emerges with this transformation of credentials: The credentials leak into the trust zone. As long as each service is in the same trust zone (for example in the same data-center in the same cluster behind the same API gateway), this may not be problematic. As soon as the communication is between data centers, the communication and the credentials must be protected. It is not possible to create a zero trust (assumption, that an attacker is always present, see Section <a href="#sec:zero-trust">2.6.3</a>) environment with the need of knowledge about the target’s authentication schemes.</p>
+<div id="fig:zero_trust_environment" class="fignos">
+<figure>
+<img src="diagrams/component/db721ae09ba5a3de9257a54712f5b091.png" alt="Figure 8: Zero Trust Environment" /><figcaption aria-hidden="true"><span>Figure 8:</span> Zero Trust Environment</figcaption>
+</figure>
+</div>
+<p>Figure <a href="#fig:zero_trust_environment">8</a> shows the problem when communicating between trust zones. While the two services in “Trust Zone A” may implicitly trust each other, because they are in the same trust zone behind the same API gateway, the problem of leaking credentials is not critical. As soon as the three zones communicate with each other, credentials leave the trust zone and enter another zone. When implementing zero trust, the service in zone B may only know, that the user was in fact authorized, but it must not have access to the explicit source credentials (e.g. the original access token).</p>
+<p>Service meshes may provide a way to secure communication between services, but they are not able to transform credentials to a required format for any legacy application yet. It would be a possible solution to enable service meshes to transform credentials. However, normally service meshes introduce another layer of complexity on top of the environment.</p>
+<p>Other technologies - such as credential vaults - provide a similar problem. The vault is the central weakness in the system. If the vault is attacked, the whole trust zone may fail. While a credential vault would provide a way to share credentials between services, it does not mitigate the need of transformation of credentials. A vault, like “Vault by HashiCorp”<a href="#fn13" class="footnote-ref" id="fnref13" role="doc-noteref"><sup>13</sup></a> typically provides a secure way to inject credentials into a system. The vaults do not transform credentials for the destination.</p>
 <h1 id="distributed-authentication-mesh">Distributed Authentication Mesh</h1>
 <p>This section gives a general overview of the proposed solution. Furthermore, boundaries of the solution are provided along with common software engineering elements like requirements, non-functional requirements and the documentation of the architecture.</p>
 <p>The proposed architecture may be used as generic description for a solution to the described problem. For this project, the solution is implemented specifically to work within a Kubernetes cluster. The delivery of this project is a proof of concept to provide insights into the general topic of manipulating HTTP requests in-flight.</p>
@@ -573,7 +578,7 @@ SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 </tbody>
 </table>
 </div>
-<p>It is important to note that the implemented proof of concept (PoC) will not meet all requierements. Further work is needed to implement a solution according to the architecture that adheres the stated requirements.</p>
+<p>It is important to note that the implemented proof of concept (POC) will not meet all requierements. Further work is needed to implement a solution according to the architecture that adheres the stated requirements.</p>
 <h2 id="non-functional-requirements">Non-Functional Requirements</h2>
 <p>In Table <a href="#tbl:non-functional-requirements">3</a>, we show the non-functional requirements (NFR) for the proposed solution.</p>
 <div id="tbl:non-functional-requirements" class="tablenos">
@@ -629,7 +634,7 @@ SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 </tbody>
 </table>
 </div>
-<p>Like the requirements in Table <a href="#tbl:functional-requirements">2</a>, the PoC will not meet all NFRs that are stated in Table <a href="#tbl:non-functional-requirements">3</a>. Further work is needed to complete the PoC to a production ready software.</p>
+<p>Like the requirements in Table <a href="#tbl:functional-requirements">2</a>, the POC will not meet all NFRs that are stated in Table <a href="#tbl:non-functional-requirements">3</a>. Further work is needed to complete the POC to a production ready software.</p>
 <h2 id="contrast">Contrast</h2>
 <p>To distinguish this solution from other software, this sections gives a contrast to two specific topics. The given topics stand for a general architectural idea and the contrast to the presented solution.</p>
 <h3 id="saml">SAML</h3>
@@ -659,7 +664,7 @@ Content-Length: nnnn
 <p>The proposed solution differs from WS-* such that there is no exact specification needed for the target service. While the solution contains a common domain language - a SOAP like protocol to encode data - it does not specify the endpoints of a service. The solution merely interacts with the HTTP request that targets a specific service and transforms the credentials from the common format to the specific format. Of course, certain authentication schemes need specific information to generate their credentials out of the data.</p>
 <h2 id="architecture">Architecture</h2>
 <p>The following sections provide an architectural overview over the proposed solution. The solution is described in prosa text, as well as usual software engineering diagrams with explanations. First, a description of the solution gives an introduction about the idea, then the architecture shows the general overview of the solution followed by sequence and communication definitions.</p>
-<p>The reader should note, that the proposed architecture does not match the implementation of the PoC to the full extent. The goal of this project is to provide a generalizable idea to implement such a solution, while the PoC proves the ability of modifying HTTP requests in-flight.</p>
+<p>The reader should note, that the proposed architecture does not match the implementation of the POC to the full extent. The goal of this project is to provide a generalizable idea to implement such a solution, while the POC proves the ability of modifying HTTP requests in-flight.</p>
 <h3 id="brief-description">Brief Description</h3>
 <p>In general, when some service wants to communicate with another service and the user does not need to authenticate himself for every service, probably a federated identity is used. This means, that at some point, the user validates his own identity and is then authenticated in the whole zone of trust.</p>
 <p>To achieve such a federated identity with diverging authentication schemes, the solution converts validated credentials to a common language format. This format, in conjunction with a proof of the sender, validates the identity over the wire in the communication between services without the need of additional authentication. When all parties of a communication are trusted through verification, no information about the effective credentials leak into the communication between services.</p>
@@ -685,58 +690,58 @@ Content-Length: nnnn
 <p>In this section, we describe the system architecture of the proposed solution. The architecture is shown in a diagram and then broken down to the individual parts.</p>
 <div id="fig:solution_architecture" class="fignos">
 <figure>
-<img src="diagrams/component/64a23481728552507fb1db28a0e0409c.png" alt="Figure 7: Solution Architecture" /><figcaption aria-hidden="true"><span>Figure 7:</span> Solution Architecture</figcaption>
+<img src="diagrams/component/0f3f992f8d71db7753e46751092f9fda.png" alt="Figure 9: Solution Architecture" /><figcaption aria-hidden="true"><span>Figure 9:</span> Solution Architecture</figcaption>
 </figure>
 </div>
-<p>Figure <a href="#fig:solution_architecture">7</a> shows the general solution architecture. In the “support” package, general available elements are presented. The solution needs a public key infrastructure (PKI) to deliver key material for signing and validation purposes. Furthermore a configuration and secret storage must be provided.</p>
+<p>Figure <a href="#fig:solution_architecture">9</a> shows the general solution architecture. In the “support” package, general available elements are presented. The solution needs a public key infrastructure (PKI) to deliver key material for signing and validation purposes. Furthermore a configuration and secret storage must be provided.</p>
 <p>Additionally, an optional automation component watches and manages applications. In case of cloud environments, this component is strongly suggested to automate deployment configuration. The automation does inject the proxies, translators and the specific needed configurations for the managed components.</p>
 <p>An application service consists of three parts. First, the source (or destination) service, which represents the deployed application itself, a translator that manages the transformation between the common language format of the identity and the implementation specific authentication format and a proxy that manages the communication from and to the application.</p>
 <p>For the further sections, the architecture shows elements of a Kubernetes cloud environment. The reason is to describe the specific architecture in a practical way. However, the general idea of the solution may be deployed in various environments and is not bound to a cloud infrastructure.</p>
 <h4 id="automation">Automation</h4>
-<p>In case of a Kubernetes infrastructure, the automation part is done by an operator as explained in Section <a href="#sec:kubernetes_operator">2.2.3</a>.</p>
+<p>In case of a Kubernetes infrastructure, the automation part is done by an operator as explained in Section <a href="#sec:kubernetes_operator">2.3</a>.</p>
 <div id="fig:automation_architecture" class="fignos">
 <figure>
-<img src="diagrams/component/8ab1636e46798db9773722c109061f37.png" alt="Figure 8: Automation Architecture" /><figcaption aria-hidden="true"><span>Figure 8:</span> Automation Architecture</figcaption>
+<img src="diagrams/component/a146c62a7c5abc1bd1ddbea8c310864c.png" alt="Figure 10: Automation Architecture" /><figcaption aria-hidden="true"><span>Figure 10:</span> Automation Architecture</figcaption>
 </figure>
 </div>
-<p>The operator in Figure <a href="#fig:automation_architecture">8</a> watches the Kubernetes API for changes. When deployments or services are created, the operator enhances the respective elements. “Enhancing” in this context means, that additional pods (see Table <a href="#tbl:kubernetes_terminology">1</a>) are injected into a deployment as sidecars. The additional sidecars are the proxy and the translator. While the proxy manages incomming (“ingress”) and outgoing (“egress”) communication, the translator manages the transformation of credentials from and to a common format.</p>
+<p>The operator in Figure <a href="#fig:automation_architecture">10</a> watches the Kubernetes API for changes. When deployments or services are created, the operator enhances the respective elements. “Enhancing” in this context means, that additional pods (see Table <a href="#tbl:kubernetes_terminology">1</a>) are injected into a deployment as sidecars. The additional sidecars are the proxy and the translator. While the proxy manages incomming (“ingress”) and outgoing (“egress”) communication, the translator manages the transformation of credentials from and to a common format.</p>
 <div id="fig:automation_process" class="fignos">
 <figure>
-<img src="diagrams/sequences/a7f1ebec352ed877efed8fbe59ee95ae.png" alt="Figure 9: Automation Process" /><figcaption aria-hidden="true"><span>Figure 9:</span> Automation Process</figcaption>
+<img src="diagrams/sequences/549c16f9df0f20e9853880283c72bf51.png" alt="Figure 11: Automation Process" /><figcaption aria-hidden="true"><span>Figure 11:</span> Automation Process</figcaption>
 </figure>
 </div>
-<p>The process that enhances deployments is shown in Figure <a href="#fig:automation_process">9</a>. The operator registers a “watcher” for deployments and services with the Kubernetes API. Whenever a deployment or a service is created or modified, the operator receives a notification. Then, the operator checks of the object in question “is relevant” by checking if it is part of the authentication mesh. This participation can be configured - in the example of Kubernetes - via annotations, labels or any other means of configuration. If the object is relevant, depending on the type, the operator injects sidecars into the deployment or reconfigures the service to use the proxy as targeting port for the service communication.</p>
+<p>The process that enhances deployments is shown in Figure <a href="#fig:automation_process">11</a>. The operator registers a “watcher” for deployments and services with the Kubernetes API. Whenever a deployment or a service is created or modified, the operator receives a notification. Then, the operator checks of the object in question “is relevant” by checking if it is part of the authentication mesh. This participation can be configured - in the example of Kubernetes - via annotations, labels or any other means of configuration. If the object is relevant, depending on the type, the operator injects sidecars into the deployment or reconfigures the service to use the proxy as targeting port for the service communication.</p>
 <h4 id="public-key-infrastructure-pki">Public Key Infrastructure (PKI)</h4>
 <p>The role of the public key infrastructure in the solution is to build the trust anchor in the system.</p>
 <div id="fig:pki_architecture" class="fignos">
 <figure>
-<img src="diagrams/component/645963aab3a61a7b8ff215236bd36369.png" alt="Figure 10: PKI Architecture" /><figcaption aria-hidden="true"><span>Figure 10:</span> PKI Architecture</figcaption>
+<img src="diagrams/component/d6991b843634af297cfe5a5236b3492b.png" alt="Figure 12: PKI Architecture" /><figcaption aria-hidden="true"><span>Figure 12:</span> PKI Architecture</figcaption>
 </figure>
 </div>
-<p>Figure <a href="#fig:pki_architecture">10</a> depicts the relation of the translators and the PKI. When a translator starts, it aquires trusted key material from the PKI (for example with a certificate signing request). This key material is then used to sign the identity that is transmitted to the receiving party. The receiving translator can validate the signature of the identity and the sending party. The proxies are responsible for the communication between the instances.</p>
+<p>Figure <a href="#fig:pki_architecture">12</a> depicts the relation of the translators and the PKI. When a translator starts, it aquires trusted key material from the PKI (for example with a certificate signing request). This key material is then used to sign the identity that is transmitted to the receiving party. The receiving translator can validate the signature of the identity and the sending party. The proxies are responsible for the communication between the instances.</p>
 <div id="fig:pki_process" class="fignos">
 <figure>
-<img src="diagrams/sequences/e33367b4750a02b2c209f2aaad89f1ed.png" alt="Figure 11: PKI Process" /><figcaption aria-hidden="true"><span>Figure 11:</span> PKI Process</figcaption>
+<img src="diagrams/sequences/e2dc0e3e4bf8c18fb636dae85ce8650a.png" alt="Figure 13: PKI Process" /><figcaption aria-hidden="true"><span>Figure 13:</span> PKI Process</figcaption>
 </figure>
 </div>
-<p>The sequence in Figure <a href="#fig:pki_process">11</a> shows how the PKI is used by the translator to create key material for itself. When a translator starts, it checks if it already generated a private key and obtains the key (either by creating a new one or fetching the existing one). Then, a certificate signing request (CSR) is sent to the PKI. The PKI will then create a certificate with the CSR and return the signed certificate.</p>
+<p>The sequence in Figure <a href="#fig:pki_process">13</a> shows how the PKI is used by the translator to create key material for itself. When a translator starts, it checks if it already generated a private key and obtains the key (either by creating a new one or fetching the existing one). Then, a certificate signing request (CSR) is sent to the PKI. The PKI will then create a certificate with the CSR and return the signed certificate.</p>
 <p>When communication happens, the proxy will forward the HTTP headers of the request to the translator which contains the transfered identity of the user in the DSL. In case of a JWT token, the transformer may now confirm the signature of the JWT token with the obtained certificate since it is signed by the same Certificate Authority (CA). Then the transformation may happen and the proxy forwards the communication to the destination.</p>
 <p>To increase the security and mitigate the problem of leaking certificates, it is adviced to create short living certificates in the PKI and resign certificates periodically.</p>
 <h4 id="networking">Networking</h4>
 <p>Networking in the proposed solution works with a combination of routing and communication proxing. The general purpose of the networking element is to manage data transport between instances of the authentication mesh and route the traffic to the source / destination.</p>
 <div id="fig:networking_architecture" class="fignos">
 <figure>
-<img src="diagrams/component/01deae0a6542469de62e7d6989f2fc13.png" alt="Figure 12: Networking Architecture" /><figcaption aria-hidden="true"><span>Figure 12:</span> Networking Architecture</figcaption>
+<img src="diagrams/component/a51cc02db654f7981ccce9f2ea27a57f.png" alt="Figure 14: Networking Architecture" /><figcaption aria-hidden="true"><span>Figure 14:</span> Networking Architecture</figcaption>
 </figure>
 </div>
-<p>As seen in Figure <a href="#fig:networking_architecture">12</a> the proxy is the mediator between source and destination of a communication. Furthermore, the proxy manages the translation by communicating with the translator to transform the identity of the authenticated user and transmit it to the destination where it gets transformed again. Additionally, with the aid of the PKI, the proxy can verify the identity of the sender via mTLS.</p>
+<p>As seen in Figure <a href="#fig:networking_architecture">14</a> the proxy is the mediator between source and destination of a communication. Furthermore, the proxy manages the translation by communicating with the translator to transform the identity of the authenticated user and transmit it to the destination where it gets transformed again. Additionally, with the aid of the PKI, the proxy can verify the identity of the sender via mTLS.</p>
 <h5 id="ingress">Ingress</h5>
 <div id="fig:inbound_networking_process" class="fignos">
 <figure>
-<img src="diagrams/sequences/d00cd1c4d8970579821bd8848d978c5e.png" alt="Figure 13: Inbound Networking Process" /><figcaption aria-hidden="true"><span>Figure 13:</span> Inbound Networking Process</figcaption>
+<img src="diagrams/sequences/9e6dd351bce1bd272d919a5a1d61008b.png" alt="Figure 15: Inbound Networking Process" /><figcaption aria-hidden="true"><span>Figure 15:</span> Inbound Networking Process</figcaption>
 </figure>
 </div>
-<p>Figure <a href="#fig:inbound_networking_process">13</a> shows the general process during inbound request processing. When the proxy receives a request (in the given example by the configured Kubernetes service), it calls the translator with the HTTP request detail. The PoC is implemented with the “Envoy” proxy. Envoy allows an external service to perform “external authorization”<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a> during which the external service may:</p>
+<p>Figure <a href="#fig:inbound_networking_process">15</a> shows the general process during inbound request processing. When the proxy receives a request (in the given example by the configured Kubernetes service), it calls the translator with the HTTP request detail. The POC is implemented with the “Envoy” proxy. Envoy allows an external service to perform “external authorization”<a href="#fn14" class="footnote-ref" id="fnref14" role="doc-noteref"><sup>14</sup></a> during which the external service may:</p>
 <ul>
 <li>Add new headers before reaching the destination</li>
 <li>Overwrite headers before reaching the destination</li>
@@ -744,29 +749,29 @@ Content-Length: nnnn
 <li>Add new headers before returning the result to the caller</li>
 <li>Overwrite headers before returning the result to the caller</li>
 </ul>
-<p>The translator uses this concept to consume a specific and well-known header to read the identity of the authorized user in the common format. The identity is then validated and transformed to the authentication credentials needed by the destination. Then, the translator instructs Envoy to set the credentials for the upstream. In the PoC, this is done by setting the <code>Authorization</code> header to static Basic Auth credentials.</p>
+<p>The translator uses this concept to consume a specific and well-known header to read the identity of the authorized user in the common format. The identity is then validated and transformed to the authentication credentials needed by the destination. Then, the translator instructs Envoy to set the credentials for the upstream. In the POC, this is done by setting the <code>Authorization</code> header to static Basic Auth credentials.</p>
 <h5 id="egress">Egress</h5>
 <div id="fig:outbound_networking_process" class="fignos">
 <figure>
-<img src="diagrams/sequences/f44f92a9e99ca16905bc31e8a50d3b6d.png" alt="Figure 14: Outbound Networking Process" /><figcaption aria-hidden="true"><span>Figure 14:</span> Outbound Networking Process</figcaption>
+<img src="diagrams/sequences/15c6dc7ad44f5c7fb56b2089e18e93ed.png" alt="Figure 16: Outbound Networking Process" /><figcaption aria-hidden="true"><span>Figure 16:</span> Outbound Networking Process</figcaption>
 </figure>
 </div>
-<p>In Figure <a href="#fig:outbound_networking_process">14</a> the outbound (egress) traffic is described. The proxy needs to catch all traffic from the source and performs the reversed process (of Figure <a href="#fig:inbound_networking_process">13</a>) by transforming the provided information from the source to generate the common format with the users identity. This identity is then inserted into the HTTP headers and sent to the destination. At the sink, the process of Figure <a href="#fig:inbound_networking_process">13</a> takes place - if the sink is part of the authentication mesh.</p>
+<p>In Figure <a href="#fig:outbound_networking_process">16</a> the outbound (egress) traffic is described. The proxy needs to catch all traffic from the source and performs the reversed process (of Figure <a href="#fig:inbound_networking_process">15</a>) by transforming the provided information from the source to generate the common format with the users identity. This identity is then inserted into the HTTP headers and sent to the destination. At the sink, the process of Figure <a href="#fig:inbound_networking_process">15</a> takes place - if the sink is part of the authentication mesh.</p>
 <h4 id="translator">Translator</h4>
 <p>The translator is responsible for transforming the identity from and to the common domain specific language.</p>
 <div id="fig:translator_architecture" class="fignos">
 <figure>
-<img src="diagrams/component/ebadee9d70724ba4fdda65dda9c8faac.png" alt="Figure 15: Translator Architecture" /><figcaption aria-hidden="true"><span>Figure 15:</span> Translator Architecture</figcaption>
+<img src="diagrams/component/93bdc1625313b2dbcb3117e2e71bdfea.png" alt="Figure 17: Translator Architecture" /><figcaption aria-hidden="true"><span>Figure 17:</span> Translator Architecture</figcaption>
 </figure>
 </div>
 <p>In conjunction with the PKI, the translator can verify the validity and integrity of the incomming identity.</p>
 <div id="fig:translator_process" class="fignos">
 <figure>
-<img src="diagrams/sequences/0965d3cff84e104c9a42c4efe7802504.png" alt="Figure 16: Translator Process" /><figcaption aria-hidden="true"><span>Figure 16:</span> Translator Process</figcaption>
+<img src="diagrams/sequences/b8cc77f1f80887b6b12a3679333a7f0d.png" alt="Figure 18: Translator Process" /><figcaption aria-hidden="true"><span>Figure 18:</span> Translator Process</figcaption>
 </figure>
 </div>
-<p>When the translator receives a request to create the needed credentials, it performs the sequence of actions as stated in Figure <a href="#fig:translator_process">16</a>. First, the proxy will forward the needed data to the translator. Afterwards, the translator will check if the transported identity is valid and signed by an authorized party in the authentication mesh. When the credentials are valid, they are translated according to the implementation of the translator. The proxy is then instructed with the actions to replace the transported identity with the correct credentials to access the destination.</p>
-<p>In the PoC, the proof of integrity is not implemented, but the transformation takes place, where a “Bearer Token”<a href="#fn10" class="footnote-ref" id="fnref10" role="doc-noteref"><sup>10</sup></a> is used to check if the user may access and then replaces the token with static Basic Auth credentials.</p>
+<p>When the translator receives a request to create the needed credentials, it performs the sequence of actions as stated in Figure <a href="#fig:translator_process">18</a>. First, the proxy will forward the needed data to the translator. Afterwards, the translator will check if the transported identity is valid and signed by an authorized party in the authentication mesh. When the credentials are valid, they are translated according to the implementation of the translator. The proxy is then instructed with the actions to replace the transported identity with the correct credentials to access the destination.</p>
+<p>In the POC, the proof of integrity is not implemented, but the transformation takes place, where a “Bearer Token”<a href="#fn15" class="footnote-ref" id="fnref15" role="doc-noteref"><sup>15</sup></a> is used to check if the user may access and then replaces the token with static Basic Auth credentials.</p>
 <h3 id="communication">Communication</h3>
 <p>The communication between the proxies must be secured. Furthermore, the identity that is transformed over the wire must be tamper proof. Two established formats would suffice: “SAML” and “JWT Tokens.” While both contain the possibility to hash their contents and thus secure them against modification, JWT tokens are better designed for HTTP headers, since in current OIDC environments, JWT tokens are already used as access and/or identity tokens. They provide a secure environment with public and private claim names <span class="citation" data-cites="RFC7519">(Jones, Bradley, and Sakimura 2015, sec. 4.2, sec. 4.3)</span>.</p>
 <p>Other options could be:</p>
@@ -780,21 +785,21 @@ Content-Length: nnnn
 <p>The problem with other structured formats is that tamper protection and encoding must be done manually. JWT tokens provide a specified way of attaching a hashed version of the whole content <span class="citation" data-cites="RFC7519">(Jones, Bradley, and Sakimura 2015)</span> and therefore provide a method of validating a JWT token if it is still valid and if the sender is trusted. If the receiving end has his key material from the same PKI (and therefore the same CA), it can check the certificate and the integrity of the JWT token. If the signature is correct, the JWT token has been issued by a trusted and registered instance of the authentication network.</p>
 <p>X509 certificates - as defined in <strong>RFC5280</strong> <span class="citation" data-cites="RFC5280">(Cooper et al. 2008)</span> - introduce another valid way of transporting data and properties about something to another party. “Certificate Extensions” can be defined by “private communities” and are attached to the certificate itself <span class="citation" data-cites="RFC5280">(Cooper et al. 2008, sec. 4.2, sec. 4.2.2)</span>.</p>
 <p>While X509 certificates could be used instead of JWT to transport this data, using certificates would enforce the translator to act as intermediate CA and create new certificates for each request. From our experience, creating, extracting and manipulating certificates, for example in C#, is not a task done easily. Since this solution should be as easy to use as it can be, manipulating certificates in translators does not seem to be a feasible option. For the sake of simplicity and the well known usage, further work to this project will probably use JWT tokens to transmit the users identity.</p>
-<h2 id="implementation-proof-of-concept-poc">Implementation Proof of Concept (PoC)</h2>
-<p>To provide a proof that the general idea of the solution is possible, a PoC is implemented during the work of this project. The solution is implemented with the following technologies and environments:</p>
+<h2 id="implementation-proof-of-concept-poc">Implementation Proof of Concept (POC)</h2>
+<p>To provide a proof that the general idea of the solution is possible, a POC is implemented during the work of this project. The solution is implemented with the following technologies and environments:</p>
 <ul>
-<li>Environment: The PoC is implemented on a Kubernetes environment to enable automation and easy deployment for testing</li>
-<li>“Automation”: A Kubernetes operator, written in .NET (C#) with the “Dotnet Operator SDK”<a href="#fn11" class="footnote-ref" id="fnref11" role="doc-noteref"><sup>11</sup></a></li>
+<li>Environment: The POC is implemented on a Kubernetes environment to enable automation and easy deployment for testing</li>
+<li>“Automation”: A Kubernetes operator, written in .NET (C#) with the “Dotnet Operator SDK”<a href="#fn16" class="footnote-ref" id="fnref16" role="doc-noteref"><sup>16</sup></a></li>
 <li>“Proxy”: Envoy proxy which gets the needed configuration injected as Kubernetes ConfigMap file</li>
 <li>“Translator”: A .NET (F#) application that uses the Envoy gRPC defintions to react to Envoy’s requests and poses as the external service for the external authorization</li>
 <li>“Showcase App”: A solution of three applications that pose as demo case with:
 <ul>
-<li>“Frontend”: An ASP.NET static site application that authenticates itself against “Zitadel”<a href="#fn12" class="footnote-ref" id="fnref12" role="doc-noteref"><sup>12</sup></a></li>
+<li>“Frontend”: An ASP.NET static site application that authenticates itself against “Zitadel”<a href="#fn17" class="footnote-ref" id="fnref17" role="doc-noteref"><sup>17</sup></a></li>
 <li>“Modern Service”: A modern ASP.NET api application that can verify an OIDC token from Zitadel</li>
-<li>“Legacy Service”: A “legacy” ASP.NET api application that is only able to verify <code>Basic Auth</code> (RFC7617, see Section <a href="#sec:basic_auth">2.3.1</a>)</li>
+<li>“Legacy Service”: A “legacy” ASP.NET api application that is only able to verify <code>Basic Auth</code> (RFC7617, see Section <a href="#sec:basic_auth">2.6.1</a>)</li>
 </ul></li>
 </ul>
-<p>The PoC addresses the following questions:</p>
+<p>The POC addresses the following questions:</p>
 <ul>
 <li>Is it possible intercept HTTP requests to an arbitrary service</li>
 <li>Is it further possible to modify the HTTP headers of the request</li>
@@ -805,7 +810,7 @@ Content-Length: nnnn
 <li>The translator module to transform the credentials</li>
 </ul></li>
 </ul>
-<p>Based on the results of the PoC, the following further work may be realized:</p>
+<p>Based on the results of the POC, the following further work may be realized:</p>
 <ul>
 <li>Specify the concrete common domain language to transport identities</li>
 <li>Implement a secure way of transporting identities with validation of integrity</li>
@@ -816,28 +821,28 @@ Content-Length: nnnn
 </ul>
 <p>For the solution to be production ready, at least the secure communication channel between elements of the mesh as well as the common language format must be implemented. To be used in current cloud environments, an implementation in Kubernetes can provide insights on how to develop the solution for other orchestrators than Kubernetes.</p>
 <h3 id="showcase-application">Showcase Application</h3>
-<p>The showcase application is a demo to show the need and the particular usecase of the solution. The application resides in an open source repository under <a href="https://github.com/WirePact/poc-showcase-app" class="uri">https://github.com/WirePact/poc-showcase-app</a>.</p>
-<p>When installed in a Kubernetes cluster, the user can open (depending on the local configuration) the URL to the frontend application<a href="#fn13" class="footnote-ref" id="fnref13" role="doc-noteref"><sup>13</sup></a>.</p>
+<p>The showcase application is a demo to show the need and the particular use-case of the solution. The application resides in an open source repository under <a href="https://github.com/WirePact/poc-showcase-app" class="uri">https://github.com/WirePact/poc-showcase-app</a>.</p>
+<p>When installed in a Kubernetes cluster, the user can open (depending on the local configuration) the URL to the frontend application<a href="#fn18" class="footnote-ref" id="fnref18" role="doc-noteref"><sup>18</sup></a>.</p>
 <div id="fig:impl_components_showcase_app" class="fignos">
 <figure>
-<img src="diagrams/component/4032bc1798039526f4ad189449c70457.png" alt="Figure 17: Component Diagram of the Showcase Application" /><figcaption aria-hidden="true"><span>Figure 17:</span> Component Diagram of the Showcase Application</figcaption>
+<img src="diagrams/component/64fcec1ffc5ae2100efad8949d36af7d.png" alt="Figure 19: Component Diagram of the Showcase Application" /><figcaption aria-hidden="true"><span>Figure 19:</span> Component Diagram of the Showcase Application</figcaption>
 </figure>
 </div>
-<p>Figure <a href="#fig:impl_components_showcase_app">17</a> gives an overview over the components in the showcase application. The system contains an ASP.NET Razor Page<a href="#fn14" class="footnote-ref" id="fnref14" role="doc-noteref"><sup>14</sup></a> application as the frontend, an ASP.NET API application with configured Zitadel OIDC authentication as “modern” backend service and another ASP.NET API application that only supports basic authentication as “legacy” backend. The frontend can only communicate with the modern API and the modern API is able to call an additional service on the legacy API.</p>
+<p>Figure <a href="#fig:impl_components_showcase_app">19</a> gives an overview over the components in the showcase application. The system contains an ASP.NET Razor Page<a href="#fn19" class="footnote-ref" id="fnref19" role="doc-noteref"><sup>19</sup></a> application as the frontend, an ASP.NET API application with configured Zitadel OIDC authentication as “modern” backend service and another ASP.NET API application that only supports basic authentication as “legacy” backend. The frontend can only communicate with the modern API and the modern API is able to call an additional service on the legacy API.</p>
 <div id="fig:seq_showcase_call" class="fignos">
 <figure>
-<img src="diagrams/sequences/b8f867df74e125c26dc64ba5b20e754e.png" alt="Figure 18: Sequence Diagram of the Showcase Call" /><figcaption aria-hidden="true"><span>Figure 18:</span> Sequence Diagram of the Showcase Call</figcaption>
+<img src="diagrams/sequences/039b6d6fa1d8fc97fcc4890cc15e02b1.png" alt="Figure 20: Sequence Diagram of the Showcase Call" /><figcaption aria-hidden="true"><span>Figure 20:</span> Sequence Diagram of the Showcase Call</figcaption>
 </figure>
 </div>
-<p>In Figure <a href="#fig:seq_showcase_call">18</a>, we show the process of a user call in the showcase application. The user opens the web application and authenticates himself with Zitadel. After that, the user is presented with the application and can click the “Call API” button. The frontend application will call the modern backend API with the OIDC token and asks for customer and order data. The customer data is present on the modern API so it is directly returned. To query order data, the modern service relies on a legacy application which is only capable of basic authentication.</p>
+<p>In Figure <a href="#fig:seq_showcase_call">20</a>, we show the process of a user call in the showcase application. The user opens the web application and authenticates himself with Zitadel. After that, the user is presented with the application and can click the “Call API” button. The frontend application will call the modern backend API with the OIDC token and asks for customer and order data. The customer data is present on the modern API so it is directly returned. To query order data, the modern service relies on a legacy application which is only capable of basic authentication.</p>
 <p>Depending on the configuration (i.e. the environment variable <code>USE_WIREPACT</code>), the modern service will call the legacy one with either transformed basic auth credentials (when <code>USE_WIREPACT=false</code>) or with the presented OIDC token (otherwise). Either way, the legacy API receives basic auth credentials and returns the data which then in turn is returned and presented to the user.</p>
-<p>To install and run the showcase application without any interference of the operator or the rest of the solution, follow the installation guide in the readme on <a href="https://github.com/WirePact/poc-showcase-app" class="uri">https://github.com/WirePact/poc-showcase-app</a>. To install and use the whole PoC solution, please refer to the installation guide in the Appendix.</p>
+<p>To install and run the showcase application without any interference of the operator or the rest of the solution, follow the installation guide in the readme on <a href="https://github.com/WirePact/poc-showcase-app" class="uri">https://github.com/WirePact/poc-showcase-app</a>. To install and use the whole POC solution, please refer to the installation guide in the Appendix.</p>
 <h3 id="operator">Operator</h3>
 <blockquote>
 <p>TODO</p>
 </blockquote>
 <h3 id="envoy-sidecar">Envoy Sidecar</h3>
-<p>In the PoC, the proxy sidecar is an Envoy proxy with an injected configuration. The operator injects the sidecar whenever a <code>Deployment</code> is created or updated via the Kubernetes API. The operator attaches the proxy and adds several annotations that are used for communication with a <code>Mutation Webhook</code>. Furthermore, a <code>ConfigMap</code> with the envoy configuration is created during the webhook.</p>
+<p>In the POC, the proxy sidecar is an Envoy proxy with an injected configuration. The operator injects the sidecar whenever a <code>Deployment</code> is created or updated via the Kubernetes API. The operator attaches the proxy and adds several annotations that are used for communication with a <code>Mutation Webhook</code>. Furthermore, a <code>ConfigMap</code> with the envoy configuration is created during the webhook.</p>
 <p>Two parts of the envoy configuration are crucial. First, the <code>filter_chain</code> of the inbound traffic listener contains a list of <code>http_filters</code>. Within this list of filters, the external authorization filter is added to force Envoy to check if an arbitrary request is allowed or not:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ... more config</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">http_filters</span><span class="kw">:</span></span>
@@ -883,13 +888,12 @@ Content-Length: nnnn
 </blockquote>
 <h1 id="conclusion">Conclusion</h1>
 <blockquote>
-<p>TODO</p>
+<p>TODO : Conclusion</p>
 </blockquote>
-<h2 id="further-work">Further Work</h2>
 <blockquote>
-<p>TODO</p>
+<p>TODO : Further work</p>
 </blockquote>
-<h1 id="bibliography">Bibliography</h1>
+<h1 class="unnumbered" id="bibliography">Bibliography</h1>
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-RFC6902" class="csl-entry" role="doc-biblioentry">
 Bryan, Paul, and Mark Nottingham. 2013. <span>“Javascript Object Notation (<span>JSON</span>) Patch.”</span> RFC. Internet Engineering Task Force <span>IETF</span>. <a href="https://tools.ietf.org/html/rfc6902">https://tools.ietf.org/html/rfc6902</a>.
@@ -911,6 +915,9 @@ Curbera, F., M. Duftler, R. Khalaf, W. Nagy, N. Mukhi, and S. Weerawarana. 2002.
 </div>
 <div id="ref-dobies:KubernetesOperators" class="csl-entry" role="doc-biblioentry">
 Dobies, Jason, and Joshua Wood. 2020. <em>Kubernetes Operators: Automating the Container Orchestration Platform</em>. " O’Reilly Media, Inc.".
+</div>
+<div id="ref-nginx:website:ext-authz" class="csl-entry" role="doc-biblioentry">
+F5 Inc. Authors. 2021. <span>“Authentication Based on Subrequest Result.”</span> <em>NGINX</em>. <a href="https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-subrequest-authentication/">https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-subrequest-authentication/</a>.
 </div>
 <div id="ref-RFC6749" class="csl-entry" role="doc-biblioentry">
 Hardt, Dick, and others. 2012. <span>“The <span>OAuth</span> 2.0 Authorization Framework.”</span> RFC. Internet Engineering Task Force <span>IETF</span>. <a href="https://tools.ietf.org/html/rfc6749">https://tools.ietf.org/html/rfc6749</a>.
@@ -939,11 +946,14 @@ Naik, N., and P. Jenkins. 2017. <span>“Securing Digital Identities in the Clou
 <div id="ref-RFC7617" class="csl-entry" role="doc-biblioentry">
 Reschke, Julian. 2015. <span>“The ’Basic’ <span>HTTP</span> Authentication Scheme.”</span> RFC. Internet Engineering Task Force <span>IETF</span>. <a href="https://tools.ietf.org/html/rfc7617">https://tools.ietf.org/html/rfc7617</a>.
 </div>
+<div id="ref-rose:zero-trust" class="csl-entry" role="doc-biblioentry">
+Rose, Scott, Oliver Borchert, Stu Mitchell, and Sean Connelly. 2019. <span>“Zero Trust Architecture.”</span> National Institute of Standards; Technology.
+</div>
 <div id="ref-spec:OIDC" class="csl-entry" role="doc-biblioentry">
 Sakimura, Natsuhiko, John Bradley, Mike Jones, Breno De Medeiros, and Chuck Mortimore. 2014. <span>“Openid Connect Core 1.0.”</span> Spec. The <span>OpenID</span> Foundation <span>OIDF</span>. <a href="https://openid.net/specs/openid-connect-core-1_0.html">https://openid.net/specs/openid-connect-core-1_0.html</a>.
 </div>
 </div>
-<h1 class="unnumbered" id="appendix-a-installation-guide-for-poc">Appendix A: Installation Guide for PoC</h1>
+<h1 class="unnumbered" id="appendix-a-installation-guide-for-poc">Appendix A: Installation Guide for POC</h1>
 <blockquote>
 <p>TODO</p>
 </blockquote>
@@ -957,17 +967,22 @@ Sakimura, Natsuhiko, John Bradley, Mike Jones, Breno De Medeiros, and Chuck Mort
 <li id="fn1" role="doc-endnote"><p>According to the matrix problem: <span class="math inline"><em>X</em> services * <em>Y</em> authentication methods</span><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2" role="doc-endnote"><p><a href="https://kubernetes.io/" class="uri">https://kubernetes.io/</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn3" role="doc-endnote"><p><a href="https://www.envoyproxy.io/" class="uri">https://www.envoyproxy.io/</a><a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4" role="doc-endnote"><p><a href="https://www.getambassador.io/" class="uri">https://www.getambassador.io/</a><a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn5" role="doc-endnote"><p><a href="https://github.com/prometheus-operator/prometheus-operator" class="uri">https://github.com/prometheus-operator/prometheus-operator</a><a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn6" role="doc-endnote"><p><a href="https://github.com/zalando/postgres-operator" class="uri">https://github.com/zalando/postgres-operator</a><a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn7" role="doc-endnote"><p><a href="https://github.com/GoogleCloudPlatform/cloudsql-proxy" class="uri">https://github.com/GoogleCloudPlatform/cloudsql-proxy</a><a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn8" role="doc-endnote"><p><a href="https://istio.io/" class="uri">https://istio.io/</a><a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn9" role="doc-endnote"><p> <a href="https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter" class="uri">https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter</a><a href="#fnref9" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn10" role="doc-endnote"><p>Opaque OIDC Token of an IDP.<a href="#fnref10" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn11" role="doc-endnote"><p><a href="https://github.com/buehler/dotnet-operator-sdk" class="uri">https://github.com/buehler/dotnet-operator-sdk</a><a href="#fnref11" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn12" role="doc-endnote"><p><a href="https://zitadel.ch" class="uri">https://zitadel.ch</a><a href="#fnref12" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn13" role="doc-endnote"><p>In the example it is https://kubernetes.docker.internal since this is the local configured URL for “Docker Desktop”<a href="#fnref13" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn14" role="doc-endnote"><p> <a href="https://docs.microsoft.com/en-us/aspnet/core/razor-pages/" class="uri">https://docs.microsoft.com/en-us/aspnet/core/razor-pages/</a><a href="#fnref14" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4" role="doc-endnote"><p><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment" class="uri">https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#creating-a-deployment</a><a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5" role="doc-endnote"><p><a href="https://www.getambassador.io/" class="uri">https://www.getambassador.io/</a><a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6" role="doc-endnote"><p><a href="https://github.com/prometheus-operator/prometheus-operator" class="uri">https://github.com/prometheus-operator/prometheus-operator</a><a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7" role="doc-endnote"><p><a href="https://github.com/zalando/postgres-operator" class="uri">https://github.com/zalando/postgres-operator</a><a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn8" role="doc-endnote"><p>As done by istio (<a href="https://istio.io/latest/docs/reference/config/networking/sidecar/" class="uri">https://istio.io/latest/docs/reference/config/networking/sidecar/</a>)<a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn9" role="doc-endnote"><p>Like the Google CloudSQL Proxy<a href="#fnref9" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn10" role="doc-endnote"><p><a href="https://istio.io/" class="uri">https://istio.io/</a><a href="#fnref10" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn11" role="doc-endnote"><p><a href="https://grpc.io/" class="uri">https://grpc.io/</a><a href="#fnref11" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn12" role="doc-endnote"><p><a href="https://www.nginx.com/" class="uri">https://www.nginx.com/</a><a href="#fnref12" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn13" role="doc-endnote"><p><a href="https://www.vaultproject.io/" class="uri">https://www.vaultproject.io/</a><a href="#fnref13" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn14" role="doc-endnote"><p> <a href="https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter" class="uri">https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter</a><a href="#fnref14" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn15" role="doc-endnote"><p>Opaque OIDC Token of an IDP.<a href="#fnref15" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn16" role="doc-endnote"><p><a href="https://github.com/buehler/dotnet-operator-sdk" class="uri">https://github.com/buehler/dotnet-operator-sdk</a><a href="#fnref16" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn17" role="doc-endnote"><p><a href="https://zitadel.ch" class="uri">https://zitadel.ch</a><a href="#fnref17" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn18" role="doc-endnote"><p>In the example it is https://kubernetes.docker.internal since this is the local configured URL for “Docker Desktop”<a href="#fnref18" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn19" role="doc-endnote"><p> <a href="https://docs.microsoft.com/en-us/aspnet/core/razor-pages/" class="uri">https://docs.microsoft.com/en-us/aspnet/core/razor-pages/</a><a href="#fnref19" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 </body>
