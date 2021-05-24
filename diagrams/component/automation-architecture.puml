@@ -25,7 +25,7 @@ KubernetesSvc(svc, "Service", "")
 
 api <-- op : watches
 
-op --> dep : enhances
+op -right-> dep : enhances
 op --> svc : enhances
 
 @enduml

@@ -6,7 +6,7 @@ component [Automation] as auto
 frame "Support" as sup {
     component [Config Storage] as config
     component [Secret Storage] as secret
-    component [PKI] as pki
+    component [Public Key Infrastructure] as pki
 }
 
 frame "Application Service" as app_a {

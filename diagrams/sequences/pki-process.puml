@@ -4,15 +4,15 @@ skinparam backgroundcolor transparent
 participant "Translator" as t
 participant "Secret\nStorage" as sec
 participant "Proxy" as p
-participant "PKI" as k
+participant "Public\nKey\nInfrastructure" as k
 
 alt key exists
-    t -> sec : Fetch Key
+    t -> sec : Fetch Private Key
     activate sec
     return Return Private Key
 else key does not exist
     t -> t : Generate Private Key
-    t -> sec : Store Key
+    t -> sec : Store Private Key
 end
 
 t -> k : Certificate Signing Request
@@ -20,10 +20,12 @@ activate k
     k -> k : Sign Certificate
 return Signed Certificate
 
-[-> p : Communication
+[-> p : Inbound Communication
 activate p
     p -> t : Provide HTTP Request Headers\nRequest Translation
     activate t
+    t -> t : Check Signature
+    t -> t : Transform Identity\nto Target Credentials
     return Transformed Credentials
     p ->] : Forward to Destination
 deactivate p
