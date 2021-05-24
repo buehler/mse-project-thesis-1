@@ -8,7 +8,7 @@ participant "Legacy API" as l
 
 u -> fe : Open web application
 activate fe
-return Authorize via IAM
+return Authorize via ZITADEL
 
 u -> fe : Click "Call API" button
 activate fe

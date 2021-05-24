@@ -9,12 +9,12 @@
 |       | solution. In Kubernetes this is done via an operator. |
 +-------+--------------------------------------------------------------+
 | REQ 3 | Beside the translator, an Envoy proxy is injected to the |
-|       | service inquestion to handle the data flow. This  |
-|       | injection is also performed by the operator. |
+|       | service in question to handle the data flow. This  |
+|       | injection is performed by the operator as well. |
 +-------+--------------------------------------------------------------+
-| REQ 4 | Translators do only modify HTTP headers, they do not |
+| REQ 4 | Translators do only modify HTTP headers. They do not |
 |       | interfere with the data that is transmitted. Any |
-|       | information that needs to be forwarded must be within |
+|       | information that needs to be forwarded must reside in |
 |       | the HTTP headers. |
 +-------+--------------------------------------------------------------+
 | REQ 5 |  |

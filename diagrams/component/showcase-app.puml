@@ -2,7 +2,7 @@
 skinparam backgroundcolor transparent
 
 actor User as u
-component [Zitadel IAM] as i
+component [ZITADEL] as i
 
 node "Cloud Environment" {
     component [Client\n(OIDC Capable)] as c

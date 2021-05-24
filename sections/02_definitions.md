@@ -70,7 +70,7 @@ According to @burns:DesignPatternsForContainerSystems, the sidecar pattern is th
 
 The example shown in {@fig:kubernetes_sidecar} is extensible. Such sidecars may be injected by a mutator or an operator to extend functionality.
 
-Common use-cases for sidecars include controlling the data flow in a cluster in service mesh^[As done by istio (<https://istio.io/latest/docs/reference/config/networking/sidecar/>)], providing access to secure locations^[Like the Google CloudSQL Proxy] or performing additional tasks such as collecting logs of an application. Since sidecars are tightly coupled to the original application, they scale with the pod. It is not possible to scale a sidecar without scaling the pod - and therefore the application - itself.
+Common use cases for sidecars include controlling the data flow in a cluster in service mesh^[As done by istio (<https://istio.io/latest/docs/reference/config/networking/sidecar/>)], providing access to secure locations^[Like the Google CloudSQL Proxy] or performing additional tasks such as collecting logs of an application. Since sidecars are tightly coupled to the original application, they scale with the pod. It is not possible to scale a sidecar without scaling the pod - and therefore the application - itself.
 
 ## Controlling the Data with a Service Mesh {#sec:service_mesh}
 
@@ -129,4 +129,4 @@ The stated JWT token contains:
 
 ### Zero Trust Environment {#sec:zero-trust}
 
-"Zero Trust" is a security model with its focus on protecting data and user credentials. The basic idea of zero trust is to assume that an attacker is always present. It does not matter if the application resides within an enterprise network, zero trust assumes that enterprise networks are no more trustworthy than any other public network. As a consequence of zero trust, applications are not implicitly trusted. Therefore, user credentials must be presented and validated for each access to a resource [@rose:zero-trust].
+"Zero Trust" is a security model with its focus on protecting data and user credentials. The basic idea of zero trust is to assume that an attacker is always present. It does not matter if the application resides within an enterprise network, zero trust assumes that enterprise networks are no more trustworthy than any other public network. As a consequence of zero trust, applications are not implicitly trusted. Therefore, user credentials must be presented and validated for each access to a resource [@rose:zero-trust]. Zero trust can be summarized with: "Never trust, always verify".

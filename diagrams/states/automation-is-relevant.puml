@@ -1,0 +1,20 @@
+@startuml
+skinparam backgroundcolor transparent
+
+start
+
+if (Is Deployment or Service?) then (yes)
+    if (Is Part of the Mesh?) then (yes)
+        if (Object-Type?) then (Deployment)
+            :Inject Proxy;
+            :Inject Translator;
+        else (Service)
+            :Reconfigure Ports;
+        endif
+    else (no)
+    endif
+else (no)
+endif
+
+stop
+@enduml

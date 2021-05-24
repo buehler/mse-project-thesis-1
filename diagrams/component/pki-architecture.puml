@@ -12,8 +12,8 @@ component "Proxy" as p_b
 pki <--> t_a : Key Material
 pki <--> t_b : Key Material
 
-t_a <--> p_a : Communication
-t_b <--> p_b : Communication
+t_a <--> p_a : Translation\nof Credentials
+t_b <--> p_b : Translation\nof Credentials
 
 t_a <.> t_b : Validation\nof Trust
 
