@@ -1,0 +1,19 @@
+@startuml
+skinparam backgroundcolor transparent
+
+start
+
+if (Is Service?) then (yes)
+    if (Is Part of the Mesh?) then (yes)
+        if (Already configured?) then (no)
+            :Search port from config;
+            :Reroute service to Envoy;
+        else (yes)
+        endif
+    else (no)
+    endif
+else (no)
+endif
+
+stop
+@enduml

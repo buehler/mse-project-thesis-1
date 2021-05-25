@@ -122,7 +122,7 @@ For these sections, the architecture shows elements of a Kubernetes cloud enviro
 
 #### Concrete Example of Communication
 
-To give a concrete example of the solution, this section describes a situation, where the distributed authentication mesh helps to protect credentials. The example can be used to comprehend the concepts of the solution.
+To give a concrete example of the solution, this section describes a situation, where the distributed authentication mesh helps to protect credentials and eases the process of translating credentials. The example can be used to comprehend the concepts of the solution.
 
 The situation for the example is as follows:
 
@@ -251,22 +251,22 @@ While X509 certificates could be used instead of JWT to transport this data, usi
 
 ## Implementation Proof of Concept (POC)
 
-To provide a proof that the general idea of the solution is possible, a POC is implemented during the work of this project. The following technologies and environments build the foundation of the POC:
+To proof that the general idea of the solution is possible, a POC is implemented during the work of this project. The following technologies and environments build the foundation of the POC:
 
 - Environment: The POC is implemented on a Kubernetes environment to enable automation and easy deployment for testing
 - "Automation": A Kubernetes operator, written in .NET (C\#) with the "Dotnet Operator SDK"^[<https://github.com/buehler/dotnet-operator-sdk>]
 - "Proxy": Envoy proxy which gets the required configuration injected as Kubernetes ConfigMap file
-- "Translator": A .NET (F\#) application that uses the Envoy gRPC defintions to react to Envoy's requests and poses as the external service for the external authorization
+- "Translator": A .NET (F\#) application that uses the Envoy gRPC definitions to react to Envoy's requests and poses as the external service for the external authorization
 - "Sample Application": A solution of three applications that pose as demo case with:
   - "Frontend": An ASP.NET static site application that authenticates itself against
     "ZITADEL"^[<https://zitadel.ch>]
-  - "Modern Service": An ASP.NET api application that can verify an OIDC token from ZITADEL
-  - "Legacy Service": A "legacy" ASP.NET api application that is only able to verify
+  - "Modern Service": An ASP.NET API application that can verify an OIDC token from ZITADEL
+  - "Legacy Service": A "legacy" ASP.NET API application that is only able to verify
     `Basic Auth` (RFC7617, see {@sec:basic_auth})
 
 The POC addresses the following questions:
 
-- Is it possible intercept HTTP requests to an arbitrary service
+- Is it possible to intercept HTTP requests to an arbitrary service
 - Is it further possible to modify the HTTP headers of the request
 - Can a sidecar service transform given credentials from one format to another
 - Can a custom operator inject the following elements:
@@ -277,22 +277,22 @@ Based on the results of the POC, the following further work may be realized:
 
 - Specify the concrete format to transport identities
 - Implement a secure way of transporting identities with validation of integrity
-- Provide a production ready solution of some translators and the operator
+- Provide a production-ready solution for some translators and the operator
 - Integrate the solution with a service mesh
-- Provide a production ready documentation of the solution
-- Further investiage the possibility of hardening the communication between services (e.g. with mTLS)
+- Provide a production-ready documentation of the solution
+- Further investigate the possibility of hardening the communication between services (e.g. with mTLS)
 
-For the solution to be production ready, at least the secure communication channel between elements of the mesh as well as the DSL for the identity must be implemented. To be used in current cloud environments, an implementation in Kubernetes can provide insights on how to develop the solution for other orchestrators than Kubernetes.
+For the solution to be production-ready, at least the secure communication channel between elements of the mesh as well as the DSL for the identity must be implemented. To be used in current cloud environments, an implementation in Kubernetes can provide insights on how to develop the solution for other orchestrators than Kubernetes.
 
 ### Case Study for the POC
 
-The demo application shows the need and the particular use case of the distributed authentication mesh. The application resides in an open source repository on GitHub (<https://github.com/WirePact/poc-showcase-app>).
+The demo application shows the need and the particular use case of the distributed authentication mesh. The application resides in an open-source repository on GitHub (<https://github.com/WirePact/poc-showcase-app>).
 
-When installed in a Kubernetes cluster, the user can open (depending on the local configuration) the URL to the frontend application^[In the example it is https://kubernetes.docker.internal since this is the local configured URL for "Docker Desktop"].
+When installed in a Kubernetes cluster, the user can open (depending on the local configuration) the URL to the frontend application^[In the example, it is "https://kubernetes.docker.internal" since this is the local configured URL for "Docker Desktop"].
 
 ![Component Diagram of the Case Study](diagrams/component/showcase-app.puml){#fig:impl_components_showcase_app}
 
-{@fig:impl_components_showcase_app} gives an overview over the components in the showcase application. The system contains an ASP.NET Razor Page^[<https://docs.microsoft.com/en-us/aspnet/core/razor-pages/>] application as the frontend, an ASP.NET API application with configured ZITADEL OIDC authentication as "modern" backend service and another ASP.NET API application that only supports Basic Authentication as "legacy" backend. The frontend can only communicate with the modern API and the modern API is able to call an additional service on the legacy API.
+{@fig:impl_components_showcase_app} gives an overview over the components in the showcase application. The system contains an ASP.NET Razor Page^[<https://docs.microsoft.com/en-us/aspnet/core/razor-pages/>] application as the frontend, an ASP.NET API application with configured ZITADEL OIDC authentication as "modern" backend service, and another ASP.NET API application that only supports Basic Authentication as "legacy" backend. The frontend can only communicate with the modern API and the modern API is able to call an additional service on the legacy API.
 
 ![Sequence Diagram of the Communication in the Case Study](diagrams/sequences/showcase-app-calls.puml){#fig:seq_showcase_call}
 
@@ -304,12 +304,23 @@ To install and run the case study without any interference of the operator or th
 
 ### Automation Engine for Applications
 
-> TODO
+As explained in the abstract section about the architecture, the automation engine is generally optional. If omitted, the user is responsible for configuring the proxy and the translator. In the POC, the automation engine is a Kubernetes operator written with the .NET SDK in C\#. The source of the POC operator is hosted on GitHub: <https://github.com/WirePact/poc-operator>. The operator (automated and customized management of resources in Kubernetes, see {@sec:kubernetes_operator}) intercepts events for `Deployments` and `Services`. To update services and deployments in the POC, an annotation (basically a key-value storage in the metadata of an object in Kubernetes) is used. In future work, the operator may react to Custom Resource Definitions (CRD) as well.
+
+![Activity Model for Kubernetes Resources in the Automation Engine](diagrams/states/operator-events.puml){#fig:poc_operator_events}
+
+{@fig:poc_operator_events} gives an overview of the process that an event of the Kubernetes API completes. When the operator is notified by Kubernetes that a service or a deployment was created or modified, the operator determines the type and uses the specific controller to reconcile the resource. If the entity is a deployment and it is relevant for the authentication mesh, the operator will modify the deployment. On the other hand, if the entity is a service, the operator modifies the service if it is part of the mesh.
+
+![Automated Configuration of a Kubernetes Deployment in the POC](diagrams/states/operator-deployment.puml){#fig:poc_operator_deployment}
+
+In the case of a deployment, {@fig:poc_operator_deployment} shows the process for the management-event of the deployment. The first step of the operator is to determine if the entity is relevant for the authentication mesh. If the deployment contains the annotation `ch.wirepact/port` in its metadata, it is automatically part of the mesh. If the deployment is already configured, further reconfiguration is skipped. If not, the operator fetches the already configured ports of the deployment, and generates two additional ports. One port is used for the Envoy sidecar while the other is configured for the translator sidecar. The next step is to generate and store the Envoy configuration in a Kubernetes `ConfigMap`. Last, the sidecars are injected into the deployment configuration and the Kubernetes client stores the modified manifest.
+
+![Automated Configuration of a Kubernetes Service in the POC](diagrams/states/operator-service.puml){#fig:poc_operator_service}
+
+When reconciling a service, {#fig:poc_operator_service} shows the activities of the operator during the reconciliation. The service counts as relevant, if the annotation `ch.wirepact/deployment` is attached in the metadata of the service. The value of this annotation gives the deployment object to which the service should point. Then, the operator reads the annotations on the service to determine the port in question and searches for the port in its manifest. Then the port will receive a new "target port", that points to the Envoy port of the deployment. Last, the Kubernetes client will store the changed service.
 
 ### Network and Routing Proxy for Communication
 
--->
-In the POC, the proxy sidecar is an Envoy proxy with an injected configuration. The operator injects the sidecar whenever a `Deployment` is created or updated via the Kubernetes API. The operator attaches the proxy and adds several annotations that are used for communication with a `Mutation Webhook`. Furthermore, a `ConfigMap` with the envoy configuration is created during the webhook.
+In the POC, the proxy sidecar is an Envoy proxy with its configuration injected by the automation engine. The operator injects the sidecar whenever a `Deployment` is created or updated via the Kubernetes API. The operator attaches the proxy and adds several annotations that are used for communication with a `Mutation Webhook`. Furthermore, a `ConfigMap` with the envoy configuration is created during the webhook.
 
 Two parts of the envoy configuration are crucial. First, the `filter_chain` of the inbound traffic listener contains a list of `http_filters`. Within this list of filters, the external authorization filter is added to force Envoy to check if an arbitrary request is allowed or not:
 
@@ -318,7 +329,9 @@ Two parts of the envoy configuration are crucial. First, the `filter_chain` of t
 http_filters:
   - name: envoy.filters.http.ext_authz
     typed_config:
-      '@type': type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+      '@type': type.googleapis.com/
+        envoy.extensions.filters.http.
+        ext_authz.v3.ExtAuthz
       transport_api_version: v3
       grpc_service:
         envoy_grpc:
@@ -338,7 +351,9 @@ Second, the external authorization service must be added to the `clusters` list 
   type: STATIC
   typed_extension_protocol_options:
     envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
-      '@type': type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+      '@type': type.googleapis.com/
+        envoy.extensions.upstreams.http.
+        v3.HttpProtocolOptions
       explicit_http_config:
         http2_protocol_options: {}
   load_assignment:

@@ -11,7 +11,7 @@ common_build_args = \
 	--standalone
 
 
-.PHONY: default clean clean_diagrams clean_build build build_html build_pdf build_sections force
+.PHONY: default clean clean_diagrams clean_build build build_html build_pdf build_sections force pdf html
 
 default: clean_build build
 
@@ -43,11 +43,13 @@ build_html:
 	@cp -R diagrams public/
 	@rm -rf public/diagrams/.gitignore
 
+html: build_html
 
 build_pdf:
 	@echo "Build PDF version"
 	@pandoc ${common_build_args} --output=public/report.pdf ${sections}
 
+pdf: build_pdf
 
 sections/%.md: force
 	@echo "Build section $@ to pdf"

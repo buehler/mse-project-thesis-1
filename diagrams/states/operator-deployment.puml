@@ -1,0 +1,21 @@
+@startuml
+skinparam backgroundcolor transparent
+
+start
+
+if (Is Deployment?) then (yes)
+    if (Is Part of the Mesh?) then (yes)
+        if (Already configured?) then (no)
+            :Fetch used ports;
+            :Generate new ports;
+            :Configure sidecars;
+            :Store Envoy configuration;
+        else (yes)
+        endif
+    else (no)
+    endif
+else (no)
+endif
+
+stop
+@enduml
