@@ -1,0 +1,14 @@
+@startuml
+skinparam backgroundcolor transparent
+
+start
+
+if (Is Deployment?) then (yes)
+    :Modify Deployment;
+elseif (Is Service?) then (yes)
+    :Modify Service;
+else (no)
+endif
+
+stop
+@enduml

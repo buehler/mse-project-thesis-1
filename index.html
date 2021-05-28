@@ -637,7 +637,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <h2 id="differentiation-from-other-technologies">Differentiation from other Technologies</h2>
 <p>To distinguish this project from other technologies, this section gives a differentiation to two specific topics. The given topics stand for a general architectural idea and the contrast to the presented solution.</p>
 <h3 id="security-assertion-markup-language">Security Assertion Markup Language</h3>
-<p>The “Security Assertion Markup Language” (SAML) is a so-called “Federated Identity Management” (FIdM) standard. SAML, OAuth, and OIDC represent the three most popular FIdm standards. SAML is an XML framework for transmitting user data, such as authentication, entitlement, and other attributes, between services and organizations <span class="citation" data-cites="naik:SAMLandFIdM">(Naik and Jenkins 2017)</span>.</p>
+<p>The “Security Assertion Markup Language” (SAML) is a so-called “Federated Identity Management” (FIdM) standard. SAML, OAuth, and OIDC represent the three most popular FIdM standards. SAML is an XML framework for transmitting user data, such as authentication, entitlement, and other attributes, between services and organizations <span class="citation" data-cites="naik:SAMLandFIdM">(Naik and Jenkins 2017)</span>.</p>
 <p>While SAML is a partial solution for the stated problem, it does not cover the use case when credentials need to be transformed to communicate with a legacy system. SAML enables services to share identities in a trustful way, but all communicating partners must implement the SAML protocol to be part of the network. This project addresses the specific transformation of credentials into a format for some legacy systems. The basic idea of SAML may be used as a baseline of security and the general idea of processing identities.</p>
 <h3 id="sec:ws-deathstar">WS-*</h3>
 <p>The term “WS-*” contains a broad class of specifications within the “Web Services Description Language” (WSDL) and “Simple Object Access Protocol” (SOAP) context. The specifications were created by the World Wide Web Consortium (W3C). However, the consortium never finished and released the specification.</p>
@@ -662,43 +662,43 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <p>WSDL is an XML-based description of a web service. The goal of WSDL is to provide a description of methods that may be called on a web service. WSDL fills the needed endpoint description that SOAP is missing. While SOAP provides basic communication, WSDL defines the exact methods that can be called on an endpoint <span class="citation" data-cites="curbera:SOAP-and-WSDL">(Curbera et al. 2002)</span>.</p>
 <p>The distributed authentication mesh differs from WS-* such that there is no exact specification required for the target service. While the solution contains a common domain language - a SOAP-like protocol to encode data - it does not specify the endpoints of a service. The solution merely interacts with the HTTP request that targets a specific service and transforms the credentials from the common format to the specific format. Of course, certain authentication schemes need additional information to generate their user credentials out of the data.</p>
 <h2 id="use-case-of-dynamic-credential-transformation">Use Case of Dynamic Credential Transformation</h2>
-<p>The usefulness of such a solution shows when “older” or monolythic software moves to the cloud or when third party software is used that provides no accessable source code.</p>
+<p>The usefulness of such a solution shows when “older” or monolithic software moves to the cloud or when third-party software is used that provides no accessible source code.</p>
 <h3 class="unlisted unnumbered" id="communicate-with-legacy-software">Communicate with legacy software</h3>
-<p>Precondition: Cloud Native Application (CNA) and legacy software are deployed with their respective manifests and the sidecars of the mesh are running.</p>
+<p>Precondition: Cloud-Native Application (CNA) and legacy software are deployed with their respective manifests and the sidecars of the mesh are running.</p>
 <ol type="1">
 <li>The user is authenticated against the CNA</li>
 <li>The user tries to access a resource on the legacy software</li>
 <li>The CNA creates a request and “forwards” the credentials of the user</li>
 <li>The proxy intercepts the request and forwards the credentials to the transformer</li>
-<li>The transformer verifies the credentials and transforms them into a domain specific format</li>
+<li>The transformer verifies the credentials and transforms them into a domain-specific format</li>
 <li>The proxy replaces the headers and forwards the request</li>
-<li>The receiving proxy forwards the domain specific format to the translator of the target</li>
+<li>The receiving proxy forwards the domain-specific format to the translator of the target</li>
 <li>The translator casts the credentials into the specific authentication scheme credentials</li>
 <li>The receiving proxy forwards the request to the target service with the updated HTTP headers</li>
 </ol>
 <p>Postcondition: The communication has taken place and no credentials have left the source service (the CNA). Furthermore, the legacy service does not know what specific authentication scheme was used by the source to identify the user.</p>
-<p>This use case can be changed such that the receiving service is not a legacy software but some third party application where the source code is not accessable.</p>
+<p>This use case can be changed such that the receiving service is not a legacy software but some third-party application where the source code is not accessible.</p>
 <h2 id="architecture-of-the-solution">Architecture of the Solution</h2>
-<p>The following sections provide an architectural overview over the proposed solution. The solution is initially described in prosa text. Afterwards, an abstract architecture describes the concepts behind the solution. Then the architecture is concretized with platform specific examples based on Kubernetes.</p>
-<p>The reader should note, that the proposed architecture does not match the implementation of the POC to the full extent. The goal of this project is to provide an abstract idea to implement such a solution, while the POC proves the ability of modifying HTTP requests in-flight.</p>
+<p>The following sections provide an architectural overview over the proposed solution. The brief description gives an initial overview of the architecture and the idea. Afterwards, an abstract architecture describes the concepts behind the distributed authentication mesh. Then the architecture is concretized with platform-specific examples based on Kubernetes.</p>
+<p>The reader should note that the proposed architecture does not match the implementation of the POC to the full extent. The goal of this project is to provide an abstract idea to implement such an application, while the POC proves the ability of modifying HTTP requests in-flight.</p>
 <h3 id="brief-description">Brief Description</h3>
-<p>In general, when some service wants to communicate with another service and the user does not need to authenticate himself, most likely a federated identity is in use. This means that at some point, the user validates his own identity and is then authenticated in the whole zone of trust. This does not contradict a zero trust environment. A federated identity can be validated by each service and thus may be used in a zero trust environment.</p>
+<p>In general, when some service wants to communicate with another service and the user does not need to authenticate himself, most likely a federated identity is in use. This means that at some point, the user validates his own identity and is then authenticated in the whole zone of trust. This does not contradict a zero-trust environment. A federated identity can be validated by each service and thus may be used in a zero-trust environment.</p>
 <p>To achieve such a federated identity with diverging authentication schemes, the solution converts validated credentials to a domain specific language (DSL). This format, in conjunction with a proof of the sender, validates the identity over the wire in the communication between services without the need of additional authentication. When all parties of a communication are trusted through verification, no information about the effective credentials leak into the communication between services.</p>
 <p>The basic idea of the distributed authentication mesh is to replace any user credentials from an outgoing HTTP request with the DSL representation of the users identity. On the receiving side, the DSL encoded identity in the incomming HTTP request is transformed to the valid user credentias for the target service.</p>
 <h3 id="abstract-and-conceptional-architecture">Abstract and Conceptional Architecture</h3>
-<p>This section describe the architecture of the proposed solution in an abstract and generalized way. The concepts are not bound to any specific platform or a specific implementation nor are they required to run in a cloud environment. The concepts could be implemented as “fat-client” solution for a Windows machine as well.</p>
+<p>This section describes the architecture of the proposed solution in an abstract and generalized way. The concepts are not bound to any specific platform or a specific implementation nor required to run in a cloud environment. The concepts could be implemented as a “fat-client” solution for a Windows machine as well.</p>
 <div id="fig:solution_architecture" class="fignos">
 <figure>
 <img src="diagrams/component/fd583116a4ca7052d0033400d570bb3c.png" alt="Figure 9: Abstract Solution Architecture" /><figcaption aria-hidden="true"><span>Figure 9:</span> Abstract Solution Architecture</figcaption>
 </figure>
 </div>
-<p>Figure <a href="#fig:solution_architecture">9</a> shows the abstract solution architecture. In the “support” package, general available elements provide utility functions to the mesh. The solution requires a public key infrastructure (PKI) to deliver key material for signing and validation purposes. This key material may also be used to secure the communication between the nodes (or applications). Furthermore a configuration and secret storage enables the applications to store and retrieve configurations and secret elements like credentials or key material.</p>
+<p>Figure <a href="#fig:solution_architecture">9</a> shows the abstract solution architecture. In the “support” package, generally available elements provide utility functions to the mesh. The solution requires a public key infrastructure (PKI) to deliver key material for signing and validation purposes. This key material may also be used to secure the communication between the nodes (or applications). Furthermore, configuration and secret storage enable the applications to store and retrieve configurations and secret elements like credentials or key material.</p>
 <p>Additionally, an optional automation component watches and manages application. This component enhances the application services with the required components to participate in the distributed authentication mesh. Such a component is strongly suggested when the solution is used on a cloud environment to enable a dynamic usage of the mesh. The automation injects the proxies, translators and the required configurations for the managed components.</p>
 <p>A (managed) application service consists of three parts. First, the source (or destination) service, which represents the deployed application itself, a translator that manages the transformation between the DSL of the identity and the implementation specific authentication format and a proxy that manages the communication from and to the application.</p>
 <h3 id="platform-specific-example-in-kubernetes">Platform-Specific Example in Kubernetes</h3>
 <p>For these sections, the architecture shows elements of a Kubernetes cloud environment. The reason is to describe the specific architecture in a practical way. However, the general idea of the solution may be deployed in various environments and is not bound to a cloud infrastructure. Table <a href="#tbl:kubernetes_terminology">1</a> gives an overview of used terms and concepts in Kubernetes which are used to describe the platform-specific architecture.</p>
 <h4 id="concrete-example-of-communication">Concrete Example of Communication</h4>
-<p>To give a concrete example of the solution, this section describes a situation, where the distributed authentication mesh helps to protect credentials. The example can be used to comprehend the concepts of the solution.</p>
+<p>To give a concrete example of the solution, this section describes a situation, where the distributed authentication mesh helps to protect credentials and eases the process of translating credentials. The example can be used to comprehend the concepts of the solution.</p>
 <p>The situation for the example is as follows:</p>
 <ul>
 <li>Two applications are deployed in a Kubernetes cluster</li>
@@ -824,22 +824,22 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <p>X509 certificates - as defined in <strong>RFC5280</strong> <span class="citation" data-cites="RFC5280">(Cooper et al. 2008)</span> - introduce another valid way of transporting data and attributes to another party. “Certificate Extensions” can be defined by “private communities” and are attached to the certificate itself <span class="citation" data-cites="RFC5280">(Cooper et al. 2008, sec. 4.2, sec. 4.2.2)</span>.</p>
 <p>While X509 certificates could be used instead of JWT to transport this data, using certificates would enforce the translator to act as intermediate CA and create new certificates for each request. From our experience, creating, extracting and manipulating certificates, for example in C#, is not a task done easily. Since this solution should be as easy to use as it can be, manipulating certificates in translators does not seem to be a feasible option. For the sake of simplicity and the well-known usage, further work to this project will probably use JWT tokens to transmit the users identity.</p>
 <h2 id="implementation-proof-of-concept-poc">Implementation Proof of Concept (POC)</h2>
-<p>To provide a proof that the general idea of the solution is possible, a POC is implemented during the work of this project. The following technologies and environments build the foundation of the POC:</p>
+<p>To proof that the general idea of the solution is possible, a POC is implemented during the work of this project. The following technologies and environments build the foundation of the POC:</p>
 <ul>
 <li>Environment: The POC is implemented on a Kubernetes environment to enable automation and easy deployment for testing</li>
 <li>“Automation”: A Kubernetes operator, written in .NET (C#) with the “Dotnet Operator SDK”<a href="#fn16" class="footnote-ref" id="fnref16" role="doc-noteref"><sup>16</sup></a></li>
 <li>“Proxy”: Envoy proxy which gets the required configuration injected as Kubernetes ConfigMap file</li>
-<li>“Translator”: A .NET (F#) application that uses the Envoy gRPC defintions to react to Envoy’s requests and poses as the external service for the external authorization</li>
+<li>“Translator”: A .NET (F#) application that uses the Envoy gRPC definitions to react to Envoy’s requests and poses as the external service for the external authorization</li>
 <li>“Sample Application”: A solution of three applications that pose as demo case with:
 <ul>
 <li>“Frontend”: An ASP.NET static site application that authenticates itself against “ZITADEL”<a href="#fn17" class="footnote-ref" id="fnref17" role="doc-noteref"><sup>17</sup></a></li>
-<li>“Modern Service”: An ASP.NET api application that can verify an OIDC token from ZITADEL</li>
-<li>“Legacy Service”: A “legacy” ASP.NET api application that is only able to verify <code>Basic Auth</code> (RFC7617, see Section <a href="#sec:basic_auth">2.6.1</a>)</li>
+<li>“Modern Service”: An ASP.NET API application that can verify an OIDC token from ZITADEL</li>
+<li>“Legacy Service”: A “legacy” ASP.NET API application that is only able to verify <code>Basic Auth</code> (RFC7617, see Section <a href="#sec:basic_auth">2.6.1</a>)</li>
 </ul></li>
 </ul>
 <p>The POC addresses the following questions:</p>
 <ul>
-<li>Is it possible intercept HTTP requests to an arbitrary service</li>
+<li>Is it possible to intercept HTTP requests to an arbitrary service</li>
 <li>Is it further possible to modify the HTTP headers of the request</li>
 <li>Can a sidecar service transform given credentials from one format to another</li>
 <li>Can a custom operator inject the following elements:
@@ -852,21 +852,21 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <ul>
 <li>Specify the concrete format to transport identities</li>
 <li>Implement a secure way of transporting identities with validation of integrity</li>
-<li>Provide a production ready solution of some translators and the operator</li>
+<li>Provide a production-ready solution for some translators and the operator</li>
 <li>Integrate the solution with a service mesh</li>
-<li>Provide a production ready documentation of the solution</li>
-<li>Further investiage the possibility of hardening the communication between services (e.g. with mTLS)</li>
+<li>Provide a production-ready documentation of the solution</li>
+<li>Further investigate the possibility of hardening the communication between services (e.g. with mTLS)</li>
 </ul>
-<p>For the solution to be production ready, at least the secure communication channel between elements of the mesh as well as the DSL for the identity must be implemented. To be used in current cloud environments, an implementation in Kubernetes can provide insights on how to develop the solution for other orchestrators than Kubernetes.</p>
+<p>For the solution to be production-ready, at least the secure communication channel between elements of the mesh as well as the DSL for the identity must be implemented. To be used in current cloud environments, an implementation in Kubernetes can provide insights on how to develop the solution for other orchestrators than Kubernetes.</p>
 <h3 id="case-study-for-the-poc">Case Study for the POC</h3>
-<p>The demo application shows the need and the particular use case of the distributed authentication mesh. The application resides in an open source repository on GitHub (<a href="https://github.com/WirePact/poc-showcase-app" class="uri">https://github.com/WirePact/poc-showcase-app</a>).</p>
+<p>The demo application shows the need and the particular use case of the distributed authentication mesh. The application resides in an open-source repository on GitHub (<a href="https://github.com/WirePact/poc-showcase-app" class="uri">https://github.com/WirePact/poc-showcase-app</a>).</p>
 <p>When installed in a Kubernetes cluster, the user can open (depending on the local configuration) the URL to the frontend application<a href="#fn18" class="footnote-ref" id="fnref18" role="doc-noteref"><sup>18</sup></a>.</p>
 <div id="fig:impl_components_showcase_app" class="fignos">
 <figure>
 <img src="diagrams/component/56283de2e5979940600075ebb2eec200.png" alt="Figure 19: Component Diagram of the Case Study" /><figcaption aria-hidden="true"><span>Figure 19:</span> Component Diagram of the Case Study</figcaption>
 </figure>
 </div>
-<p>Figure <a href="#fig:impl_components_showcase_app">19</a> gives an overview over the components in the showcase application. The system contains an ASP.NET Razor Page<a href="#fn19" class="footnote-ref" id="fnref19" role="doc-noteref"><sup>19</sup></a> application as the frontend, an ASP.NET API application with configured ZITADEL OIDC authentication as “modern” backend service and another ASP.NET API application that only supports Basic Authentication as “legacy” backend. The frontend can only communicate with the modern API and the modern API is able to call an additional service on the legacy API.</p>
+<p>Figure <a href="#fig:impl_components_showcase_app">19</a> gives an overview over the components in the showcase application. The system contains an ASP.NET Razor Page<a href="#fn19" class="footnote-ref" id="fnref19" role="doc-noteref"><sup>19</sup></a> application as the frontend, an ASP.NET API application with configured ZITADEL OIDC authentication as “modern” backend service, and another ASP.NET API application that only supports Basic Authentication as “legacy” backend. The frontend can only communicate with the modern API and the modern API is able to call an additional service on the legacy API.</p>
 <div id="fig:seq_showcase_call" class="fignos">
 <figure>
 <img src="diagrams/sequences/d7be7433001a1299cf3177eee650a4bf.png" alt="Figure 20: Sequence Diagram of the Communication in the Case Study" /><figcaption aria-hidden="true"><span>Figure 20:</span> Sequence Diagram of the Communication in the Case Study</figcaption>
@@ -876,25 +876,43 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <p>Depending on the configuration (i.e. the environment variable <code>USE_WIREPACT</code>), the modern service will call the legacy application with either transformed basic authentication credentials (when <code>USE_WIREPACT=false</code>) or with the presented access token (otherwise). Either way, the legacy API receives basic authentication credentials in the form of <code>&lt;username&gt;:&lt;password&gt;</code> and returns the data which then in turn is returned and presented to the user.</p>
 <p>To install and run the case study without any interference of the operator or the rest of the solution, follow the installation guide in the readme on <a href="https://github.com/WirePact/poc-showcase-app" class="uri">https://github.com/WirePact/poc-showcase-app</a>. To install and use the whole POC, please refer to the installation guide in the Appendix.</p>
 <h3 id="automation-engine-for-applications">Automation Engine for Applications</h3>
-<blockquote>
-<p>TODO</p>
-</blockquote>
+<p>As explained in the abstract section about the architecture, the automation engine is generally optional. If omitted, the user is responsible for configuring the proxy and the translator. In the POC, the automation engine is a Kubernetes operator written with the .NET SDK in C#. The source of the POC operator is hosted on GitHub: <a href="https://github.com/WirePact/poc-operator" class="uri">https://github.com/WirePact/poc-operator</a>. The operator (automated and customized management of resources in Kubernetes, see Section <a href="#sec:kubernetes_operator">2.3</a>) intercepts events for <code>Deployments</code> and <code>Services</code>. To update services and deployments in the POC, an annotation (basically a key-value storage in the metadata of an object in Kubernetes) is used. In future work, the operator may react to Custom Resource Definitions (CRD) as well.</p>
+<div id="fig:poc_operator_events" class="fignos">
+<figure>
+<img src="diagrams/states/f6212c1b5b849eed502cbb7b10115a14.png" alt="Figure 21: Activity Model for Kubernetes Resources in the Automation Engine" /><figcaption aria-hidden="true"><span>Figure 21:</span> Activity Model for Kubernetes Resources in the Automation Engine</figcaption>
+</figure>
+</div>
+<p>Figure <a href="#fig:poc_operator_events">21</a> gives an overview of the process that an event of the Kubernetes API completes. When the operator is notified by Kubernetes that a service or a deployment was created or modified, the operator determines the type and uses the specific controller to reconcile the resource. If the entity is a deployment and it is relevant for the authentication mesh, the operator will modify the deployment. On the other hand, if the entity is a service, the operator modifies the service if it is part of the mesh.</p>
+<div id="fig:poc_operator_deployment" class="fignos">
+<figure>
+<img src="diagrams/states/74c7d2e051d88f19f56539db2924ac3a.png" alt="Figure 22: Automated Configuration of a Kubernetes Deployment in the POC" /><figcaption aria-hidden="true"><span>Figure 22:</span> Automated Configuration of a Kubernetes Deployment in the POC</figcaption>
+</figure>
+</div>
+<p>In the case of a deployment, Figure <a href="#fig:poc_operator_deployment">22</a> shows the process for the management-event of the deployment. The first step of the operator is to determine if the entity is relevant for the authentication mesh. If the deployment contains the annotation <code>ch.wirepact/port</code> in its metadata, it is automatically part of the mesh. If the deployment is already configured, further reconfiguration is skipped. If not, the operator fetches the already configured ports of the deployment, and generates two additional ports. One port is used for the Envoy sidecar while the other is configured for the translator sidecar. The next step is to generate and store the Envoy configuration in a Kubernetes <code>ConfigMap</code>. Last, the sidecars are injected into the deployment configuration and the Kubernetes client stores the modified manifest.</p>
+<div id="fig:poc_operator_service" class="fignos">
+<figure>
+<img src="diagrams/states/ae44bce0b71a90fb340fe0a690116181.png" alt="Figure 23: Automated Configuration of a Kubernetes Service in the POC" /><figcaption aria-hidden="true"><span>Figure 23:</span> Automated Configuration of a Kubernetes Service in the POC</figcaption>
+</figure>
+</div>
+<p>When reconciling a service, {#fig:poc_operator_service} shows the activities of the operator during the reconciliation. The service counts as relevant, if the annotation <code>ch.wirepact/deployment</code> is attached in the metadata of the service. The value of this annotation gives the deployment object to which the service should point. Then, the operator reads the annotations on the service to determine the port in question and searches for the port in its manifest. Then the port will receive a new “target port,” that points to the Envoy port of the deployment. Last, the Kubernetes client will store the changed service.</p>
 <h3 id="network-and-routing-proxy-for-communication">Network and Routing Proxy for Communication</h3>
-<p>–&gt; In the POC, the proxy sidecar is an Envoy proxy with an injected configuration. The operator injects the sidecar whenever a <code>Deployment</code> is created or updated via the Kubernetes API. The operator attaches the proxy and adds several annotations that are used for communication with a <code>Mutation Webhook</code>. Furthermore, a <code>ConfigMap</code> with the envoy configuration is created during the webhook.</p>
+<p>In the POC, the proxy sidecar is an Envoy proxy with its configuration injected by the automation engine. The operator injects the sidecar whenever a <code>Deployment</code> is created or updated via the Kubernetes API. The operator attaches the proxy and adds several annotations that are used for communication with a <code>Mutation Webhook</code>. Furthermore, a <code>ConfigMap</code> with the envoy configuration is created during the webhook.</p>
 <p>Two parts of the envoy configuration are crucial. First, the <code>filter_chain</code> of the inbound traffic listener contains a list of <code>http_filters</code>. Within this list of filters, the external authorization filter is added to force Envoy to check if an arbitrary request is allowed or not:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ... more config</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">http_filters</span><span class="kw">:</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> envoy.filters.http.ext_authz</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">typed_config</span><span class="kw">:</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">&#39;@type&#39;</span><span class="kw">:</span><span class="at"> type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">transport_api_version</span><span class="kw">:</span><span class="at"> v3</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">grpc_service</span><span class="kw">:</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">envoy_grpc</span><span class="kw">:</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">cluster_name</span><span class="kw">:</span><span class="at"> auth_translator</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">timeout</span><span class="kw">:</span><span class="at"> 1s</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">include_peer_certificate</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> envoy.filters.http.router</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co"># ... more config</span></span></code></pre></div>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">&#39;@type&#39;</span><span class="kw">:</span><span class="at"> type.googleapis.com/</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="at">        envoy.extensions.filters.http.</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="at">        ext_authz.v3.ExtAuthz</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">transport_api_version</span><span class="kw">:</span><span class="at"> v3</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">grpc_service</span><span class="kw">:</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">envoy_grpc</span><span class="kw">:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">cluster_name</span><span class="kw">:</span><span class="at"> auth_translator</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">timeout</span><span class="kw">:</span><span class="at"> 1s</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">include_peer_certificate</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> envoy.filters.http.router</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># ... more config</span></span></code></pre></div>
 <p>Second, the external authorization service must be added to the <code>clusters</code> list to be access via the configured name (<code>auth_translator</code>):</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ... more config</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> auth_translator</span></span>
@@ -902,24 +920,62 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> STATIC</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">typed_extension_protocol_options</span><span class="kw">:</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">envoy.extensions.upstreams.http.v3.HttpProtocolOptions</span><span class="kw">:</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">&#39;@type&#39;</span><span class="kw">:</span><span class="at"> type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">explicit_http_config</span><span class="kw">:</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">http2_protocol_options</span><span class="kw">:</span><span class="at"> </span><span class="kw">{}</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">load_assignment</span><span class="kw">:</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">cluster_name</span><span class="kw">:</span><span class="at"> auth_translator</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">endpoints</span><span class="kw">:</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">lb_endpoints</span><span class="kw">:</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="fu">endpoint</span><span class="kw">:</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">address</span><span class="kw">:</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="at">                </span><span class="fu">socket_address</span><span class="kw">:</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">address</span><span class="kw">:</span><span class="at"> </span><span class="fl">127.0.0.1</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">port_value</span><span class="kw">:</span><span class="at"> &lt;&lt;PORT_VALUE&gt;&gt;</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co"># ... more config</span></span></code></pre></div>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">&#39;@type&#39;</span><span class="kw">:</span><span class="at"> type.googleapis.com/</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="at">        envoy.extensions.upstreams.http.</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="at">        v3.HttpProtocolOptions</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">explicit_http_config</span><span class="kw">:</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">http2_protocol_options</span><span class="kw">:</span><span class="at"> </span><span class="kw">{}</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">load_assignment</span><span class="kw">:</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">cluster_name</span><span class="kw">:</span><span class="at"> auth_translator</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">endpoints</span><span class="kw">:</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">lb_endpoints</span><span class="kw">:</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="fu">endpoint</span><span class="kw">:</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">address</span><span class="kw">:</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="at">                </span><span class="fu">socket_address</span><span class="kw">:</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">address</span><span class="kw">:</span><span class="at"> </span><span class="fl">127.0.0.1</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">port_value</span><span class="kw">:</span><span class="at"> &lt;&lt;PORT_VALUE&gt;&gt;</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># ... more config</span></span></code></pre></div>
 <p>This configures Envoy to find the external authorization service on the local loopback IP on the configured port. Since gRPC is configured (<code>grpc_service: envoy_grpc: ...</code> in the filter config), http2 must be enabled for the communication. In a productive environment, timeouts should be set accordingly.</p>
 <h3 id="translator">Translator</h3>
-<blockquote>
-<p>TODO</p>
-</blockquote>
+<p>The translator is the part of the POC that proofs the modification of HTTP headers per request. Since the intermediate DSL is not implemented in the POC, the translator uses static credentials. If any error occurs or the translator exceeds ten seconds, Envoy returns a HTTP 403 Forbidden message by default.</p>
+<div id="fig:poc_translator_403" class="fignos">
+<figure>
+<img src="diagrams/sequences/translator-poc-process-403" alt="Figure 24: Communication with an invalid access token" /><figcaption aria-hidden="true"><span>Figure 24:</span> Communication with an invalid access token</figcaption>
+</figure>
+</div>
+<p>Figure <a href="#fig:poc_translator_403">24</a> shows the sequence when the access token is not valid. Envoy forwards the HTTP headers to the translator which extracts the <code>Authorization</code> header. If it is not a <code>Bearer</code> access token, or if the shown validation with ZITADEL fails (if the token is not valid or expired), the translator returns an <code>Unauthorized</code> (HTTP 401) or <code>Forbidden</code> (HTTP 403) response depending on the status. The <code>Unauthorized</code> status is returned when no access token is provided (i.e. the HTTP header is missing) and <code>Forbidden</code> is the answer, if the token is invalid. In either case, Envoy will return the returned status code to the caller and the call ends. The destination application does not receive any communication or notification about this event.</p>
+<div id="fig:poc_translator_200" class="fignos">
+<figure>
+<img src="diagrams/sequences/translator-poc-process-200" alt="Figure 25: Communication with a valid access token" /><figcaption aria-hidden="true"><span>Figure 25:</span> Communication with a valid access token</figcaption>
+</figure>
+</div>
+<p>In contrast to Figure <a href="#fig:poc_translator_403">24</a>, the sequence in {#fig:poc_translator_200} shows the success path of a communication. If the given access token is valid, the translator fetches the static Basic Authentication credentials (i.e. username and password) from the secret storage. The secret storage in this example is a simple Kubernetes Secret. The received credentials are then transformed in the correct encoded Basic Authentication format (as described in RFC7617). Afterwards, the translator returns an instructionset for Envoy to process the HTTP request. Envoy executes the instruction and forwards the call to the destination and returns the response - if any.</p>
+<h4 id="instructions-for-rejected-request">Instructions for Rejected Request</h4>
+<p>When the translator decides that the request is unauthorized or forbidden, it returns a <code>DeniedResponse</code> to Envoy. The reponse is encoded in a binary “protobuf” format, but a JSON example would be:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;deniedResponse&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;code&quot;</span><span class="fu">:</span> <span class="dv">403</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;body&quot;</span><span class="fu">:</span> <span class="st">&quot;No valid Authorization provided&quot;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>There are additional fields encoded in the message, but the example above shows the essential parts of the denied response.</p>
+<h4 id="instructions-for-accepted-request">Instructions for Accepted Request</h4>
+<p>In contrast to the rejected response instructions, an accepting response may include modifications for HTTP headers. It is possible to add new, modify, and remove headers from the request for the upstream (i.e. the destination of the request), as well as adding or modifying additional headers for the downstream (i.e. the source of the request when the result is returned). Such a response, that replaces the <code>Authorization</code> header with the basic credentials, is:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;okResponse&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;headers&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">&quot;header&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>          <span class="dt">&quot;key&quot;</span><span class="fu">:</span> <span class="st">&quot;Authorization&quot;</span><span class="fu">,</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>          <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="st">&quot;Basic &lt;&lt;CREDENTIALS&gt;&gt;&quot;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>In the response above, if an <code>Authorization</code> header already exists, it is replaced. Otherwise, the value is added. In the case of the distributed authentication mesh, this technique can be used to consume the user identity (i.e. remove a custom header) and add the specific authentication credentials for the upstream.</p>
 <h1 id="evaluation">Evaluation</h1>
 <blockquote>
 <p>TODO: show in an evaluation, that the provided solution is working and improves the situation</p>
@@ -1019,7 +1075,7 @@ Sakimura, Natsuhiko, John Bradley, Mike Jones, Breno De Medeiros, and Chuck Mort
 <li id="fn15" role="doc-endnote"><p>access token of an IDP.<a href="#fnref15" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn16" role="doc-endnote"><p><a href="https://github.com/buehler/dotnet-operator-sdk" class="uri">https://github.com/buehler/dotnet-operator-sdk</a><a href="#fnref16" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn17" role="doc-endnote"><p><a href="https://zitadel.ch" class="uri">https://zitadel.ch</a><a href="#fnref17" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn18" role="doc-endnote"><p>In the example it is https://kubernetes.docker.internal since this is the local configured URL for “Docker Desktop”<a href="#fnref18" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn18" role="doc-endnote"><p>In the example, it is “https://kubernetes.docker.internal” since this is the local configured URL for “Docker Desktop”<a href="#fnref18" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn19" role="doc-endnote"><p><a href="https://docs.microsoft.com/en-us/aspnet/core/razor-pages/" class="uri">https://docs.microsoft.com/en-us/aspnet/core/razor-pages/</a><a href="#fnref19" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
