@@ -1,0 +1,26 @@
+@startuml
+skinparam backgroundcolor transparent
+
+participant "Proxy" as p
+participant "Translator" as t
+participant "Secret\nStorage" as s
+participant "Destination" as d
+
+[-> p : Incomming Communication
+activate p
+    p -> t : Forward HTTP Headers
+    activate t
+        t -> t : Extract Access Token
+        t -> t : Validate Access Token on ZITADEL
+        t -> s : Fetch static\nBasic Authentication\nCredentials
+        activate s
+        return username:password
+    return Instruction with changed\nHTTP Headers
+    p -> p : Execute Instructions
+    p -> d : Forward modified HTTP Request
+    activate d
+        d -> d : Execute Request
+    return Result
+return Result
+
+@enduml

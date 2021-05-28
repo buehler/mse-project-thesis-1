@@ -34,7 +34,7 @@ To distinguish this project from other technologies, this section gives a differ
 
 ### Security Assertion Markup Language
 
-The "Security Assertion Markup Language" (SAML) is a so-called "Federated Identity Management" (FIdM) standard. SAML, OAuth, and OIDC represent the three most popular FIdm standards. SAML is an XML framework for transmitting user data, such as authentication, entitlement, and other attributes, between services and organizations [@naik:SAMLandFIdM].
+The "Security Assertion Markup Language" (SAML) is a so-called "Federated Identity Management" (FIdM) standard. SAML, OAuth, and OIDC represent the three most popular FIdM standards. SAML is an XML framework for transmitting user data, such as authentication, entitlement, and other attributes, between services and organizations [@naik:SAMLandFIdM].
 
 While SAML is a partial solution for the stated problem, it does not cover the use case when credentials need to be transformed to communicate with a legacy system. SAML enables services to share identities in a trustful way, but all communicating partners must implement the SAML protocol to be part of the network. This project addresses the specific transformation of credentials into a format for some legacy systems. The basic idea of SAML may be used as a baseline of security and the general idea of processing identities.
 
@@ -70,35 +70,35 @@ The distributed authentication mesh differs from WS-\* such that there is no exa
 
 ## Use Case of Dynamic Credential Transformation
 
-The usefulness of such a solution shows when "older" or monolythic software moves to the cloud or when third party software is used that provides no accessable source code.
+The usefulness of such a solution shows when "older" or monolithic software moves to the cloud or when third-party software is used that provides no accessible source code.
 
 ### Communicate with legacy software {.unlisted .unnumbered}
 
-Precondition: Cloud Native Application (CNA) and legacy software are deployed with their respective manifests and the sidecars of the mesh are running.
+Precondition: Cloud-Native Application (CNA) and legacy software are deployed with their respective manifests and the sidecars of the mesh are running.
 
 1. The user is authenticated against the CNA
 2. The user tries to access a resource on the legacy software
 3. The CNA creates a request and "forwards" the credentials of the user
 4. The proxy intercepts the request and forwards the credentials to the transformer
-5. The transformer verifies the credentials and transforms them into a domain specific format
+5. The transformer verifies the credentials and transforms them into a domain-specific format
 6. The proxy replaces the headers and forwards the request
-7. The receiving proxy forwards the domain specific format to the translator of the target
+7. The receiving proxy forwards the domain-specific format to the translator of the target
 8. The translator casts the credentials into the specific authentication scheme credentials
 9. The receiving proxy forwards the request to the target service with the updated HTTP headers
 
 Postcondition: The communication has taken place and no credentials have left the source service (the CNA). Furthermore, the legacy service does not know what specific authentication scheme was used by the source to identify the user.
 
-This use case can be changed such that the receiving service is not a legacy software but some third party application where the source code is not accessable.
+This use case can be changed such that the receiving service is not a legacy software but some third-party application where the source code is not accessible.
 
 ## Architecture of the Solution
 
-The following sections provide an architectural overview over the proposed solution. The solution is initially described in prosa text. Afterwards, an abstract architecture describes the concepts behind the solution. Then the architecture is concretized with platform specific examples based on Kubernetes.
+The following sections provide an architectural overview over the proposed solution. The brief description gives an initial overview of the architecture and the idea. Afterwards, an abstract architecture describes the concepts behind the distributed authentication mesh. Then the architecture is concretized with platform-specific examples based on Kubernetes.
 
-The reader should note, that the proposed architecture does not match the implementation of the POC to the full extent. The goal of this project is to provide an abstract idea to implement such a solution, while the POC proves the ability of modifying HTTP requests in-flight.
+The reader should note that the proposed architecture does not match the implementation of the POC to the full extent. The goal of this project is to provide an abstract idea to implement such an application, while the POC proves the ability of modifying HTTP requests in-flight.
 
 ### Brief Description
 
-In general, when some service wants to communicate with another service and the user does not need to authenticate himself, most likely a federated identity is in use. This means that at some point, the user validates his own identity and is then authenticated in the whole zone of trust. This does not contradict a zero trust environment. A federated identity can be validated by each service and thus may be used in a zero trust environment.
+In general, when some service wants to communicate with another service and the user does not need to authenticate himself, most likely a federated identity is in use. This means that at some point, the user validates his own identity and is then authenticated in the whole zone of trust. This does not contradict a zero-trust environment. A federated identity can be validated by each service and thus may be used in a zero-trust environment.
 
 To achieve such a federated identity with diverging authentication schemes, the solution converts validated credentials to a domain specific language (DSL). This format, in conjunction with a proof of the sender, validates the identity over the wire in the communication between services without the need of additional authentication. When all parties of a communication are trusted through verification, no information about the effective credentials leak into the communication between services.
 
@@ -106,11 +106,11 @@ The basic idea of the distributed authentication mesh is to replace any user cre
 
 ### Abstract and Conceptional Architecture
 
-This section describe the architecture of the proposed solution in an abstract and generalized way. The concepts are not bound to any specific platform or a specific implementation nor are they required to run in a cloud environment. The concepts could be implemented as "fat-client" solution for a Windows machine as well.
+This section describes the architecture of the proposed solution in an abstract and generalized way. The concepts are not bound to any specific platform or a specific implementation nor required to run in a cloud environment. The concepts could be implemented as a "fat-client" solution for a Windows machine as well.
 
 ![Abstract Solution Architecture](diagrams/component/solution-architecture.puml){#fig:solution_architecture}
 
-{@fig:solution_architecture} shows the abstract solution architecture. In the "support" package, general available elements provide utility functions to the mesh. The solution requires a public key infrastructure (PKI) to deliver key material for signing and validation purposes. This key material may also be used to secure the communication between the nodes (or applications). Furthermore a configuration and secret storage enables the applications to store and retrieve configurations and secret elements like credentials or key material.
+{@fig:solution_architecture} shows the abstract solution architecture. In the "support" package, generally available elements provide utility functions to the mesh. The solution requires a public key infrastructure (PKI) to deliver key material for signing and validation purposes. This key material may also be used to secure the communication between the nodes (or applications). Furthermore, configuration and secret storage enable the applications to store and retrieve configurations and secret elements like credentials or key material.
 
 Additionally, an optional automation component watches and manages application. This component enhances the application services with the required components to participate in the distributed authentication mesh. Such a component is strongly suggested when the solution is used on a cloud environment to enable a dynamic usage of the mesh. The automation injects the proxies, translators and the required configurations for the managed components.
 
@@ -372,4 +372,50 @@ This configures Envoy to find the external authorization service on the local lo
 
 ### Translator
 
-> TODO
+The translator is the part of the POC that proofs the modification of HTTP headers per request. Since the intermediate DSL is not implemented in the POC, the translator uses static credentials. If any error occurs or the translator exceeds ten seconds, Envoy returns a HTTP 403 Forbidden message by default.
+
+![Communication with an invalid access token](diagrams/sequences/translator-poc-process-403){#fig:poc_translator_403}
+
+{@fig:poc_translator_403} shows the sequence when the access token is not valid. Envoy forwards the HTTP headers to the translator which extracts the `Authorization` header. If it is not a `Bearer` access token, or if the shown validation with ZITADEL fails (if the token is not valid or expired), the translator returns an `Unauthorized` (HTTP 401) or `Forbidden` (HTTP 403) response depending on the status. The `Unauthorized` status is returned when no access token is provided (i.e. the HTTP header is missing) and `Forbidden` is the answer, if the token is invalid. In either case, Envoy will return the returned status code to the caller and the call ends. The destination application does not receive any communication or notification about this event.
+
+![Communication with a valid access token](diagrams/sequences/translator-poc-process-200){#fig:poc_translator_200}
+
+In contrast to {@fig:poc_translator_403}, the sequence in {#fig:poc_translator_200} shows the success path of a communication. If the given access token is valid, the translator fetches the static Basic Authentication credentials (i.e. username and password) from the secret storage. The secret storage in this example is a simple Kubernetes Secret. The received credentials are then transformed in the correct encoded Basic Authentication format (as described in RFC7617). Afterwards, the translator returns an instructionset for Envoy to process the HTTP request. Envoy executes the instruction and forwards the call to the destination and returns the response - if any.
+
+#### Instructions for Rejected Request
+
+When the translator decides that the request is unauthorized or forbidden, it returns a `DeniedResponse` to Envoy. The reponse is encoded in a binary "protobuf" format, but a JSON example would be:
+
+```json
+{
+  "deniedResponse": {
+    "status": {
+      "code": 403
+    },
+    "body": "No valid Authorization provided"
+  }
+}
+```
+
+There are additional fields encoded in the message, but the example above shows the essential parts of the denied response.
+
+#### Instructions for Accepted Request
+
+In contrast to the rejected response instructions, an accepting response may include modifications for HTTP headers. It is possible to add new, modify, and remove headers from the request for the upstream (i.e. the destination of the request), as well as adding or modifying additional headers for the downstream (i.e. the source of the request when the result is returned). Such a response, that replaces the `Authorization` header with the basic credentials, is:
+
+```json
+{
+  "okResponse": {
+    "headers": [
+      {
+        "header": {
+          "key": "Authorization",
+          "value": "Basic <<CREDENTIALS>>"
+        }
+      }
+    ]
+  }
+}
+```
+
+In the response above, if an `Authorization` header already exists, it is replaced. Otherwise, the value is added. In the case of the distributed authentication mesh, this technique can be used to consume the user identity (i.e. remove a custom header) and add the specific authentication credentials for the upstream.
