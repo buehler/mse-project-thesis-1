@@ -14,8 +14,23 @@ keywords:
   - Kubernetes
 reference-section-title: Bibliography
 abstract: |
-  TODO, this will contain the
-  abstract of the project report.
+  As more and more applications move to the cloud, security is a
+  big concern. Applications shield themselves against attacks with various
+  authentication mechanisms like OpenID Connect (OIDC). However, legacy
+  appications that are not refactored nor updated tend to not support modern 
+  security standards. To enable applications to communicate with legacy
+  (or third-party) software, it is often required to introduce code changes
+  to the modern apps. To eliminate the leakage of credentials (like access
+  tokens) and to reduce the risk of bugs, this project targets the dynamic
+  conversion of a user identity. This identity authenticates the user over 
+  the wire instead of the effective credentials. This project gives the
+  conceptional idea and the architecture, as well as a platform specific
+  example of such a solution. Furthermore, a proof of concept answers
+  relevant questions for the realization of such a framework. The evaluation
+  then validates the architecture against the goals and non-goals and
+  checks the architecture. In the end, the conclusion provides information
+  about the project, possible further work, and the goals of the next
+  project-phase.
 
 # Latex config
 papersize: a4
@@ -26,8 +41,9 @@ lof: true
 lot: true
 bibliography: bibliography.bib
 thanks: |
-  I would like to thank Dr. Olaf Zimmermann
-  and Florian Forster. TODO.
+  I would like to thank Dr. Olaf Zimmermann for reviewing and guiding
+  this work. Furthermore, I thank Florian Forster, who acted as tester
+  in the practice.
 # header-includes:
 #   - \usepackage{fvextra}
 #   - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\}}

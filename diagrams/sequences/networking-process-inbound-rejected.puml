@@ -1,0 +1,15 @@
+@startuml
+skinparam backgroundcolor transparent
+
+participant "Proxy" as p
+participant "Translator" as t
+participant "Destination" as dest
+
+[-> p : Incomming\nCommunication
+activate p
+    p -> t : Forward HTTP Headers
+    activate t
+    return HTTP 401 Unauthorized\nor\nHTTP 403 Forbidden
+return HTTP 401 Unauthorized\nor\nHTTP 403 Forbidden
+
+@enduml

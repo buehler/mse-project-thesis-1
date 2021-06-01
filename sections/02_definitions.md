@@ -99,9 +99,9 @@ The `Basic` authentication is a trivial authentication scheme (i.e. a way to pro
 
 ### OpenID Connect (OIDC) {#sec:auth_oidc}
 
-OpenID Connect is not defined in a RFC, the specification is provided by the OpenID Foundation (OIDF). OIDC however, builds on top of OAuth, which is defined by **RFC6749**.
+OpenID Connect is not defined in a RFC, the specification is provided by the OpenID Foundation (OIDF). OIDC extends OAuth, which is defined by **RFC6749**.
 
-OpenID Connect is an authentication scheme, that builds upon the `OAuth 2.0` authorization protocol. OAuth itself is an authorization framework, that enables applications to gain access to a service (API or other) [@RFC6749, abstract]. OAuth 2.0 only deals with authorization and grants access to data and features on a specific application. OAuth by itself does not define _how_ the credentials are transmitted and exchanged [@RFC6749]. OIDC adds a layer on top of OAuth 2.0 that defines _how_ these credentials must be exchanged. This adds login and profile capabilities to any application that uses OIDC [@spec:OIDC].
+OpenID Connect is an authentication scheme, that extends the `OAuth 2.0` framework. OAuth itself is an authorization framework, that enables applications to gain access to a resource (API or other) [@RFC6749, abstract]. OAuth 2.0 only deals with authorization and grants access to data and features on a specific application. OAuth by itself does not define _how_ the credentials are transmitted and exchanged [@RFC6749]. OIDC adds additional logic to OAuth 2.0 that defines _how_ these credentials must be exchanged. Thus, OIDC enables login and profile capabilities in any application that uses OIDC [@spec:OIDC].
 
 ![OIDC code authorization flow [@spec:OIDC]. Only contains the credential flow, without the explicit OAuth part. OAuth handles the authorization whereas OIDC handles the authentication.](diagrams/sequences/oidc-code-flow.puml){#fig:oidc_code_flow short-caption="OIDC code flow"}
 
