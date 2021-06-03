@@ -267,7 +267,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <li><a href="#external-authentication-and-identity-transport">External Authentication and Identity Transport</a></li>
 <li><a href="#sec:deficiencies">Missing Dynamic Credential Transformation</a></li>
 </ul></li>
-<li><a href="#distributed-authentication-mesh">Distributed Authentication Mesh</a>
+<li><a href="#sec:solution">Distributed Authentication Mesh</a>
 <ul>
 <li><a href="#definition">Definition</a></li>
 <li><a href="#goals-and-non-goals-of-the-project">Goals and Non-Goals of the Project</a></li>
@@ -292,7 +292,15 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <li><a href="#translator">Translator</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#evaluation">Evaluation</a></li>
+<li><a href="#evaluation">Evaluation</a>
+<ul>
+<li><a href="#the-architecture-versus-the-requirements">The Architecture versus the Requirements</a>
+<ul>
+<li><a href="#nfr-1-improve-security">NFR 1: Improve Security</a></li>
+</ul></li>
+<li><a href="#prevent-leakage-of-credentials">Prevent Leakage of Credentials</a></li>
+<li><a href="#improve-developer-and-user-experience">Improve Developer and User Experience</a></li>
+</ul></li>
 <li><a href="#conclusion">Conclusion</a></li>
 <li><a href="#bibliography">Bibliography</a></li>
 <li><a href="#appendix-a-teaching-material-for-kubernetes-operators">Appendix A: Teaching Material for Kubernetes Operators</a></li>
@@ -528,7 +536,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 <p>Figure <a href="#fig:zero_trust_environment">8</a> shows the problem when communicating between trust zones. While the two services in “Trust Zone A” may implicitly trust each other, because they are in the same trust zone behind the same API gateway, the problem of leaking credentials is not critical. As soon as the three zones communicate with each other, credentials leave the trust zone and enter another zone. When implementing zero trust, each service in the system must verify the integrity and validity of the presented credentials again. There must not be any implicit trust based on a trust zone.</p>
 <p>Service meshes may provide a way to secure communication between services, but they are not able to transform credentials to a required format for any legacy application yet. It would be a possible solution to enable service meshes to transform credentials. However, service meshes introduce another layer of complexity on top of the environment. Such a system should be easy to use.</p>
 <p>Other technologies - such as credential vaults - provide a similar problem. The vault is the central weakness in the system. If the vault is attacked, the whole trust zone may fail. While a credential vault would provide a way to share credentials between services, it does not mitigate the need of transformation. A vault, like “Vault by HashiCorp”<a href="#fn13" class="footnote-ref" id="fnref13" role="doc-noteref"><sup>13</sup></a> typically provides a secure way to inject credentials into a system. The vaults do not transform credentials for the destination. However, such a vault could be used as secure storage of credentials for such a system that enables the described transformation. In the given example above, the secure vault could be used to store the static Basic Authentication credentials for the legacy service. The transformer can then access the vault to fetch the needed credentials for the target system.</p>
-<h1 id="distributed-authentication-mesh">Distributed Authentication Mesh</h1>
+<h1 id="sec:solution">Distributed Authentication Mesh</h1>
 <p>This section gives a general overview of the proposed solution. Furthermore, boundaries of the solution are provided along with common software engineering elements like requirements, non-functional requirements, and the documentation of the architecture.</p>
 <p>The proposed architecture provides a generic description for a solution to the described problem. For this project, a proof of concept (POC) gives insights into the general topic of manipulating HTTP requests in-flight. The POC is implemented to run on a Kubernetes cluster to provide a practical example.</p>
 <h2 id="definition">Definition</h2>
@@ -1002,9 +1010,16 @@ The given example enables two applications with different authentication mechani
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <p>In the response above, if an <code>Authorization</code> header already exists, it is replaced. Otherwise, the value is added. In the case of the distributed authentication mesh, this technique can be used to consume the user identity (i.e. remove a custom header) and add the specific authentication credentials for the upstream.</p>
 <h1 id="evaluation">Evaluation</h1>
+<p>This section evaluates the concept and the architecture of Section <a href="#sec:solution">4</a>. The main goal is to show that the proposed solution can improve the current situation and does not introduce security issues when used. Since the architecture is only conceptional, the evaluation is done in a theroretical manner.</p>
+<h2 id="the-architecture-versus-the-requirements">The Architecture versus the Requirements</h2>
+<p>To show that the architecture of the distributed authentication mesh does improve the developer experience as well as the current situation with legacy or third-party software, we compare the architecture against the non functional requirements in Table <a href="#tbl:non-functional-requirements">3</a>.</p>
+<h3 id="nfr-1-improve-security">NFR 1: Improve Security</h3>
 <blockquote>
-<p>TODO: show in an evaluation, that the provided solution is working and improves the situation</p>
+<p>NFR 1: First and foremost, the solution <strong>must not</strong> be less secure than current solutions.</p>
 </blockquote>
+<p>Currently, without the distributed authentication mesh, credentials like access tokens or basic authentication credentials are transmitted in the HTTP headers. This is a well-known way of authorizing requests <span class="citation" data-cites="RFC1945">(Nielsen, Fielding, and Berners-Lee 1996)</span>. If the current standard is viewed as “secure” - not judging by the authorization scheme - then the mesh is secure as well. It even improves the security by hiding the originally used credentials. This may prevent man in the middle attacks and leakage of credentials.</p>
+<h2 id="prevent-leakage-of-credentials">Prevent Leakage of Credentials</h2>
+<h2 id="improve-developer-and-user-experience">Improve Developer and User Experience</h2>
 <h1 id="conclusion">Conclusion</h1>
 <blockquote>
 <p>TODO : Conclusion</p>
