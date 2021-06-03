@@ -1,4 +1,4 @@
-# Distributed Authentication Mesh
+# Distributed Authentication Mesh {#sec:solution}
 
 This section gives a general overview of the proposed solution. Furthermore, boundaries of the solution are provided along with common software engineering elements like requirements, non-functional requirements, and the documentation of the architecture.
 
