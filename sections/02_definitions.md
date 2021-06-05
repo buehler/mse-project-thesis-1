@@ -64,7 +64,7 @@ When the user interacts with the Kubernetes API (e.g. via the `kubectl` executab
 
 ## The Sidecar Pattern {#sec:kubernetes_sidecar}
 
-According to @burns:DesignPatternsForContainerSystems, the sidecar pattern is the most common pattern for multi-container deployments [@burns:DesignPatternsForContainerSystems, section 4.1]. Sidecars are containers that enhance the functionality of the main container in a pod. An example for such a sidecar is a log collector, that collects log files written to the file system and forwards them towards some log processing software [@burns:DesignPatternsForContainerSystems, section 4.1]. Another example is the Google CloudSQL Proxy^[<https://github.com/GoogleCloudPlatform/cloudsql-proxy>, which provides access to a CloudSQL instance from a pod without routing the whole traffic through Kubernetes services.
+According to @burns:DesignPatternsForContainerSystems, the sidecar pattern is the most common pattern for multi-container deployments. Sidecars are containers that enhance the functionality of the main container in a pod. An example for such a sidecar is a log collector, that collects log files written to the file system and forwards them towards some log processing software [@burns:DesignPatternsForContainerSystems, section 4.1]. Another example is the Google CloudSQL Proxy^[<https://github.com/GoogleCloudPlatform/cloudsql-proxy>], which provides access to a CloudSQL instance from a pod without routing the whole traffic through Kubernetes services.
 
 ![Sidecar container extending a main container in a pod. As example, this could be a log collector [@burns:DesignPatternsForContainerSystems, figure 1].](diagrams/component/sidecar-pattern.puml){#fig:kubernetes_sidecar short-caption="Example of a sidecar container"}
 
@@ -110,7 +110,7 @@ When a user wants to authenticate himself with OIDC, one of the possible "flows"
 An example of an `id_token` in JWT format may be:
 
 ```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.yJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.flKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 ```
 
 The stated JWT token contains:

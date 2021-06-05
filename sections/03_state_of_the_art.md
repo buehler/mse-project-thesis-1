@@ -44,7 +44,7 @@ All the discussed technologies and applications above do not support the dynamic
 
 ## Missing Dynamic Credential Transformation {#sec:deficiencies}
 
-The situation described in the previous sections introduces several problems. It does not matter whether the legacy system is a third party application to which no code changes can be applied to, or if it is an application that cannot be updated for the time being. Most likely, the code change to provide the ability to communicate will be introduced into the CNA. This adds the risk of errors since new code must be produced, which would not be necessary if the legacy service was refactored. Also, changing the CNA to communicate with the legacy software may be a feasible solution in a small setup. But as the landscape of the application grows, this solution does not scale well.
+The situation described in the previous sections introduces several problems. It does not matter whether the legacy system is a third-party application to which no code changes can be applied to, or if it is an application that cannot be updated for the time being. Most likely, the code change to provide the ability to communicate will be introduced into the CNA. This adds the risk of errors since new code must be produced, which would not be necessary if the legacy service was refactored. Also, changing the CNA to communicate with the legacy software may be a feasible solution in a small setup. But as the landscape of the application grows, this solution does not scale well.
 
 ![Matrix Problem in Service Landscape](diagrams/component/matrix-problem.puml){#fig:matrix_problem}
 

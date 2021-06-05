@@ -32,7 +32,7 @@ These goals and non-goals define the first list of REQ and NFR. During further w
 
 To distinguish this project from other technologies, this section gives a differentiation to two specific topics. The given topics stand for a general architectural idea and the contrast to the presented solution.
 
-### Security Assertion Markup Language
+### Security Assertion Markup Language {#sec:saml}
 
 The "Security Assertion Markup Language" (SAML) is a so-called "Federated Identity Management" (FIdM) standard. SAML, OAuth, and OIDC represent the three most popular FIdM standards. SAML is an XML framework for transmitting user data, such as authentication, entitlement, and other attributes, between services and organizations [@naik:SAMLandFIdM].
 
@@ -106,7 +106,7 @@ The basic idea of the distributed authentication mesh is to replace any user cre
 
 Since the topic of the mesh is about security, error handling is a delicate matter. The mesh does depend on existing infrastructure and principles. Thus, error handling is limited to the translator engine. When the translator encounters any error, the request is denied.
 
-### Abstract and Conceptional Architecture
+### Abstract and Conceptional Architecture {#sec:abstract_architecture}
 
 This section describes the architecture of the proposed solution in an abstract and generalized way. The concepts are not bound to any specific platform or a specific implementation nor required to run in a cloud environment. The concepts could be implemented as a "fat-client" solution for a Windows machine as well.
 
@@ -120,7 +120,7 @@ A (managed) application service consists of three parts. First, the source (or d
 
 The communication between instances in the authentication mesh is handled by the proxies. The mesh must not interfere with the data transmission, it is only responsible to transform HTTP headers. Handling errors on the data plane is not part of the mesh and must be done by the implementation of the proxy.
 
-### Platform-Specific Example in Kubernetes
+### Platform-Specific Example in Kubernetes {#sec:specific_architecture}
 
 For these sections, the architecture shows elements of a Kubernetes cloud environment. The reason is to describe the specific architecture in a practical way. However, the general idea of the solution may be deployed in various environments and is not bound to a cloud infrastructure. {@tbl:kubernetes_terminology} gives an overview of used terms and concepts in Kubernetes which are used to describe the platform-specific architecture.
 
@@ -168,7 +168,7 @@ The given example enables two applications with different authentication mechani
 
 #### Automation with an Operator
 
-In case of a Kubernetes infrastructure, the automation part is done by an operator pattern as explained in {@sec:kubernetes_operator}. The automation part of the mesh is optional. When no automation is provided, the required proxy and translator elements must be started and maintained by some other means. However, in the context of Kubernetes, an operator pattern enables an automated enhancement and management of applications.
+In the case of a Kubernetes infrastructure, the automation part is done by an operator pattern as explained in {@sec:kubernetes_operator}. The automation part of the mesh is optional. When no automation is provided, the required proxy and translator elements must be started and maintained by some other means. However, in the context of Kubernetes, an operator pattern enables an automated enhancement and management of applications.
 
 ![Automation with an Operator in a Kubernetes Environment](diagrams/component/automation-architecture.puml){#fig:automation_architecture}
 
@@ -182,7 +182,7 @@ To determine if an object is relevant for the automation, the operator uses the 
 
 The sequence that enhances deployments and services is shown in {@fig:automation_process}. The operator registers a "watcher" for deployments and services with the Kubernetes API. Whenever a deployment or a service is created or modified, the operator receives a notification. Then, the operator checks if the object in question "is relevant" by checking if it should be part of the authentication mesh. This participation can be configured - in the example of Kubernetes - via annotations, labels or any other means of configuration. If the object is relevant, depending on the type, the operator injects sidecars into the deployment or reconfigures the service to use the injected proxy as targeting port for the network communication.
 
-If the automation engine encounters errors, it relies on Kubernetes to perform actions to reach a meaningful state. Since the engine runs on Kubernetes, if any operational errors occur, the application is restarted by Kubernetes. Logging is essential to find such errors. If deployments and services cannot be modified, the operator shall try it again in the next reconciliation-cycle.
+If the automation engine encounters errors, it relies on Kubernetes to perform actions to reach a meaningful state. Since the engine runs on Kubernetes, if any operational errors occur, the application is restarted by Kubernetes. Logging is essential to find such errors. If deployments and services cannot be modified, the operator shall try again in the next reconciliation cycle.
 
 #### Public Key Infrastructure
 
@@ -190,7 +190,7 @@ The role of the public key infrastructure (PKI) in the solution is to build the 
 
 ![The Relation of the Public Key Infrastructure and the System](diagrams/component/pki-architecture.puml){#fig:pki_architecture}
 
-{@fig:pki_architecture} depicts the relation of the translators and the PKI. When a translator starts, it acquires trusted key material from the PKI (for example with a certificate signing request). This key material provides the possibility to sign the identity that is transmitted to the receiving party. The receiving translator can validate the signature of the identity and the sending party. The proxies are responsible for the communication between the instances.
+{@fig:pki_architecture} depicts the relation of the translators and the PKI. When a translator starts, it acquires trusted key material from the PKI (for example, with a certificate signing request). This key material provides the possibility to sign the identity that is transmitted to the receiving party. The receiving translator can validate the signature of the identity and the sending party. The proxies are responsible for the communication between the instances.
 
 ![Provide Key Material to the Translator](diagrams/sequences/pki-process.puml){#fig:pki_process}
 
@@ -210,7 +210,7 @@ Networking in the proposed solution works with a combination of routing and comm
 
 As seen in {@fig:networking_architecture} the proxy is the mediator between source and destination of a communication. Furthermore, the proxy manages the translation of the credentials by communicating with the translator to transform the identity of the authenticated user and transmit it to the destination where it gets transformed again. Additionally, with the help of the PKI, the proxy can verify the identity of the sender via mTLS.
 
-Since the authentication mesh relies on external software to take care of communication and networking, error handling is off-loaded to that specific software as well. The authentication mesh does not guarantee any connectivity between parties of the mesh. In the specific example, if the configuration provided by the automation engine is faulty, Envoy will crash and log this matter to the output. Any other errors encountered by Envoy result in their respective HTTP error messages.
+Since the authentication mesh relies on external software to take care of communication and networking, error handling is off-loaded to that specific software as well. The authentication mesh does not guarantee any connectivity between parts of the mesh. In the specific example, if the configuration provided by the automation engine is faulty, Envoy will crash and log this matter to the output. Any other errors encountered by Envoy result in their respective HTTP error messages.
 
 ##### Inbound accepted Communication for an Application
 
@@ -253,7 +253,7 @@ The translator is responsible for transforming the identity from and to the doma
 
 When the translator receives a request to create the required credentials, it performs the sequence of actions as stated in {@fig:translator_process}. First, the proxy will forward the HTTP request data to the translator. Afterward, the translator checks if the transported identity is valid and signed by an authorized party in the authentication mesh. When the credentials are valid, they are translated according to the implementation of the translator. The proxy is then instructed with the actions to replace the transported identity with the correct credentials to access the destination.
 
-The translator is the critical part of the authentication mesh. If it receives invalid credentials (for example an identity that has been tampered with), it must reject the request with a `HTTP 403 Forbidden` response. If no identity is provided at all, a `HTTP 401 Unauthorized` must be sent. When the translation engine encounters any unexpected error during translation of the identity (like not being able to access the secret storage, or failure of some database), it must reject the request. The translator must reject any request that cannot be transformed successfully.
+The translator is the critical part of the authentication mesh. If it receives invalid credentials (e.g. an identity that has been tampered with, or just a wrong username/password combination), it must reject the request with a `HTTP 403 Forbidden` response. If no identity is provided at all, a `HTTP 401 Unauthorized` must be sent. When the translation engine encounters any unexpected error during translation of the identity (like not being able to access the secret storage, or failure of some database), it must reject the request. The translator must reject any request that cannot be transformed successfully. This error handling is used on the receiving and the sending side.
 
 In the POC, the proof of integrity is not implemented, but the transformation takes place, where a "Bearer Token"^[access token of an IDP.] is used to check if the user may access the destination and then replaces the token with static Basic Authentication credentials.
 
@@ -274,11 +274,11 @@ The problem with other structured formats is that tamper protection and encoding
 
 X509 certificates - as defined in **RFC5280** [@RFC5280] - introduce another valid way of transporting data and attributes to another party. "Certificate Extensions" can be defined by "private communities" and are attached to the certificate itself [@RFC5280, sec. 4.2, sec. 4.2.2].
 
-While X509 certificates could be used instead of JWT to transport this data, using certificates would enforce the translator to act as intermediate CA and create new certificates for each request. From our experience, creating, extracting, and manipulating certificates, for example in C\#, is not a task done easily. Since this solution should be as easy to use as it can be, manipulating certificates in translators does not seem to be a feasible option. For the sake of simplicity and the well-known usage, further work on this project will probably use JWT tokens to transmit the identity data.
+While X509 certificates could be used instead of JWT to transport this data, using certificates would enforce the translator to act as intermediate CA and create new certificates for each request. From our experience, creating, extracting, and manipulating certificates, for example in C\#, is not a task done easily. Since this solution should be as easy to use as it can be, manipulating certificates in translators does not seem to be a feasible option. For the sake of simplicity and well-known usage, further work on this project will probably use JWT tokens to transmit the identity data.
 
 ## Implementation Proof of Concept (POC)
 
-To proof that the general idea of the solution is possible, a POC is implemented during the work of this project. The following technologies and environments build the foundation of the POC:
+To prove that the general idea of the solution is possible, a POC is implemented during the work of this project. The following technologies and environments build the foundation of the POC:
 
 - Environment: The POC is implemented on a Kubernetes environment to enable automation and easy deployment for testing
 - "Automation": A Kubernetes operator, written in .NET (C\#) with the "Dotnet Operator SDK"^[<https://github.com/buehler/dotnet-operator-sdk>]
@@ -306,7 +306,7 @@ Based on the results of the POC, the following further work may be realized:
 - Implement a secure way of transporting identities with validation of integrity
 - Provide a production-ready solution for some translators and the operator
 - Integrate the solution with a service mesh
-- Provide a production-ready documentation of the solution
+- Provide production-ready documentation of the solution
 - Further investigate the possibility of hardening the communication between services (e.g. with mTLS)
 
 For the solution to be production-ready, at least the secure communication channel between elements of the mesh as well as the DSL for the identity must be implemented. To be used in current cloud environments, an implementation in Kubernetes can provide insights on how to develop the solution for other orchestrators than Kubernetes.
@@ -323,7 +323,7 @@ When installed in a Kubernetes cluster, the user can open (depending on the loca
 
 ![Sequence Diagram of the Communication in the Case Study](diagrams/sequences/showcase-app-calls.puml){#fig:seq_showcase_call}
 
-In {@fig:seq_showcase_call}, we show the process of a user call in the demo application. The user opens the web application and authenticates himself with ZITADEL. After that, the user is presented with the application and can click the "Call API" button. The frontend application calls the modern backend API with the access token from ZITADEL and asks for customer and order data. The customer data is present on the modern API so it is directly returned. To query the order data, the modern service relies on a legacy application which is only capable of Basic Authentication.
+In {@fig:seq_showcase_call}, we show the process of a user call in the demo application. The user opens the web application and authenticates himself with ZITADEL. After that, the user is presented with the application and can click the "Call API" button. The frontend application calls the modern backend API with the access token from ZITADEL and asks for customer and order data. The customer data is present on the modern API, so it is directly returned. To query the order data, the modern service relies on a legacy application which is only capable of Basic Authentication.
 
 Depending on the configuration (i.e. the environment variable `USE_WIREPACT`), the modern service will call the legacy application with either transformed basic authentication credentials (when `USE_WIREPACT=false`) or with the presented access token (`USE_WIREPACT=true`). Either way, the legacy API receives basic authentication credentials in the form of `<username>:<password>` and returns the data that is then presented to the user.
 
@@ -397,7 +397,7 @@ Second, the external authorization service must be added to the `clusters` list 
 
 This configures Envoy to find the external authorization service on the local loopback IP on the configured port. Since the transformer uses gRPC (`grpc_service: envoy_grpc: ...` in the filter config), http2 must be enabled for the communication. In a productive environment, timeouts should be set accordingly.
 
-### Translator
+### Translator {#sec:poc_translator}
 
 The translator is the part of the POC that shows the modification of HTTP headers per request. Since the intermediate DSL is not implemented in the POC, the translator converts an access token to static basic authentication credentials. If any error occurs or the translator call exceeds ten seconds, Envoy returns a HTTP 403 Forbidden message by default. The source code resides on GitHub: <https://github.com/WirePact/poc-demo-translator>.
 

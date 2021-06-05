@@ -17,12 +17,12 @@ abstract: |
   As more and more applications move to the cloud, security is a
   big concern. Applications shield themselves against attacks with various
   authentication mechanisms like OpenID Connect (OIDC). However, legacy
-  appications that are not refactored nor updated tend to not support modern 
+  appications that are not refactored nor updated tend to not support modern
   security standards. To enable applications to communicate with legacy
   (or third-party) software, it is often required to introduce code changes
   to the modern apps. To eliminate the leakage of credentials (like access
   tokens) and to reduce the risk of bugs, this project targets the dynamic
-  conversion of a user identity. This identity authenticates the user over 
+  conversion of a user identity. This identity authenticates the user over
   the wire instead of the effective credentials. This project gives the
   conceptional idea and the architecture, as well as a platform specific
   example of such a solution. Furthermore, a proof of concept answers
@@ -40,10 +40,7 @@ numbersections: true
 lof: true
 lot: true
 bibliography: bibliography.bib
-thanks: |
-  I would like to thank Dr. Olaf Zimmermann for reviewing and guiding
-  this work. Furthermore, I thank Florian Forster, who acted as tester
-  in the practice.
+thanks: I would like to express my appreciation to Dr. Olaf Zimmermann for reviewing and guiding this work. Furthermore, special thanks to Florian Forster, who challenged the results of this project from a practical perspective.
 # header-includes:
 #   - \usepackage{fvextra}
 #   - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\}}
