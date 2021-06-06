@@ -1,4 +1,4 @@
-# State of the Art and the Practice
+# State of the Art and the Practice {#sec:state_of_the_art}
 
 This section gives an overview of the current state of the art and the practice. Furthermore, it states the deficiencies that this project tries to solve.
 
@@ -8,7 +8,7 @@ In cloud environments, a solved problem is the transmission of arbitrary data fr
 
 In terms of authentication and authorization, there is a variety of schemes that enable an application to authenticate and authorize its users. OpenID Connect (OIDC) (see {@sec:auth_oidc}) is a modern authentication scheme, that extends the OAuth 2.0 framework, which in turn handles authorization [@spec:OIDC]. OAuth only defines how to grant access to specific resources (like APIs) but not how they are exchanged. OIDC fills that space by introducing authentication flows (e.g. "Authorization Code Flow" in {@fig:oidc_code_flow}). OAuth in combination with OIDC provides a modern and secure way of authentication and authorizing users against an API.
 
-Modern software architectures that are specifically designed for the cloud are called "Cloud Native Applications" (CNA). @kratzke:CloudNativeApplications define a CNA as:
+Modern software architectures that are specifically designed for the cloud are called "Cloud Native Applications" (CNA). A CNA can be defined as [@kratzke:CloudNativeApplications]:
 
 > "A cloud-native application is a distributed, elastic and horizontal scalable system composed of (micro)services which isolates state in a minimum of stateful components. The application and each self-contained deployment unit of that application is designed according to cloud-focused design patterns and operated on a self-service elastic platform."
 

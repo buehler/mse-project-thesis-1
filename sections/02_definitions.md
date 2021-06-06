@@ -1,4 +1,4 @@
-# Definitions and Clarification of the Scope
+# Definitions and Clarification of the Scope {#sec:definitions}
 
 This section provides general information about the project, the context, and prerequisite knowledge. It gives an overview of the context as well as terminology and general definitions.
 

@@ -276,7 +276,7 @@ X509 certificates - as defined in **RFC5280** [@RFC5280] - introduce another val
 
 While X509 certificates could be used instead of JWT to transport this data, using certificates would enforce the translator to act as intermediate CA and create new certificates for each request. From our experience, creating, extracting, and manipulating certificates, for example in C\#, is not a task done easily. Since this solution should be as easy to use as it can be, manipulating certificates in translators does not seem to be a feasible option. For the sake of simplicity and well-known usage, further work on this project will probably use JWT tokens to transmit the identity data.
 
-## Implementation Proof of Concept (POC)
+## Implementation Proof of Concept (POC) {#sec:poc}
 
 To prove that the general idea of the solution is possible, a POC is implemented during the work of this project. The following technologies and environments build the foundation of the POC:
 
@@ -310,6 +310,10 @@ Based on the results of the POC, the following further work may be realized:
 - Further investigate the possibility of hardening the communication between services (e.g. with mTLS)
 
 For the solution to be production-ready, at least the secure communication channel between elements of the mesh as well as the DSL for the identity must be implemented. To be used in current cloud environments, an implementation in Kubernetes can provide insights on how to develop the solution for other orchestrators than Kubernetes.
+
+### Installation of the POC
+
+> TODO
 
 ### Case Study for the POC
 
