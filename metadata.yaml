@@ -13,22 +13,23 @@ keywords:
   - Microservices
   - Kubernetes
 reference-section-title: Bibliography
+csl: springer-lecture-notes-in-computer-science.csl
 abstract: |
   As more and more applications move to the cloud, security is a
   big concern. Applications shield themselves against attacks with various
-  authentication mechanisms like OpenID Connect (OIDC). However, legacy
+  authentication mechanisms like OpenID Connect. However, legacy
   appications that are not refactored nor updated tend to not support modern
   security standards. To enable applications to communicate with legacy
   (or third-party) software, it is often required to introduce code changes
-  to the modern apps. To eliminate the leakage of credentials (like access
+  to the modern apps. To eliminate the leakage of credentials (such as access
   tokens) and to reduce the risk of bugs, this project targets the dynamic
   conversion of a user identity. This identity authenticates the user over
   the wire instead of the effective credentials. This project gives the
   conceptional idea and the architecture, as well as a platform specific
   example of such a solution. Furthermore, a proof of concept answers
   relevant questions for the realization of such a framework. The evaluation
-  then validates the architecture against the goals and non-goals and
-  checks the architecture. In the end, the conclusion provides information
+  then validates the architecture against the goals and non-goals.
+  In the end, the conclusion provides information
   about the project, possible further work, and the goals of the next
   project-phase.
 
@@ -40,18 +41,19 @@ numbersections: true
 lof: true
 lot: true
 bibliography: bibliography.bib
-thanks: I would like to express my appreciation to Dr. Olaf Zimmermann for reviewing and guiding this work. Furthermore, special thanks to Florian Forster, who challenged the results of this project from a practical perspective.
-# header-includes:
-#   - \usepackage{fvextra}
-#   - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\}}
+thanks: I would like to express my appreciation to Dr. Olaf Zimmermann for guiding and reviewing this work. Furthermore, special thanks to Florian Forster, who challenged the results of this project from a practical perspective.
 
 # Tool configuration
 fignos-cleveref: true
 fignos-plus-name: Figure
 fignos-star-name: figure
 secnos-cleveref: true
-secnos-plus-name: Section
-secnos-star-name: section
+secnos-plus-name:
+  section: Section
+  chapter: Chapter
+secnos-star-name:
+  section: section
+  chapter: chapter
 tablenos-cleveref: true
 tablenos-plus-name: Table
 tablenos-star-name: table

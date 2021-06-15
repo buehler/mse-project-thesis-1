@@ -8,6 +8,7 @@ numbersections: false
 lof: false
 lot: false
 bibliography: bibliography.bib
+csl: springer-lecture-notes-in-computer-science.csl
 
 # Tool configuration
 fignos-cleveref: true
