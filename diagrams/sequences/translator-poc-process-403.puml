@@ -11,7 +11,7 @@ activate p
     activate t
         t -> t : Extract Access Token
         t -> t : Validate Access Token on ZITADEL
-    return HTTP 403 Forbidden
-return HTTP 403 Forbidden
+    return HTTP 401 Unauthorized/\nHTTP 403 Forbidden
+return HTTP 401 Unauthorized/\nHTTP 403 Forbidden
 
 @enduml

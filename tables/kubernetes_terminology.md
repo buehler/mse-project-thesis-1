@@ -10,7 +10,7 @@
 |             | bundle Kubernetes manifests. It consists of a               |
 |             | `kustomization.yaml` and various referenced manifest        |
 |             | `yaml` files. It is declarative and does not allow          |
-|             | dynamic structures. It helps administrators to              |
+|             | dynamic structures. It helps administrators                 |
 |             | template applications for Kubernetes.                       |
 +-------------+-------------------------------------------------------------+
 | Container   | Smallest possible unit in a deployment.                     |
@@ -19,15 +19,15 @@
 |             | volumes and other specific information to carry out         |
 |             | a task.                                                     |
 +-------------+-------------------------------------------------------------+
-| Pod         | Composed of multiple containers. Is ran by Kubernetes       |
+| Pod         | Composed of multiple containers. It is ran by Kubernetes    |
 |             | as an instance of a deployment. Pods may be scaled          |
 |             | according to definitions or "pod scalers". Highly           |
 |             | coupled tasks are deployed together in a pod                |
 |             | (i.e. multiple coupled containers in a pod).                |
 +-------------+-------------------------------------------------------------+
-| Deployment  | A deployment is a managed instance of a pod.                |
+| Deployment  | A "Deployment" is a managed instance of a pod.              |
 | Daemonset   | Daemonsets and Statefulsets are variants of deployments.    |
-| Statefulset | Kubernetes will run the described pod with the              |
+| Statefulset | Kubernetes will run the described pod(s) with the           |
 |             | desired replica count on the best possible worker           |
 |             | node. Deployments may be scaled with auto-scaling           |
 |             | mechanisms.                                                 |
@@ -40,7 +40,7 @@
 |             | the namespace (e.g. `my-service.namespace`).                |
 +-------------+-------------------------------------------------------------+
 | Ingress     | Incoming communication and data flow into a component.      |
-|             | Furthermore an "Ingress" is a Kubernetes object             |
+|             | Furthermore, an "Ingress" is a Kubernetes object            |
 |             | that defines incoming communication and configures          |
 |             | an API gateway to route traffic to specific services.       |
 +-------------+-------------------------------------------------------------+

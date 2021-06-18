@@ -12,20 +12,25 @@ skinparam backgroundcolor transparent
 !include KubernetesPuml/OSS/KubernetesPod.puml
 !include KubernetesPuml/OSS/KubernetesDeploy.puml
 
-KubernetesApi(api, "Kubernetes API", "")
+Container(op, "Operator", "Operator")
 
-component "Operator" as op
-
-Cluster_Boundary(dep, "Deployment"){
-    Container(app, "Application", "Deployed Application")
-    Container(proxy, "Proxy", "Envoy Sidecar")
-    Container(translator, "Translator", "Sidecar for translation")
+Cluster_Boundary(dep, "Deployment") {
+    Cluster_Boundary(po_2, "Pod") {
+        Container(po2_c1, "Container", "Application")
+        Container(po2_c2, "Container", "Sidecar 1")
+        Container(po2_c3, "Container", "Sidecar 2")
+    }
 }
+
+Container(gate, "API Gateway", "e.g. Ambassador")
+
 KubernetesSvc(svc, "Service", "")
 
-api <-- op : watches
+op --> dep : Manages Resources
+op -> svc : Manages Resources
 
-op -right-> dep : enhances
-op --> svc : enhances
+svc --> po2_c1 : Allows communication
+
+gate -left-> svc : Routes communication
 
 @enduml
