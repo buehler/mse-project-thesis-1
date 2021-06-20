@@ -1084,7 +1084,7 @@ flKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 <p>This report showed a potential solution to the problem of dynamic credential transformation in systems with diverging authentication mechanisms. In Section <a href="#sec:introduction">1</a>, a brief overview stated the problem and described the goal of the project.</p>
 <p>Section <a href="#sec:definitions">2</a> defined the scope of the project and explained various technologies and terms like “Kubernetes,” “Operator Pattern,” and “Sidecar Pattern.” Additionally, Section <a href="#sec:definitions">2</a> introduced vital information about authentication, authorization, and security standards required for the general understanding of this report.</p>
 <p>Section <a href="#sec:state_of_the_art">3</a> gave an overview of the current state of the art and the current problems. The maintainability of implementing multiple authentication schemes and the leakage of user credentials (like access tokens) onto the wire were identified as core problems.</p>
-<p>To solve the stated problems in Section <a href="#sec:state_of_the_art">3</a>, a conceptional architecture was proposed in Section <a href="#sec:solution">4</a>. To show the architecture within a practical environment, Section <a href="#sec:solution">4</a> also gave a platform-specific example of the archtecture in Kubernetes. The conceptual idea of the distributed authentication mesh introduced a solution to the issues of diverging authentication schemes and leakage of credentials. When using a proxy component to intercept traffic from and to a service, a “translator” component can modify the HTTP headers of the requests. This removed the requirement of transmitting sensible credentials over the wire, which fixed the problem of leaking credentials. The translator transforms outgoing credentials (for example an access token) to a common format. On the receiving side, the proxy intercepts the request and the translator converts the common format into the authentication scheme fitting the destination service. With the same procedure, the issue of implementing multiple authentication schemes in an application was addressed as well. It is possible to have multiple transformers and therefore serve a multitude of authentication mechanisms without introducing code changes to the applications.</p>
+<p>To solve the stated problems in Section <a href="#sec:state_of_the_art">3</a>, a conceptional architecture was proposed in Section <a href="#sec:solution">4</a>. To show the architecture within a practical environment, Section <a href="#sec:solution">4</a> also gave a platform-specific example of the archtecture in Kubernetes. The conceptual idea of the distributed authentication mesh introduced a solution to the issues of diverging authentication schemes and leakage of credentials. When using a proxy component to intercept traffic from and to a service, a “translator” component can modify the HTTP headers of the requests. This removed the requirement of transmitting sensitive credentials over the wire, which fixed the problem of leaking credentials. The translator transforms outgoing credentials (for example an access token) to a common format. On the receiving side, the proxy intercepts the request and the translator converts the common format into the authentication scheme fitting the destination service. With the same procedure, the issue of implementing multiple authentication schemes in an application was addressed as well. It is possible to have multiple transformers and therefore serve a multitude of authentication mechanisms without introducing code changes to the applications.</p>
 <p>The idea of the distributed authentication mesh came close to the concept of SAML (Security Assertion Markup Language). While SAML provides a federated identity, it requires the participating services to implement the SAML protocol as well, the authentication mesh removes this requirement. The shown concept improves the developer experience by allowing dynamic credential transformation.</p>
 <p>To validate if the concept is feasible, the proof of concept in Section <a href="#sec:solution">4</a> has shown that it is possible to modify HTTP headers in-flight and therefore the core concept of the architecture is generally possible. Furthermore, Section <a href="#sec:evaluation">5</a> checked if the given requirements and goals/non-goals were achieved with the proposed architecture. The evaluation shows that the solution is able to enhance general security by preventing the leakage of credentials.</p>
 <p>As complementation to the main delivery of this project - the concept of the distributed authentication mesh - teaching material was created that can be found in Appendix A. It targets the topic of “Kubernetes Operators and how to create them.” This material may be used to introduce people to the operator pattern and helps to create a custom operator with a SDK.</p>
@@ -1155,10 +1155,10 @@ flKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 </div>
 </div>
 <h1 class="unnumbered" id="sec:teaching-material">Appendix A: Teaching Material for Kubernetes Operators</h1>
-<h2 id="motivation">Motivation</h2>
+<h2 class="unnumbered" id="motivation">Motivation</h2>
 <p>The usefulness of Kubernetes Operators shows as there exists a variety of them. For example, the Prometheus Operator<a href="#fn26" class="footnote-ref" id="fnref26" role="doc-noteref"><sup>26</sup></a> which manages instances of Prometheus<a href="#fn27" class="footnote-ref" id="fnref27" role="doc-noteref"><sup>27</sup></a> in Kubernetes. A non-exhaustive list of operators can be found on <a href="https://operatorhub.io/">https://operatorhub.io</a>. An operator is not required to perform only one task.</p>
 <p>Since operators are an elegant tool to extend the capabilities of Kubernetes, developers may want to know how to create a custom operator. This material gives an overview of the operator pattern and a description of how operators work. As an exercise, a custom operator must be written with the help of an SDK. The solution to the custom operator is implemented with C# and the .NET operator SDK “KubeOps”<a href="#fn28" class="footnote-ref" id="fnref28" role="doc-noteref"><sup>28</sup></a>.</p>
-<h2 id="learning-objectives">Learning Objectives</h2>
+<h2 class="unnumbered" id="learning-objectives">Learning Objectives</h2>
 <p>The operator pattern is well defined <span class="citation" data-cites="dobies:KubernetesOperators">[4]</span>. To be able to implement a custom operator, the building blocks and concepts of the internal elements of an operator must be known. An SDK helps to create an operator, but when the operator gets more complex, it may be vital to know how operators work. Therefore, this material shows how an operator works and how one can be built.</p>
 <p>To summarize the learning objectives:</p>
 <ul>
@@ -1166,8 +1166,8 @@ flKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 <li>One can explain the parts of an operator with own words</li>
 <li>One can build a custom operator with an SDK</li>
 </ul>
-<h2 id="kubernetes-operators-and-their-use">Kubernetes Operators and their Use</h2>
-<h3 id="what-is-an-operator">What is an Operator?</h3>
+<h2 class="unnumbered" id="kubernetes-operators-and-their-use">Kubernetes Operators and their Use</h2>
+<h3 class="unnumbered" id="what-is-an-operator">What is an Operator?</h3>
 <p>An operator in Kubernetes is an extension to the Kubernetes API itself. A custom operator typically manages the whole lifecycle of an application <span class="citation" data-cites="dobies:KubernetesOperators">[4]</span>.</p>
 <div id="fig:teach_op_loop" class="fignos">
 <figure>
@@ -1182,7 +1182,7 @@ flKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 </div>
 <p>The operator pattern uses the reconciliation loop to manage a custom application or a custom use case. The pattern is shown in Figure <a href="#fig:teach_op_pattern">29</a>. When a user modifies resources (be it custom resources or predefined ones), the API stores the resources as the new desired state. The operator gets notified by the API and can adjust elements in Kubernetes.</p>
 <p>The operator pattern can be used to manage whole applications, for example Prometheus or PostgreSQL databases. Another use case of an operator could include injecting logging collectors into each deployment in the cloud environment.</p>
-<h3 id="how-do-operators-work">How do Operators work?</h3>
+<h3 class="unnumbered" id="how-do-operators-work">How do Operators work?</h3>
 <p>The following objects exist in or around an operator:</p>
 <ul>
 <li><strong>Watcher</strong><a href="#fn29" class="footnote-ref" id="fnref29" role="doc-noteref"><sup>29</sup></a>: The operator registers one or multiple watchers with the Kubernetes API. This enables the operator to receive events when a watched resource gets modified. A watcher can be namespaced or global and can watch one type of resource (e.g. Depoyments, Services, or a custom resource).</li>
@@ -1204,7 +1204,7 @@ flKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 </figure>
 </div>
 <p>To specify the general workflow in Figure <a href="#fig:teach_op_pattern">29</a> in more detail, Figure <a href="#fig:teach_kubernetes_operator_workflow">30</a> depicts the concrete sequence of a reconciliation loop. An important note on admission webhooks (mutators/validators): if the operator does not respond within ten seconds, the API will abort the creation/modification/deletion of the resource. This could lead to deadlocks when the operator crashes or is not able to respond to the webhooks.</p>
-<h3 id="what-is-an-operator-sdk">What is an Operator SDK?</h3>
+<h3 class="unnumbered" id="what-is-an-operator-sdk">What is an Operator SDK?</h3>
 <p>To help developers create custom operators, SDKs provide aid to perform the Kubernetes specific tasks. Depending on the SDK, several technical elements are abstracted like registering and error handling of the wachers. A non-exhaustive list of SDKs includes:</p>
 <ul>
 <li>KUDO<a href="#fn35" class="footnote-ref" id="fnref35" role="doc-noteref"><sup>35</sup></a>: A declarative operator SDK that creates operators based on declarative descriptions.</li>
@@ -1214,17 +1214,17 @@ flKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
 <li>Kopf<a href="#fn39" class="footnote-ref" id="fnref39" role="doc-noteref"><sup>39</sup></a>: “Kubernetes Operator Framework (Kopf),” is a Python based SDK with an immense feature set.</li>
 <li>KubeOps<a href="#fn40" class="footnote-ref" id="fnref40" role="doc-noteref"><sup>40</sup></a>: A .NET operator SDK based on the principles of ASP.NET applications. Operators can be created with C# or F#.</li>
 </ul>
-<h2 id="exercise-create-a-custom-operator-with-an-sdk">Exercise: Create a Custom Operator with an SDK</h2>
-<h3 id="tldr">TL;DR</h3>
+<h2 class="unnumbered" id="exercise-create-a-custom-operator-with-an-sdk">Exercise: Create a Custom Operator with an SDK</h2>
+<h3 class="unnumbered" id="tldr">TL;DR</h3>
 <ol type="1">
 <li>Create an empty operator with an SDK of your choice and run it.</li>
 <li>Create a CRD for a “WeatherLocation” and for “WeatherData.”</li>
 <li>Create the controllers for the CRDs and run/deploy the operator. The use case is: The user can create a WeatherLocation object and the operator should then fetch any weather data API and create WeatherData objects for each hour. When a specific amount of WeatherData elements are created, old objects must be deleted.</li>
 </ol>
 <p>The examples and solutions are created with KubeOps in C#. When code is shown, the required “usings” are omitted. A possible solution can be found on GitHub: <a href="https://github.com/buehler/kubernetes-operator-exercise" class="uri">https://github.com/buehler/kubernetes-operator-exercise</a>.</p>
-<h3 id="create-and-run-an-empty-operator">Create and Run an empty Operator</h3>
+<h3 class="unnumbered" id="create-and-run-an-empty-operator">Create and Run an empty Operator</h3>
 <p>Select an SDK and create an empty operator and run it against a Kubernetes environment. One can use any Kubernetes environments, but it is advised to use a local instance like Docker Desktop with Kubernetes or <a href="https://minikube.sigs.k8s.io/docs/start/">minikube</a>.</p>
-<h4 id="solution">Solution</h4>
+<h4 class="unnumbered" id="solution">Solution</h4>
 <p>KubeOps provides templates to create an operator.</p>
 <ol type="1">
 <li>Install the templates: <code>dotnet new -i KubeOps.Templates::*</code></li>
@@ -1268,13 +1268,13 @@ info: Microsoft.Hosting.Lifetime[0]
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        app<span class="op">.</span><span class="fu">UseKubernetesOperator</span><span class="op">();</span></span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<h3 id="create-the-custom-resource-definition">Create the Custom Resource Definition</h3>
+<h3 class="unnumbered" id="create-the-custom-resource-definition">Create the Custom Resource Definition</h3>
 <p>Create the required objects in the operator and create the CRD for Kubernetes. The CRD is the element that gets installed in the API of Kubernetes. The following two objects must be created:</p>
 <ul>
 <li><strong>WeatherLocation</strong>: Object that contains the required data to query a weather API for weather data. As an example, if the <a href="https://openweathermap.org/api">OpenWeather API</a> is used, the object should include latitude and longitude to identify the point of interest. Depending on the API you intent to use, you may need to add other fields.</li>
 <li><strong>WeatherData</strong>: This object shall not be created by a user. It contains the “result” for a weather query. It must be linked to a WeatherLocation and should be cleaned up after 24 hours.</li>
 </ul>
-<h4 id="solution-1">Solution</h4>
+<h4 class="unnumbered" id="solution-1">Solution</h4>
 <p><code>WeatherLocation</code>: To use the OpenWeather API, we only need the latitude and the longitude to create a weather call.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode csharp"><code class="sourceCode cs"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> V1WeatherLocationSpec</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
@@ -1294,10 +1294,11 @@ info: Microsoft.Hosting.Lifetime[0]
 <span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    ApiVersion <span class="op">=</span> <span class="st">&quot;v1&quot;</span><span class="op">,</span></span>
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    Group <span class="op">=</span> <span class="st">&quot;kubernetes.dev&quot;</span><span class="op">,</span></span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    Kind <span class="op">=</span> <span class="st">&quot;WeatherLocation&quot;</span><span class="op">)]</span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> V1WeatherLocation <span class="op">:</span> CustomKubernetesEntity</span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>V1WeatherLocationSpec<span class="op">,</span> V1WeatherLocationStatus<span class="op">&gt;</span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="op">[</span><span class="fu">EntityScope</span><span class="op">(</span>EntityScope<span class="op">.</span><span class="fu">Cluster</span><span class="op">)]</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> V1WeatherLocation <span class="op">:</span> CustomKubernetesEntity</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>V1WeatherLocationSpec<span class="op">,</span> V1WeatherLocationStatus<span class="op">&gt;</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p><code>WeatherData</code>: This object should be created by the operator during runtime. It contains several elements of the weather call. The weather data object must be linked to a weather location.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode csharp"><code class="sourceCode cs"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> V1WeatherDataSpec</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
@@ -1318,102 +1319,13 @@ info: Microsoft.Hosting.Lifetime[0]
 <span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    ApiVersion <span class="op">=</span> <span class="st">&quot;v1&quot;</span><span class="op">,</span></span>
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    Group <span class="op">=</span> <span class="st">&quot;kubernetes.dev&quot;</span><span class="op">,</span></span>
 <span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    Kind <span class="op">=</span> <span class="st">&quot;WeatherData&quot;</span><span class="op">)]</span></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> V1WeatherData <span class="op">:</span> CustomKubernetesEntity<span class="op">&lt;</span>V1WeatherDataSpec<span class="op">&gt;</span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>KubeOps generates the following CRDs:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> apiextensions.k8s.io/v1</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> CustomResourceDefinition</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> weatherlocations.kubernetes.dev</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">group</span><span class="kw">:</span><span class="at"> kubernetes.dev</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">names</span><span class="kw">:</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">kind</span><span class="kw">:</span><span class="at"> WeatherLocation</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">listKind</span><span class="kw">:</span><span class="at"> WeatherLocationList</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">plural</span><span class="kw">:</span><span class="at"> weatherlocations</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">singular</span><span class="kw">:</span><span class="at"> weatherlocation</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">scope</span><span class="kw">:</span><span class="at"> Namespaced</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">versions</span><span class="kw">:</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> v1</span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">schema</span><span class="kw">:</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">openAPIV3Schema</span><span class="kw">:</span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">properties</span><span class="kw">:</span></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="fu">status</span><span class="kw">:</span></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">description</span><span class="kw">:</span><span class="at"> Status object for the entity.</span></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">properties</span><span class="kw">:</span></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="at">                </span><span class="fu">lastCheck</span><span class="kw">:</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">format</span><span class="kw">:</span><span class="at"> date-time</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">nullable</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> string</span></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="at">                </span><span class="fu">error</span><span class="kw">:</span></span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">nullable</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> string</span></span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">type</span><span class="kw">:</span><span class="at"> object</span></span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="fu">spec</span><span class="kw">:</span></span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">description</span><span class="kw">:</span><span class="at"> Specification of the kubernetes object.</span></span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">properties</span><span class="kw">:</span></span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a><span class="at">                </span><span class="fu">latitude</span><span class="kw">:</span></span>
-<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">format</span><span class="kw">:</span><span class="at"> double</span></span>
-<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> number</span></span>
-<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a><span class="at">                </span><span class="fu">longitude</span><span class="kw">:</span></span>
-<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">format</span><span class="kw">:</span><span class="at"> double</span></span>
-<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> number</span></span>
-<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">type</span><span class="kw">:</span><span class="at"> object</span></span>
-<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">type</span><span class="kw">:</span><span class="at"> object</span></span>
-<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">served</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">storage</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">subresources</span><span class="kw">:</span></span>
-<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">status</span><span class="kw">:</span><span class="at"> </span><span class="kw">{}</span></span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> apiextensions.k8s.io/v1</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> CustomResourceDefinition</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> weatherdatas.kubernetes.dev</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">group</span><span class="kw">:</span><span class="at"> kubernetes.dev</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">names</span><span class="kw">:</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">kind</span><span class="kw">:</span><span class="at"> WeatherData</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">listKind</span><span class="kw">:</span><span class="at"> WeatherDataList</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">plural</span><span class="kw">:</span><span class="at"> weatherdatas</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">singular</span><span class="kw">:</span><span class="at"> weatherdata</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">scope</span><span class="kw">:</span><span class="at"> Namespaced</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">versions</span><span class="kw">:</span></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">additionalPrinterColumns</span><span class="kw">:</span></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">jsonPath</span><span class="kw">:</span><span class="at"> .spec.mainWeather</span></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">name</span><span class="kw">:</span><span class="at"> MainWeather</span></span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">priority</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">type</span><span class="kw">:</span><span class="at"> string</span></span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">format</span><span class="kw">:</span><span class="at"> double</span></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">jsonPath</span><span class="kw">:</span><span class="at"> .spec.temperature</span></span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Temperature</span></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">priority</span><span class="kw">:</span><span class="at"> </span><span class="dv">0</span></span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">type</span><span class="kw">:</span><span class="at"> number</span></span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">name</span><span class="kw">:</span><span class="at"> v1</span></span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">schema</span><span class="kw">:</span></span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">openAPIV3Schema</span><span class="kw">:</span></span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">properties</span><span class="kw">:</span></span>
-<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="fu">spec</span><span class="kw">:</span></span>
-<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">description</span><span class="kw">:</span><span class="at"> Specification of the kubernetes object.</span></span>
-<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">properties</span><span class="kw">:</span></span>
-<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a><span class="at">                </span><span class="fu">mainWeather</span><span class="kw">:</span></span>
-<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> string</span></span>
-<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a><span class="at">                </span><span class="fu">description</span><span class="kw">:</span></span>
-<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> string</span></span>
-<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a><span class="at">                </span><span class="fu">temperature</span><span class="kw">:</span></span>
-<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">format</span><span class="kw">:</span><span class="at"> double</span></span>
-<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> number</span></span>
-<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a><span class="at">                </span><span class="fu">sunrise</span><span class="kw">:</span></span>
-<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">format</span><span class="kw">:</span><span class="at"> date-time</span></span>
-<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> string</span></span>
-<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a><span class="at">                </span><span class="fu">sunset</span><span class="kw">:</span></span>
-<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">format</span><span class="kw">:</span><span class="at"> date-time</span></span>
-<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a><span class="at">                  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> string</span></span>
-<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a><span class="at">              </span><span class="fu">type</span><span class="kw">:</span><span class="at"> object</span></span>
-<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">type</span><span class="kw">:</span><span class="at"> object</span></span>
-<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">served</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">storage</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="op">[</span><span class="fu">EntityScope</span><span class="op">(</span>EntityScope<span class="op">.</span><span class="fu">Cluster</span><span class="op">)]</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="kw">public</span> <span class="kw">class</span> V1WeatherData <span class="op">:</span> CustomKubernetesEntity<span class="op">&lt;</span>V1WeatherDataSpec<span class="op">&gt;</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>KubeOps generates the CRDs found in the repository at <a href="https://github.com/buehler/kubernetes-operator-exercise/tree/main/config/crds" class="uri">https://github.com/buehler/kubernetes-operator-exercise/tree/main/config/crds</a>.</p>
 <p>These CRDs may now be installed into Kubernetes with <code>kubectl apply</code>.</p>
-<h3 id="reconcile-the-custom-resource">Reconcile the Custom Resource</h3>
+<h3 class="unnumbered" id="reconcile-the-custom-resource">Reconcile the Custom Resource</h3>
 <p>As the operator base and the CRDs are prepared, you are now to build the operator logic. The operator must fulfill the following requirements:</p>
 <ul>
 <li>A weather API call is executed each hour for a given weather location object</li>
@@ -1422,7 +1334,7 @@ info: Microsoft.Hosting.Lifetime[0]
 <li>A validator checks if the longitude and latitude values are possible and denies the creation of the object if they are not within the boundaries</li>
 <li>A validator checks if a weather data object contains an owner reference</li>
 </ul>
-<h4 id="solution-2">Solution</h4>
+<h4 class="unnumbered" id="solution-2">Solution</h4>
 <p>Since it is not feasible to print the whole source code in this exercise, please find a possible solution on GitHub: <a href="https://github.com/buehler/kubernetes-operator-exercise" class="uri">https://github.com/buehler/kubernetes-operator-exercise</a>.</p>
 <section class="footnotes" role="doc-endnotes">
 <hr />
