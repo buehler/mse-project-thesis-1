@@ -1,12 +1,12 @@
 # Appendix A: Teaching Material for Kubernetes Operators {#sec:teaching-material .unnumbered}
 
-## Motivation
+## Motivation {.unnumbered}
 
 The usefulness of Kubernetes Operators shows as there exists a variety of them. For example, the Prometheus Operator^[<https://github.com/prometheus-operator/prometheus-operator>] which manages instances of Prometheus^[<https://prometheus.io/>] in Kubernetes. A non-exhaustive list of operators can be found on [https://operatorhub.io](https://operatorhub.io/). An operator is not required to perform only one task.
 
 Since operators are an elegant tool to extend the capabilities of Kubernetes, developers may want to know how to create a custom operator. This material gives an overview of the operator pattern and a description of how operators work. As an exercise, a custom operator must be written with the help of an SDK. The solution to the custom operator is implemented with C\# and the .NET operator SDK "KubeOps"^[<https://github.com/buehler/dotnet-operator-sdk>].
 
-## Learning Objectives
+## Learning Objectives {.unnumbered}
 
 The operator pattern is well defined [@dobies:KubernetesOperators]. To be able to implement a custom operator, the building blocks and concepts of the internal elements of an operator must be known. An SDK helps to create an operator, but when the operator gets more complex, it may be vital to know how operators work. Therefore, this material shows how an operator works and how one can be built.
 
@@ -16,9 +16,9 @@ To summarize the learning objectives:
 - One can explain the parts of an operator with own words
 - One can build a custom operator with an SDK
 
-## Kubernetes Operators and their Use
+## Kubernetes Operators and their Use {.unnumbered}
 
-### What is an Operator?
+### What is an Operator? {.unnumbered}
 
 An operator in Kubernetes is an extension to the Kubernetes API itself. A custom operator typically manages the whole lifecycle of an application [@dobies:KubernetesOperators].
 
@@ -32,7 +32,7 @@ The operator pattern uses the reconciliation loop to manage a custom application
 
 The operator pattern can be used to manage whole applications, for example Prometheus or PostgreSQL databases. Another use case of an operator could include injecting logging collectors into each deployment in the cloud environment.
 
-### How do Operators work?
+### How do Operators work? {.unnumbered}
 
 The following objects exist in or around an operator:
 
@@ -51,7 +51,7 @@ The following objects exist in or around an operator:
 
 To specify the general workflow in {@fig:teach_op_pattern} in more detail, {@fig:teach_kubernetes_operator_workflow} depicts the concrete sequence of a reconciliation loop. An important note on admission webhooks (mutators/validators): if the operator does not respond within ten seconds, the API will abort the creation/modification/deletion of the resource. This could lead to deadlocks when the operator crashes or is not able to respond to the webhooks.
 
-### What is an Operator SDK?
+### What is an Operator SDK? {.unnumbered}
 
 To help developers create custom operators, SDKs provide aid to perform the Kubernetes specific tasks. Depending on the SDK, several technical elements are abstracted like registering and error handling of the wachers. A non-exhaustive list of SDKs includes:
 
@@ -62,9 +62,9 @@ To help developers create custom operators, SDKs provide aid to perform the Kube
 - Kopf^[<https://kopf.readthedocs.io/en/stable/>]: "Kubernetes Operator Framework (Kopf)", is a Python based SDK with an immense feature set.
 - KubeOps^[<https://buehler.github.io/dotnet-operator-sdk/>]: A .NET operator SDK based on the principles of ASP.NET applications. Operators can be created with C\# or F\#.
 
-## Exercise: Create a Custom Operator with an SDK
+## Exercise: Create a Custom Operator with an SDK {.unnumbered}
 
-### TL;DR
+### TL;DR {.unnumbered}
 
 1. Create an empty operator with an SDK of your choice and run it.
 2. Create a CRD for a "WeatherLocation" and for "WeatherData".
@@ -72,11 +72,11 @@ To help developers create custom operators, SDKs provide aid to perform the Kube
 
 The examples and solutions are created with KubeOps in C\#. When code is shown, the required "usings" are omitted. A possible solution can be found on GitHub: <https://github.com/buehler/kubernetes-operator-exercise>.
 
-### Create and Run an empty Operator
+### Create and Run an empty Operator {.unnumbered}
 
 Select an SDK and create an empty operator and run it against a Kubernetes environment. One can use any Kubernetes environments, but it is advised to use a local instance like Docker Desktop with Kubernetes or [minikube](https://minikube.sigs.k8s.io/docs/start/).
 
-#### Solution
+#### Solution {.unnumbered}
 
 KubeOps provides templates to create an operator.
 
@@ -134,14 +134,14 @@ public class Startup
 }
 ```
 
-### Create the Custom Resource Definition
+### Create the Custom Resource Definition {.unnumbered}
 
 Create the required objects in the operator and create the CRD for Kubernetes. The CRD is the element that gets installed in the API of Kubernetes. The following two objects must be created:
 
 - **WeatherLocation**: Object that contains the required data to query a weather API for weather data. As an example, if the [OpenWeather API](https://openweathermap.org/api) is used, the object should include latitude and longitude to identify the point of interest. Depending on the API you intent to use, you may need to add other fields.
 - **WeatherData**: This object shall not be created by a user. It contains the "result" for a weather query. It must be linked to a WeatherLocation and should be cleaned up after 24 hours.
 
-#### Solution
+#### Solution {.unnumbered}
 
 `WeatherLocation`: To use the OpenWeather API, we only need the latitude and the longitude to create a weather call.
 
@@ -164,6 +164,7 @@ public class V1WeatherLocationStatus
     ApiVersion = "v1",
     Group = "kubernetes.dev",
     Kind = "WeatherLocation")]
+[EntityScope(EntityScope.Cluster)]
 public class V1WeatherLocation : CustomKubernetesEntity
     <V1WeatherLocationSpec, V1WeatherLocationStatus>
 {
@@ -192,112 +193,17 @@ public class V1WeatherDataSpec
     ApiVersion = "v1",
     Group = "kubernetes.dev",
     Kind = "WeatherData")]
+[EntityScope(EntityScope.Cluster)]
 public class V1WeatherData : CustomKubernetesEntity<V1WeatherDataSpec>
 {
 }
 ```
 
-KubeOps generates the following CRDs:
-
-```yaml
-apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-metadata:
-  name: weatherlocations.kubernetes.dev
-spec:
-  group: kubernetes.dev
-  names:
-    kind: WeatherLocation
-    listKind: WeatherLocationList
-    plural: weatherlocations
-    singular: weatherlocation
-  scope: Namespaced
-  versions:
-    - name: v1
-      schema:
-        openAPIV3Schema:
-          properties:
-            status:
-              description: Status object for the entity.
-              properties:
-                lastCheck:
-                  format: date-time
-                  nullable: true
-                  type: string
-                error:
-                  nullable: true
-                  type: string
-              type: object
-            spec:
-              description: Specification of the kubernetes object.
-              properties:
-                latitude:
-                  format: double
-                  type: number
-                longitude:
-                  format: double
-                  type: number
-              type: object
-          type: object
-      served: true
-      storage: true
-      subresources:
-        status: {}
-```
-
-```yaml
-apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-metadata:
-  name: weatherdatas.kubernetes.dev
-spec:
-  group: kubernetes.dev
-  names:
-    kind: WeatherData
-    listKind: WeatherDataList
-    plural: weatherdatas
-    singular: weatherdata
-  scope: Namespaced
-  versions:
-    - additionalPrinterColumns:
-        - jsonPath: .spec.mainWeather
-          name: MainWeather
-          priority: 0
-          type: string
-        - format: double
-          jsonPath: .spec.temperature
-          name: Temperature
-          priority: 0
-          type: number
-      name: v1
-      schema:
-        openAPIV3Schema:
-          properties:
-            spec:
-              description: Specification of the kubernetes object.
-              properties:
-                mainWeather:
-                  type: string
-                description:
-                  type: string
-                temperature:
-                  format: double
-                  type: number
-                sunrise:
-                  format: date-time
-                  type: string
-                sunset:
-                  format: date-time
-                  type: string
-              type: object
-          type: object
-      served: true
-      storage: true
-```
+KubeOps generates the CRDs found in the repository at <https://github.com/buehler/kubernetes-operator-exercise/tree/main/config/crds>.
 
 These CRDs may now be installed into Kubernetes with `kubectl apply`.
 
-### Reconcile the Custom Resource
+### Reconcile the Custom Resource {.unnumbered}
 
 As the operator base and the CRDs are prepared, you are now to build the operator logic. The operator must fulfill the following requirements:
 
@@ -307,6 +213,6 @@ As the operator base and the CRDs are prepared, you are now to build the operato
 - A validator checks if the longitude and latitude values are possible and denies the creation of the object if they are not within the boundaries
 - A validator checks if a weather data object contains an owner reference
 
-#### Solution
+#### Solution {.unnumbered}
 
 Since it is not feasible to print the whole source code in this exercise, please find a possible solution on GitHub: <https://github.com/buehler/kubernetes-operator-exercise>.
