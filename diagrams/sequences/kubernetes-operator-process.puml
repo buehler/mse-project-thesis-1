@@ -14,12 +14,14 @@ u -> api : ""kubectl apply -f file.yaml""
 
 alt Mutator registered for type
     api -> mut : Check for mutations
-    mut --> api : JSONPatch with zero or more patches
+    activate mut
+    return JSONPatch with zero or more patches
 end
 
 alt Validator registered for type
     api -> val : Validate resource
-    val --> api : Allowed / Not Allowed
+    activate val
+    return Allowed / Not Allowed
 end
 
 api -> node : Create / Update / Delete resource
