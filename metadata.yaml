@@ -23,8 +23,8 @@ abstract: |
   (or third-party) software, it is often required to introduce code changes
   to the modern apps. To eliminate the leakage of credentials (such as access
   tokens) and to reduce the risk of bugs, this project targets the dynamic
-  conversion of a user identity. This identity authenticates the user over
-  the wire instead of the effective credentials. This project gives the
+  conversion of a user identity. This identity is used to authenticate the
+  user instead of the original credentials. This project gives the
   conceptional idea and the architecture, as well as a platform specific
   example of such a solution. A proof of concept answers
   relevant questions for the realization of such a framework. The evaluation
