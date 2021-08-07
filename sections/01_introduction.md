@@ -8,8 +8,8 @@ The goal of the project "Distributed Authentication Mesh" is a concept and an ar
 
 The remainder of the report describes used technologies, terminology, and concepts. Furthermore, the state of the art gives an overview of the current situation and the present solutions in practice. With the description of the distributed authentication mesh, the report shows the conceptual idea and the architecture as well as a platform-specific example in Kubernetes. The feasibility of the concept is tested with the implementation of a Proof of Concept (PoC) on Kubernetes. The evaluation, following the description of the solution, validates if the goals and non-goals of the solution are met. The conclusion gives an overview of the work and a summary of the project.
 
-For further reading, basic knowledge about Docker and microservices is required. The implementation of the Proof of Concept (PoC) is based on Kubernetes to display the concepts of the solution in a practical manner. In terms of authentication and authorization, the PoC uses OpenID Connect and Basic Authentication, which are both described in later sections.
+For the understanding of the report, basic knowledge about Docker, and microservices is required. The implementation of the PoC is based on Kubernetes to display the concepts of the solution in a practical manner. In terms of authentication and authorization, the PoC uses OpenID Connect and Basic Authentication, which are both described in later sections.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEyNDc2ODMwNzksMTM2ODY3MjUzMywtMT
-YxNTM3NzcxXX0=
+eyJoaXN0b3J5IjpbLTExNDI0MTE0NDYsLTEyNDc2ODMwNzksMT
+M2ODY3MjUzMywtMTYxNTM3NzcxXX0=
 -->
