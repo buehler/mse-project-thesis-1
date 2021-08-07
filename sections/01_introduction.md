@@ -6,10 +6,10 @@ However, a specific problem is not yet solved: "dynamic" trusted communication b
 
 The goal of the project "Distributed Authentication Mesh" is a concept and an architecture for a solution to the problem of dynamic credential conversion. By introducing multiple elements, such as a translator in conjunction with a proxy that is capable of modifying HTTP headers in-flight, the described problem can be solved. The proposed concept makes use of a common domain language to transfer the authenticated identity of a user between services of an application. The proxy intercepts the requests and instructs the translator to transform the common language into the valid authentication format of the destination.
 
-The remainder of the report describes used technologies, terminology, and concepts. Furthermore, the state of the art gives an overview of the current situation and the present solutions in practice. With the description of the distributed authentication mesh, the report shows the conceptual idea and the architecture as well as a platform-specific example in Kubernetes. The feasibility of the concept is tested with the implementation of a POC on Kubernetes. The evaluation, following the description of the solution, validates if the goals and non-goals of the solution are met. The conclusion gives an overview of the work and a summary of the project.
+The remainder of the report describes used technologies, terminology, and concepts. Furthermore, the state of the art gives an overview of the current situation and the present solutions in practice. With the description of the distributed authentication mesh, the report shows the conceptual idea and the architecture as well as a platform-specific example in Kubernetes. The feasibility of the concept is tested with the implementation of a PoC on Kubernetes. The evaluation, following the description of the solution, validates if the goals and non-goals of the solution are met. The conclusion gives an overview of the work and a summary of the project.
 
 For further reading, basic knowledge about Docker and microservices is required. The implementation of the Proof of Concept (PoC) is based on Kubernetes to display the concepts of the solution in a practical manner. In terms of authentication and authorization, the PoC uses OpenID Connect and Basic Authentication, which are both described in later sections.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjQ5MzMyMTg5LDEzNjg2NzI1MzMsLTE2MT
-UzNzc3MV19
+eyJoaXN0b3J5IjpbMjE0NTUzMDM2NSwxMzY4NjcyNTMzLC0xNj
+E1Mzc3NzFdfQ==
 -->
