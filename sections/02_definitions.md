@@ -14,7 +14,7 @@ The solution may be runnable on various platforms but to provide a practical dem
 
 ## Kubernetes as an Orchestration Engine
 
-This section provides a general overview of Kubernetes. Kubernetes is a prominent orchestration engine that manages workloads on worker-nodes.
+This section provides a general overview of Kubernetes. Kubernetes is a prominent orchestration engine that manages workloads on worker-nodes. In this project, Kubernetes is used as platform for the specific implementation example in the PoC. The proposed solution does not require a cloud environment, but the automation in 
 
 ### Introduction
 
@@ -137,5 +137,6 @@ The stated JWT token contains:
 
 "Zero Trust" is a security model with a focus on protecting data and user credentials. The basic idea of zero trust is to assume that an attacker is always present. It does not matter if the application resides within an enterprise network, zero trust assumes that enterprise networks are no more trustworthy than any other public network. As a consequence of zero trust, applications are not implicitly trusted. Therefore, user credentials must be presented and validated for each access to a resource [@rose:zero-trust]. Zero trust can be summarized with: "Never trust, always verify".
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNzM4OTA3OTQwLC0zMTg5ODE0Nl19
+eyJoaXN0b3J5IjpbMTkzMzY4ODY1Miw3Mzg5MDc5NDAsLTMxOD
+k4MTQ2XX0=
 -->
