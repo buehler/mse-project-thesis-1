@@ -8,7 +8,7 @@ This project addresses the specific problem of declarative conversion of user cr
 
 To solve this problem, an automation component enhances services that are part of the application with additional functionality. A proxy in front of the service captures in-, and outgoing traffic to modify the `Authorization` HTTP header. Additionally, a translator transforms the original authentication data into a form of identity and encodes it with a common language format. The receiving service can validate this encoded identity and transforms the identity into valid user credentials again. This automatical transformation of credentials (e.g. from OIDC to Basic Auth) replaces manual work which may introduce code changes to either service. The deliverables of this and further projects may aid applications or APIs to communicate with each other despite different authentication mechanisms.
 
-The solution may be runnable on various platforms but to provide a practical demo application, the Proof of Concept (PoC) runs on Kubernetes. Kubernetes^[<https://kubernetes.io/>] is an orchestration platform that works with containerized applications. The PoC resides in an initial version in an open-source GitHub repository. The POC demonstrates that it is possible to instruct an Envoy^[<https://www.envoyproxy.io/>] proxy to communicate with an injected service to modify authentication credentials in-flight. To separate the proposed solution from more complex concepts like a service mesh, the PoC can run without a service mesh on a Kubernetes cluster and uses the built-in service discovery of Kubernetes to communicate.
+The solution may be runnable on various platforms but to provide a practical demo application, the Proof of Concept (PoC) runs on Kubernetes. Kubernetes^[<https://kubernetes.io/>] is an orchestration platform that works with containerized applications. The PoC resides in an initial version in an open-source GitHub repository. The PoC demonstrates that it is possible to instruct an Envoy^[<https://www.envoyproxy.io/>] proxy to communicate with an injected service to modify authentication credentials in-flight. To separate the proposed solution from more complex concepts like a service mesh, the PoC can run without a service mesh on a Kubernetes cluster and uses the built-in service discovery of Kubernetes to communicate.
 
 ## Kubernetes as an Orchestration Engine
 
@@ -135,5 +135,5 @@ The stated JWT token contains:
 
 "Zero Trust" is a security model with a focus on protecting data and user credentials. The basic idea of zero trust is to assume that an attacker is always present. It does not matter if the application resides within an enterprise network, zero trust assumes that enterprise networks are no more trustworthy than any other public network. As a consequence of zero trust, applications are not implicitly trusted. Therefore, user credentials must be presented and validated for each access to a resource [@rose:zero-trust]. Zero trust can be summarized with: "Never trust, always verify".
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTI2ODQxNTkzNF19
+eyJoaXN0b3J5IjpbLTMxODk4MTQ2XX0=
 -->
