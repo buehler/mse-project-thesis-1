@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "concurrently": "6.2.0",
-    "http-server": "0.12.3",
+    "http-server": "0.13.0",
     "nodemon": "2.0.7"
   }
 }
