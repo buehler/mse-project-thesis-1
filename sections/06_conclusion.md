@@ -10,7 +10,7 @@ To solve the stated problems in {@sec:state_of_the_art}, a conceptional architec
 
 The idea of the distributed authentication mesh came close to the concept of SAML (Security Assertion Markup Language). While SAML provides a federated identity, it requires the participating services to implement the SAML protocol as well, the authentication mesh removes this requirement. The shown concept improves the developer experience by allowing dynamic credential transformation.
 
-To validate if the concept is feasible, the proof of concept in {@sec:solution} has shown that it is possible to modify HTTP headers in-flight and therefore the core concept of the architecture is generally possible. Furthermore, {@sec:evaluation} checked if the given requirements and goals/non-goals were achieved with the proposed architecture. The evaluation shows that the solution is able to enhance general security by preventing the leakage of credentials.
+To validate if the concept is feasible, the Proof of Concept in {@sec:solution} has shown that it is possible to modify HTTP headers in-flight and therefore the core concept of the architecture is generally possible. Furthermore, {@sec:evaluation} checked if the given requirements and goals/non-goals were achieved with the proposed architecture. The evaluation shows that the solution is able to enhance general security by preventing the leakage of credentials.
 
 As complementation to the main delivery of this project - the concept of the distributed authentication mesh - teaching material was created that can be found in Appendix A. It targets the topic of "Kubernetes Operators and how to create them". This material may be used to introduce people to the operator pattern and helps to create a custom operator with a SDK.
 

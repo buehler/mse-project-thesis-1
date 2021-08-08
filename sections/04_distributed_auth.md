@@ -1,18 +1,18 @@
 # Distributed Authentication Mesh {#sec:solution}
 
-This section gives a general overview of the proposed solution. Furthermore, boundaries of the solution are provided along with common software engineering elements like requirements, non-functional requirements, and the documentation of the architecture.
+This section gives an overview and an in-depth documentation of the proposed solution. Furthermore, boundaries of the solution are provided along with common software engineering elements like requirements, non-functional requirements, an abstract and a conceptional architecture.
 
-The proposed architecture provides a generic description for a solution to the described problem. For this project, a proof of concept (POC) gives insights into the general topic of manipulating HTTP requests in-flight. The POC is implemented to run on a Kubernetes cluster to provide a practical example.
+The proposed architecture provides a generic description for a solution to the described problem. For this project, a Proof of Concept (PoC) gives insights into the topic of manipulating HTTP requests in-flight. The PoC is implemented to run on a Kubernetes cluster to provide a practical example.
 
 ## Definition
 
-A solution for the stated problems in {@sec:deficiencies} must be able to transform arbitrary credentials into a format that the target service understands. For this purpose, the architecture contains a service that runs as a sidecar among the target service. This sidecar intercepts requests to the target and transforms the Authorization HTTP header. The sidecar is - like in a service mesh - used to intercept inbound and outbound traffic.
+A solution for the stated problems in {@sec:state_of_the_art} must be stateless and able to transform arbitrary credentials into a format that the target service understands. For this purpose, the architecture contains a service that runs as a sidecar among the target service. This sidecar intercepts requests to the target and transforms the Authorization HTTP header. The sidecar is used to intercept inbound and outbound traffic.
 
 However, the solution **must not** interfere with the data flow itself. The problem of proxying data from point A to B is well solved. In the given work, an Envoy proxy delivers data between the services. Envoy allows the usage of an external service to modify requests in-flight.
 
 ## Goals and Non-Goals of the Project
 
-This section presents the functional and non-functional requirements and goals for the solution. It is important to note that the implemented proof of concept (POC) will not achieve all goals. Further work is needed to implement a solution according to the architecture that adheres to the stated requirements.
+This section presents the functional and non-functional requirements and goals for the solution. It is important to note that the implemented Proof of Concept (PoC) will not achieve all goals. Further work is needed to implement a solution according to the architecture that adheres to the stated requirements.
 
 In {@tbl:functional-requirements}, we present the list of functional requirements or goals (REQ) for the proposed solution and the project in general.
 
@@ -94,7 +94,7 @@ This use case can be changed such that the receiving service is not a legacy sof
 
 The following sections provide an architectural overview of the proposed solution. The brief description gives an initial overview of the architecture and the conceptional idea. Afterward, an abstract architecture describes the concepts behind the distributed authentication mesh. Then the architecture is concretized with platform-specific examples based on Kubernetes.
 
-The reader should note that the proposed architecture does not match the implementation of the POC to the full extent. The goal of this project is to provide an abstract idea to implement such an authentication mesh, while the POC proves the ability to modify HTTP requests in-flight.
+The reader should note that the proposed architecture does not match the implementation of the PoC to the full extent. The goal of this project is to provide an abstract idea to implement such an authentication mesh, while the PoC proves the ability to modify HTTP requests in-flight.
 
 ### Brief Description
 
@@ -176,7 +176,7 @@ Since the authentication mesh relies on external software to take care of commun
 
 ![Inbound Accepted Networking Sequence](diagrams/sequences/networking-process-inbound.puml){#fig:inbound_networking_process}
 
-{@fig:inbound_networking_process} shows the general invocation during inbound request processing. When the proxy receives a request (in the stated example by the configured Kubernetes service), it calls the translator with the HTTP request detail. The POC is implemented with an "Envoy" proxy. Envoy allows an external service to perform "external authorization"^[<https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter>] during which the external service may:
+{@fig:inbound_networking_process} shows the general invocation during inbound request processing. When the proxy receives a request (in the stated example by the configured Kubernetes service), it calls the translator with the HTTP request detail. The PoC is implemented with an "Envoy" proxy. Envoy allows an external service to perform "external authorization"^[<https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter>] during which the external service may:
 
 - Add new headers before reaching the destination
 - Overwrite headers before reaching the destination
@@ -184,7 +184,7 @@ Since the authentication mesh relies on external software to take care of commun
 - Add new headers before returning the result to the caller
 - Overwrite headers before returning the result to the caller
 
-The translator uses this concept to consume a specific and well-known header to read the identity of the authorized user in the DSL. The identity is then validated and transformed to the authentication credentials needed by the destination. Then, the translator instructs Envoy to set the credentials for the upstream. In the POC, this is achieved by setting the `Authorization` header to static Basic Authentication (RFC7617) credentials.
+The translator uses this concept to consume a specific and well-known header to read the identity of the authorized user in the DSL. The identity is then validated and transformed to the authentication credentials needed by the destination. Then, the translator instructs Envoy to set the credentials for the upstream. In the PoC, this is achieved by setting the `Authorization` header to static Basic Authentication (RFC7617) credentials.
 
 ##### Inbound rejected Communication for an Application
 
@@ -215,7 +215,7 @@ When the translator receives a request to create the required credentials, it pe
 
 The translator is the critical part of the authentication mesh. If it receives invalid credentials (e.g. an identity that has been tampered with, or just a wrong username/password combination), it must reject the request with a `HTTP 403 Forbidden` response. If no identity is provided at all, a `HTTP 401 Unauthorized` must be sent. When the translation engine encounters any unexpected error during translation of the identity (like not being able to access the secret storage, or failure of some database), it must reject the request. The translator must reject any request that cannot be transformed successfully. This error handling is used on the receiving and the sending side.
 
-In the POC, the proof of integrity is not implemented, but the transformation takes place, where a "Bearer Token"^[Access token of an IDP.] is used to check if the user may access the destination and then replaces the token with static Basic Authentication credentials.
+In the PoC, the proof of integrity is not implemented, but the transformation takes place, where a "Bearer Token"^[Access token of an IDP.] is used to check if the user may access the destination and then replaces the token with static Basic Authentication credentials.
 
 ## Securing the Communication between Applications
 
@@ -236,11 +236,11 @@ X509 certificates - as defined in **RFC5280** [@RFC5280] - introduce another val
 
 While X509 certificates could be used instead of JWT to transport this data, using certificates would enforce the translator to act as intermediate CA and create new certificates for each request. From our experience, creating, extracting, and manipulating certificates, for example in C\#, is not a task done lightely. Since this solution should be as easy to use as it can be, manipulating certificates in translators do not seem to be a feasible option. For the sake of simplicity and well-known usage, further work on this project will probably use JWT tokens to transmit the identity data.
 
-## Implementation Proof of Concept (POC) {#sec:poc}
+## Implementation Proof of Concept (PoC) {#sec:poc}
 
-To prove that the general idea of the solution is possible, a POC is implemented during the work of this project. The following technologies and environments build the foundation of the POC:
+To prove that the general idea of the solution is possible, a PoC is implemented during the work of this project. The following technologies and environments build the foundation of the PoC:
 
-- Environment: The POC is implemented on a Kubernetes environment to enable automation and easy deployment for testing
+- Environment: The PoC is implemented on a Kubernetes environment to enable automation and easy deployment for testing
 - "Automation": A Kubernetes operator, written in .NET (C\#) with the "Dotnet Operator SDK"^[<https://github.com/buehler/dotnet-operator-sdk>]
 - "Proxy": Envoy proxy which gets the required configuration injected as Kubernetes ConfigMap file
 - "Translator": A .NET (F\#) application that uses the Envoy gRPC definitions to react to Envoy's requests and poses as the external service for the external authorization
@@ -249,7 +249,7 @@ To prove that the general idea of the solution is possible, a POC is implemented
   - "Modern Service": An ASP.NET API application that can verify an OIDC token from ZITADEL
   - "Legacy Service": A "legacy" ASP.NET API application that is only able to verify `Basic Auth` (RFC7617, see {@sec:basic_auth})
 
-The POC addresses the following questions:
+The PoC addresses the following questions:
 
 - Is it possible to intercept HTTP requests to an arbitrary service
 - Is it further possible to modify the HTTP headers of the request
@@ -258,7 +258,7 @@ The POC addresses the following questions:
   - The correct configuration for Envoy to use external authentication
   - The translator module to transform the credentials
 
-Based on the results of the POC, the following further work may be possible:
+Based on the results of the PoC, the following further work may be possible:
 
 - Specify the concrete format to transport identities
 - Implement a secure way of transporting identities with validation of the integrity
@@ -268,17 +268,17 @@ Based on the results of the POC, the following further work may be possible:
 
 For the solution to be production-ready, at least the secure communication channel between elements of the mesh as well as the DSL for the identity must be implemented. To be of use in current cloud environments, an implementation in Kubernetes can provide insights on how to develop the solution for other orchestrators than Kubernetes.
 
-### Installation of the POC {#sec:install_poc}
+### Installation of the PoC {#sec:install_poc}
 
 This section shows how to install the case study locally. The installation guide is also hosted on GitHub (<https://github.com/WirePact/wirepact-poc>). The installation consists of the operator and the case study with three application parts. To access the application, Ambassador acts as API gateway.
 
-To begin the installation of the POC, a Kubernetes environment is needed. On Windows and Apple devices, Docker Desktop with Kubernetes^[<https://docs.docker.com/desktop/kubernetes/>] is recommended. Other environments, for example minikube^[<https://minikube.sigs.k8s.io/docs/start/>], work as well. The next step is to install Ambassador as API gateway with the shell script `./Kubernetes/case-study/install-ambassador.sh`. On Windows, the Subsystem for Linux or the git bash can be used to execute the shell script. Otherwise, the PowerShell can be used to execute the `kubectl` commands in the shell script one by one.
+To begin the installation of the PoC, a Kubernetes environment is needed. On Windows and Apple devices, Docker Desktop with Kubernetes^[<https://docs.docker.com/desktop/kubernetes/>] is recommended. Other environments, for example minikube^[<https://minikube.sigs.k8s.io/docs/start/>], work as well. The next step is to install Ambassador as API gateway with the shell script `./Kubernetes/case-study/install-ambassador.sh`. On Windows, the Subsystem for Linux or the git bash can be used to execute the shell script. Otherwise, the PowerShell can be used to execute the `kubectl` commands in the shell script one by one.
 
 For the last step, the `Kustomize`^[<https://kustomize.io/>] executable is required. Change into the `Kubernetes` directory and run `kustomize build` to see the output of the `kustomization.yaml` file or `kustomize build | kubectl apply -f -` to build and directly apply the result to Kubernetes. This installs the operator and the case study. When everything is set up, the frontend application can be accessed via `https://localhost`, `https://kubernetes.docker.internal`, or `https://kubernetes.local` depending on the hosts config of the machine.
 
 To be able to log in into the frontend application, any ZITADEL account may be used. It does not matter if the account is bound to an organization or resides in the global organization.
 
-### Case Study for the POC
+### Case Study for the PoC
 
 The demo application demonstrates the particular use case of the distributed authentication mesh. The application resides in an open-source repository on GitHub (<https://github.com/WirePact/poc-showcase-app>).
 
@@ -294,27 +294,27 @@ In {@fig:seq_showcase_call}, we show the process of a user call in the demo appl
 
 Depending on the configuration (i.e. the environment variable `USE_WIREPACT`), the modern service will call the legacy application with either transformed basic authentication credentials (when `USE_WIREPACT=false`) or with the ZITADEL access token (`USE_WIREPACT=true`). Either way, the legacy API receives basic authentication credentials in the form of `<username>:<password>` and returns the data.
 
-To install and run the case study without any interference of the operator or the rest of the solution, follow the installation guide in the readme on <https://github.com/WirePact/poc-showcase-app>. To install and use the whole POC, following the instructions in {@sec:install_poc} will install the operator and the case study.
+To install and run the case study without any interference of the operator or the rest of the solution, follow the installation guide in the readme on <https://github.com/WirePact/poc-showcase-app>. To install and use the whole PoC, following the instructions in {@sec:install_poc} will install the operator and the case study.
 
 ### Automation Engine for Applications
 
-As explained in {@sec:abstract_architecture}, the automation engine is generally optional. If omitted, the user is responsible for configuring the proxy and the translator. In the POC, the automation engine is a Kubernetes operator written with the .NET SDK in C\#. The source of the POC operator resides on GitHub: <https://github.com/WirePact/poc-operator>. The operator (automated and customized management of resources in Kubernetes, see {@sec:kubernetes_operator}) intercepts events for `Deployments` and `Services`. To update services and deployments in the POC, an annotation (key-value storage in the metadata of an object in Kubernetes) is used. In future work, the operator may react to Custom Resource Definitions (CRD) as well.
+As explained in {@sec:abstract_architecture}, the automation engine is generally optional. If omitted, the user is responsible for configuring the proxy and the translator. In the PoC, the automation engine is a Kubernetes operator written with the .NET SDK in C\#. The source of the PoC operator resides on GitHub: <https://github.com/WirePact/poc-operator>. The operator (automated and customized management of resources in Kubernetes, see {@sec:kubernetes_operator}) intercepts events for `Deployments` and `Services`. To update services and deployments in the PoC, an annotation (key-value storage in the metadata of an object in Kubernetes) is used. In future work, the operator may react to Custom Resource Definitions (CRD) as well.
 
 ![Activity Model for Kubernetes Resources in the Automation Engine](diagrams/states/operator-events.puml){#fig:poc_operator_events}
 
 {@fig:poc_operator_events} gives an overview of the process that an event of the Kubernetes API completes. When the operator receives a notification by Kubernetes that a service or a deployment was created or modified, the operator determines the type and uses the specific controller to reconcile the resource. If the entity is a deployment/service and is relevant for the authentication mesh, the operator will modify the deployment/service.
 
-![Automated Configuration of a Kubernetes Deployment in the POC](diagrams/states/operator-deployment.puml){#fig:poc_operator_deployment}
+![Automated Configuration of a Kubernetes Deployment in the PoC](diagrams/states/operator-deployment.puml){#fig:poc_operator_deployment}
 
 In the case of a deployment, {@fig:poc_operator_deployment} shows the process for the management-event of the deployment. The first step of the operator is to determine if the entity is relevant for the authentication mesh. If the deployment contains the annotation `ch.wirepact/port` in its metadata, it is automatically part of the mesh. If the deployment is already configured, further reconfiguration is skipped. If not, the operator fetches the already configured ports of the deployment, and generates two additional ports. One port is used for the Envoy sidecar while the other is configured for the translator sidecar. The next step is to generate and store the Envoy configuration in a Kubernetes `ConfigMap`. Last, the sidecars are injected into the deployment configuration and the Kubernetes client stores the modified manifest.
 
-![Automated Configuration of a Kubernetes Service in the POC](diagrams/states/operator-service.puml){#fig:poc_operator_service}
+![Automated Configuration of a Kubernetes Service in the PoC](diagrams/states/operator-service.puml){#fig:poc_operator_service}
 
 When reconciling a service, {@fig:poc_operator_service} shows the activities of the operator during the reconciliation. The service counts as relevant if the annotation `ch.wirepact/deployment` is present in the metadata of the service. The value of this annotation stores the deployment object to which the service should point. The operator reads the annotations on the service to determine the port in question and searches for the port in its manifest. The port will receive a new "target port" that points to the Envoy port of the deployment. Last, the Kubernetes client will store the changed service.
 
 ### Network and Routing Proxy for Communication
 
-In the POC, the proxy sidecar is an Envoy proxy with its configuration injected by the automation engine. The operator injects the sidecar whenever a `Deployment` is created or updated via the Kubernetes API. A `ConfigMap` with the envoy configuration is created during reconciliation.
+In the PoC, the proxy sidecar is an Envoy proxy with its configuration injected by the automation engine. The operator injects the sidecar whenever a `Deployment` is created or updated via the Kubernetes API. A `ConfigMap` with the envoy configuration is created during reconciliation.
 
 Two parts of the envoy configuration are crucial. First, the `filter_chain` of the inbound traffic listener contains a list of `http_filters`. Within this list of filters, the external authorization filter is added to force Envoy to check if a request is allowed or not:
 
@@ -366,7 +366,7 @@ This configures Envoy to find the external authorization service on the local lo
 
 ### Translator {#sec:poc_translator}
 
-The translator is the part of the POC that performs the modification of HTTP headers per request. Since the intermediate DSL is not implemented in the POC, the translator converts an access token to static basic authentication credentials. If any error occurs or the translator call exceeds ten seconds, Envoy returns a HTTP 403 Forbidden message by default. The source code is on GitHub: <https://github.com/WirePact/poc-demo-translator>.
+The translator is the part of the PoC that performs the modification of HTTP headers per request. Since the intermediate DSL is not implemented in the PoC, the translator converts an access token to static basic authentication credentials. If any error occurs or the translator call exceeds ten seconds, Envoy returns a HTTP 403 Forbidden message by default. The source code is on GitHub: <https://github.com/WirePact/poc-demo-translator>.
 
 ![Communication with an Invalid Access Token](diagrams/sequences/translator-poc-process-403.puml){#fig:poc_translator_403}
 
@@ -374,7 +374,7 @@ The translator is the part of the POC that performs the modification of HTTP hea
 
 ![Communication with a Valid Access Token](diagrams/sequences/translator-poc-process-200.puml){#fig:poc_translator_200}
 
-In contrast to {@fig:poc_translator_403}, the sequence in {@fig:poc_translator_200} shows the success path of a communication. If the given access token is valid, the translator fetches the static Basic Authentication credentials (i.e. username and password) from the secret storage. The secret storage in the POC is a simple Kubernetes Secret. The received credentials are then transformed in the correct encoded Basic Authentication format (as described in RFC7617). The translator returns an instruction set for Envoy to process the HTTP request. Envoy executes the instructions and forwards the call to the destination and returns the response - if any.
+In contrast to {@fig:poc_translator_403}, the sequence in {@fig:poc_translator_200} shows the success path of a communication. If the given access token is valid, the translator fetches the static Basic Authentication credentials (i.e. username and password) from the secret storage. The secret storage in the PoC is a simple Kubernetes Secret. The received credentials are then transformed in the correct encoded Basic Authentication format (as described in RFC7617). The translator returns an instruction set for Envoy to process the HTTP request. Envoy executes the instructions and forwards the call to the destination and returns the response - if any.
 
 #### Instructions for Rejected Request
 

@@ -34,9 +34,8 @@
 |        | mesh is already in place, the solution must be able to           |
 |        | work with the provided infrastructure.                           |
 +--------+------------------------------------------------------------------+
-| NFR 7  | The architecture **must** be scalable. The provided software     |
-|        | must be able to scale according to the business needs            |
-|        | of the overall system.                                           |
+| NFR 7  | The architecture **must** be scalable.      |
+|        |  |
 +--------+------------------------------------------------------------------+
 | NFR 8  | Each translator **should** only handle one authentication scheme |
 |        | to ensure separation of concerns and scalability of              |

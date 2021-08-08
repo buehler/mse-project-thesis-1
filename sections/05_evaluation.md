@@ -12,7 +12,7 @@ To show that the architecture of the distributed authentication mesh does improv
 
 Without the distributed authentication mesh, credentials like access tokens or basic authentication credentials are transmitted in the HTTP headers. This is a well-known way of authorizing requests [@RFC1945]. If the current standard is regarded "secure" - not judging by the authorization scheme - then the mesh is secure as well. It even improves security by hiding the original credentials.
 
-In the POC, the credentials are still transmitted. The POC is responsible to prove that modifying HTTP headers during a request is possible. Securing the implementation of the concept is not part of this project.
+In the PoC, the credentials are still transmitted. The PoC is responsible to prove that modifying HTTP headers during a request is possible. Securing the implementation of the concept is not part of this project.
 
 ### NFR 2: Secure implementation
 
@@ -49,7 +49,7 @@ The architecture does not give hints about the effective performance impact. Thi
 
 > NFR 5: The solution is modular. It is extensible with additional "translators", that provide the means of transforming the given credentials to other target formats.
 
-The architecture shows that the translator is a component that is orchestrated by the automation engine. The translators should target one specific authentication scheme and can be implemented in any language or framework. They must only adhere to the principles of the mesh. It is not defined how the communication between the proxy and the translator takes place. In the POC, Envoy (as the proxy) has a well-defined gRPC definition for such communication. Further work may contain the definition of translators for the automation engine. Using Envoy and the gRPC definition is a feasible option to implement a production-ready version of the mesh when using a cloud environment.
+The architecture shows that the translator is a component that is orchestrated by the automation engine. The translators should target one specific authentication scheme and can be implemented in any language or framework. They must only adhere to the principles of the mesh. It is not defined how the communication between the proxy and the translator takes place. In the PoC, Envoy (as the proxy) has a well-defined gRPC definition for such communication. Further work may contain the definition of translators for the automation engine. Using Envoy and the gRPC definition is a feasible option to implement a production-ready version of the mesh when using a cloud environment.
 
 ### NFR 6: Interoperability
 
@@ -79,7 +79,7 @@ The proxy and translator only modify HTTP headers. The effective transmission of
 
 > NFR 10: The solution handles errors in the translation and the automation engine according to the architectural description.
 
-All parts of the authentication mesh rely on external software, with the exception of translators. As stated above, error handling for the transmission of data is not needed since this is done by a proxy (Envoy in the POC). All other components are not part of the critical path. {@sec:poc_translator} states that in the case of a timeout, error, or invalid data, the request must be blocked by the translator. Only valid requests must be let through to the destination.
+All parts of the authentication mesh rely on external software, with the exception of translators. As stated above, error handling for the transmission of data is not needed since this is done by a proxy (Envoy in the PoC). All other components are not part of the critical path. {@sec:poc_translator} states that in the case of a timeout, error, or invalid data, the request must be blocked by the translator. Only valid requests must be let through to the destination.
 
 ## Prevent Leakage of Credentials
 

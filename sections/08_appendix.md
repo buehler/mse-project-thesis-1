@@ -1,4 +1,12 @@
-# Appendix A: Teaching Material for Kubernetes Operators {#sec:teaching-material .unnumbered}
+# Appendix A: Common Kubernetes Terminology {.unnumbered}
+
+In {@tbl:kubernetes_terminology}, we state the most common Kubernetes terminology. The table provides a list of terms that is used to explain concepts like the operator pattern.
+
+```{.include}
+tables/kubernetes_terminology.md
+```
+
+# Appendix B: Teaching Material for Kubernetes Operators {#sec:teaching-material .unnumbered}
 
 ## Motivation {.unnumbered}
 
