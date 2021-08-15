@@ -59,7 +59,7 @@ An Operator in Kubernetes is an extension to the Kubernetes control plane and AP
 
 Some examples of application operators are:
 
-- Prometheus^[Open-source monitoring and alerting toolkit] Operator^[<https://github.com/prometheus-operator/prometheus-operator>]: Manages instances of Prometheus in a cluster
+- Prometheus Operator^[<https://github.com/prometheus-operator/prometheus-operator>]: Manages instances of Prometheus (open-source monitoring and alerting toolkit) in a cluster
 - Postgres Operator^[<https://github.com/zalando/postgres-operator>]: Manages PostgreSQL clusters inside Kubernetes, with the support of multiple instance database clusters
 
 There exists a broad list of operators, which can be (partially) viewed on [https://operatorhub.io](https://operatorhub.io/).
@@ -69,6 +69,8 @@ There exists a broad list of operators, which can be (partially) viewed on [http
 In {@fig:02_kubernetes_operator_workflow}, we depict the general workflow of an event that is managed by an operator. When an operator is installed and runs on a Kubernetes cluster, it registers "Resource Watchers" with the API and receives notifications if the master node modifies resources. The overviewed events are "Added", "Modified" and "Deleted". There are two additional events that may be returned by the API ("Error" and "Bookmark"), but they are typically not needed for reconciliation.
 
 When the user interacts with the Kubernetes API (e.g. via the `kubectl` executable) and creates a new instance of a resource, the API will first call any "Mutator" in a serial manner. After the mutators, the API will call any "Validators" in parallel and if no validator objects against the creation, the API will then store the resource and tries to apply the transition for the new desired state. Now, the operator receives a notification about the watched resource and may interact with the event. Such action may include updating resources, create more resources or even delete other instances.
+
+A theoretical example of the concept is an Operator that creates database users based on a custom resource definition. When a user creates a custom resource with a username and a password, the Operator reacts to the creation and calls for validators to check if the username is set and the password is set. If the validation passes, the mutator may change the username according to some rules (e.g. no uppercase letters) and then the API stores the custom resource. After the resource is stored, the Operator gets notified about the effective "creation" and can reconcile the resource accordingly.
 
 ## The Sidecar Pattern {#sec:kubernetes_sidecar}
 
@@ -133,7 +135,7 @@ The stated JWT token contains:
 }
 ```
 
-Such JWT tokens contain information as well as a hash to secure integrity of the data. The mechanism of JWT tokens could be used to implement the "common language format" for the solution. It provides a mechanism to transmit data and protect them against modification with a hash.
+Such JWT tokens contain information as well as a hash to secure integrity of the data. The mechanism of JWT tokens could be used to implement the "common language format" for the solution. It provides a mechanism to transmit data and protects the data against modification with a hash.
 
 ### Zero Trust Environment {#sec:zero-trust}
 

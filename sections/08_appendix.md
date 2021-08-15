@@ -6,7 +6,17 @@ In {@tbl:kubernetes_terminology}, we state the most common Kubernetes terminolog
 tables/kubernetes_terminology.md
 ```
 
-# Appendix B: Teaching Material for Kubernetes Operators {#sec:teaching-material .unnumbered}
+# Appendix B: Installation of the PoC {.unnumbered}
+
+This section shows how to install the case study locally. The installation guide is also hosted on GitHub (<https://github.com/WirePact/wirepact-poc>). The installation consists of the operator and the case study with three application parts. To access the application, Ambassador acts as API gateway.
+
+To begin the installation of the PoC, a Kubernetes environment is needed. On Windows and Apple devices, Docker Desktop with Kubernetes^[<https://docs.docker.com/desktop/kubernetes/>] is recommended. Other environments, for example minikube^[<https://minikube.sigs.k8s.io/docs/start/>], work as well. The next step is to install Ambassador as API gateway with the shell script `./Kubernetes/case-study/install-ambassador.sh`. On Windows, the Subsystem for Linux or the git bash can be used to execute the shell script. Otherwise, the PowerShell can be used to execute the `kubectl` commands in the shell script one by one.
+
+For the last step, the `Kustomize`^[<https://kustomize.io/>] executable is required. Change into the `Kubernetes` directory and run `kustomize build` to see the output of the `kustomization.yaml` file or `kustomize build | kubectl apply -f -` to build and directly apply the result to Kubernetes. This installs the operator and the case study. When everything is set up, the frontend application can be accessed via `https://localhost`, `https://kubernetes.docker.internal`, or `https://kubernetes.local` depending on the hosts config of the machine.
+
+To be able to log in into the frontend application, any ZITADEL account may be used. It does not matter if the account is bound to an organization or resides in the global organization.
+
+# Appendix C: Teaching Material for Kubernetes Operators {#sec:teaching-material .unnumbered}
 
 ## Motivation {.unnumbered}
 

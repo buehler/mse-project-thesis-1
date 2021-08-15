@@ -20,14 +20,4 @@ activate k
     k -> k : Sign Certificate
 return Signed Certificate
 
-[-> p : Inbound Communication
-activate p
-    p -> t : Provide HTTP Request Headers\nRequest Translation
-    activate t
-    t -> t : Check Signature
-    t -> t : Transform Identity\nto Target Credentials
-    return Transformed Credentials
-    p ->] : Forward to Destination
-deactivate p
-
 @enduml

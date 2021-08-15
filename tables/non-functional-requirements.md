@@ -24,7 +24,7 @@
 |        | This is a general recommendation and some authentication         |
 |        | mechanism may exceed the stated 100ms.                           |
 +--------+------------------------------------------------------------------+
-| NFR 5  | The solution is modular. It is extensible with additional        |
+| NFR 5  | The solution must be extensible with additional                  |
 |        | "translators" that provide the means of transforming             |
 |        | the given credentials to other target formats.                   |
 +--------+------------------------------------------------------------------+
@@ -34,8 +34,10 @@
 |        | mesh is already in place, the solution must be able to           |
 |        | work with the provided infrastructure.                           |
 +--------+------------------------------------------------------------------+
-| NFR 7  | The architecture **must** be scalable.      |
-|        |  |
+| NFR 7  | The architecture **must** be scalable. In a cloud-native         |
+|        | environment, the application that is enhanced may                |
+|        | be scaled. Therefore, the solution must be able to scale         |
+|        | with the application as well.                                    |
 +--------+------------------------------------------------------------------+
 | NFR 8  | Each translator **should** only handle one authentication scheme |
 |        | to ensure separation of concerns and scalability of              |
