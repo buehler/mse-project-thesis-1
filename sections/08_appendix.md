@@ -12,7 +12,7 @@ This section shows how to install the case study locally. The installation guide
 
 To begin the installation of the PoC, a Kubernetes environment is needed. On Windows and Apple devices, Docker Desktop with Kubernetes^[<https://docs.docker.com/desktop/kubernetes/>] is recommended. Other environments, for example minikube^[<https://minikube.sigs.k8s.io/docs/start/>], work as well. The next step is to install Ambassador as API gateway with the shell script `./Kubernetes/case-study/install-ambassador.sh`. On Windows, the Subsystem for Linux or the git bash can be used to execute the shell script. Otherwise, the PowerShell can be used to execute the `kubectl` commands in the shell script one by one.
 
-For the last step, the `Kustomize`^[<https://kustomize.io/>] executable is required. Change into the `Kubernetes` directory and run `kustomize build` to see the output of the `kustomization.yaml` file or `kustomize build | kubectl apply -f -` to build and directly apply the result to Kubernetes. This installs the operator and the case study. When everything is set up, the frontend application can be accessed via `https://localhost`, `https://kubernetes.docker.internal`, or `https://kubernetes.local` depending on the hosts config of the machine.
+For the last step, the `Kustomize`^[<https://kustomize.io/>] executable is required. Change into the `Kubernetes` directory and run `kustomize build` to see the output of the `kustomization.yaml` file or `kustomize build | kubectl apply -f -` to build and directly apply the result to Kubernetes. This installs the operator and the case study. When everything is set up, the frontend application can be accessed via `https://localhost`, `https://kubernetes.docker.internal`, or `https://kubernetes.local` depending on the host's config of the machine.
 
 To be able to log in into the frontend application, any ZITADEL account may be used. It does not matter if the account is bound to an organization or resides in the global organization.
 
@@ -56,7 +56,7 @@ The Operator pattern can be used to manage entire applications, for example Prom
 
 Considering {@fig:teach_op_uml}, the following objects exist in or around an Operator:
 
-- **Watcher**^[<https://kubernetes.io/docs/reference/using-api/api-concepts/#efficient-detection-of-changes>]: The Operator registers one or multiple watchers with the Kubernetes API. This enables the Operator to receive events when a watched resource gets modified. A watcher can be namespaced or global and can watch one type of resource (e.g. Depoyments, Services, or a custom resource).
+- **Watcher**^[<https://kubernetes.io/docs/reference/using-api/api-concepts/#efficient-detection-of-changes>]: The Operator registers one or multiple watchers with the Kubernetes API. This enables the Operator to receive events when a watched resource gets modified. A watcher can be namespaced or global and can watch one type of resource (e.g. Deployments, Services, or a custom resource).
 - **Event**^[<https://kubernetes.io/docs/reference/using-api/api-concepts/#efficient-detection-of-changes>]: Events are the notification of the Kubernetes API that a watcher receives. Three relevant types of events exist:
   - _Added_: When a resource gets added to the watcher. This event is fired for each resource of the watched type when the watcher is registered.
   - _Modified_: When a resource that is already being watched gets modified.
@@ -64,7 +64,7 @@ Considering {@fig:teach_op_uml}, the following objects exist in or around an Ope
 - **Custom Resource Definition**^[<https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/>]: A CRD defines non-standard objects that extend the API of Kubernetes. There exist resource definitions for all standard resources like deployments and services. A CRD enables developers to create custom resources which can be reconciled by an Operator.
 - **Controller**^[<https://kubernetes.io/docs/concepts/architecture/controller/>]: Controllers are elements in an Operator that reconcile a specific CRD/resource. An Operator can contain multiple controllers and therefore manage multiple CRDs. A controller typically contains application logic to react to the events of the Kubernetes API.
 - **Finalizer**^[<https://kubernetes.io/blog/2021/05/14/using-finalizers-to-control-deletion/>]: A finalizer is a part of an Operator that enables asynchronous deletion processes in Kubernetes. When a resource contains finalizers in its metadata, the API will mark the resource as in pending deletion. An Operator may react to this state and can perform additional tasks, such as deleting a database or external resources. The Operator must then remove its finalizer entry. When all finalizers are removed, the resource is deleted. Otherwise, it will remain in the pending deletion state.
-- **Mutation Webhook**^[<https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/>]: A mutator (or mutation webhook) is an HTTP endpoint of an Operator. The endpoint will be called whenever a watched resource type is created/updated/deleted. A mutator may return an empty response to acknowledge the creation/modification/deletion of the resource or it can patch the resource before the effective action is executed. The patch must be in the form of a JSON Patch, as defined in **RFC6902** [@RFC6902]. As an example, one could create a profanity filter and remove "bad" usernames from resources. Mutators are **called in series** by the Kubernetes API.
+- **Mutation Webhook**^[<https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/>]: A mutator (or mutation webhook) is an HTTP endpoint of an Operator. The endpoint will be called whenever a watched resource type is created/updated/deleted. A mutator may return an empty response to acknowledge the creation/modification/deletion of the resource, or it can patch the resource before the effective action is executed. The patch must be in the form of a JSON Patch, as defined in **RFC6902** [@RFC6902]. As an example, one could create a profanity filter and remove "bad" usernames from resources. Mutators are **called in series** by the Kubernetes API.
 - **Validation Webhook**^[<https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/>]: In contrast to a mutation webhook, a validator (or validation webhook) may only accept or reject a resource. If multiple validators are registered for a certain type, they will be **called in parallel** by the Kubernetes API.
 
 ![Kubernetes Operator Workflow](diagrams/sequences/kubernetes-operator-process.puml){#fig:teach_kubernetes_operator_workflow tag="C.4" width=90%}
@@ -122,7 +122,7 @@ info: Microsoft.Hosting.Lifetime[0]
       Hosting environment: Development
 ```
 
-The empty Operator in C\# only registers the Operator logic with ASP.NET and starts the webserver. The minimal config required to run consists of:
+The empty Operator in C\# only registers the Operator logic with ASP.NET and starts the web server. The minimal config required to run consists of:
 
 `Program.cs`:
 
@@ -158,7 +158,7 @@ public class Startup
 
 Create the required objects in the Operator and create the CRD for Kubernetes. The CRD is the element that gets installed in the API of Kubernetes. The following two objects must be created:
 
-- **WeatherLocation**: Object that contains the required data to query a weather API for weather data. As an example, if the [OpenWeather API](https://openweathermap.org/api) is used, the object should include latitude and longitude to identify the point of interest. Depending on the API you intent to use, you may need to add other fields.
+- **WeatherLocation**: Object that contains the required data to query a weather API for weather data. As an example, if the [OpenWeather API](https://openweathermap.org/api) is used, the object should include latitude and longitude to identify the point of interest. Depending on the API you intend to use, you may need to add other fields.
 - **WeatherData**: This object shall not be created by a user. It contains the "result" for a weather query. It must be linked to a WeatherLocation and should be cleaned up after 24 hours.
 
 #### Solution {.unnumbered}
@@ -229,7 +229,7 @@ As the Operator base and the CRDs are prepared, you are now to build the Operato
 
 - A weather API call is executed each hour for a given weather location object
 - The result of the API call is stored in Kubernetes as weather data object and linked to the weather location (owner reference)
-- While reconciling, the Operator deletes old weather data objects (keep the last twelfe)
+- While reconciling, the Operator deletes old weather data objects (keep the last twelve)
 - A validator checks if the longitude and latitude values are possible and denies the creation of the object if they are not within the boundaries
 - A validator checks if a weather data object contains an owner reference
 
