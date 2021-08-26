@@ -1,6 +1,6 @@
 # Metadata
 title: Distributed Authentication Mesh
-subtitle: A Concept for Declarative Adhoc Conversion of Credentials
+subtitle: A Concept for Declarative Ad Hoc Conversion of Credentials
 author: Christoph Bühler
 date: |
   Spring Semester 2021\
@@ -14,17 +14,31 @@ keywords:
   - Kubernetes
 reference-section-title: Bibliography
 csl: ieee-software.csl
-abstract: As more and more applications run in a containerized cloud environment, securing the architecture against attackers is a general concern. Applications defend themselves against intrusion with various authentication mechanisms like OpenID Connect. However, legacy applications that are not updated nor rewritten tend to not support modern security standards. To enable applications to communicate with legacy (or third-party) software, it is often required to introduce code changes to the modern apps. To eliminate leaking credentials (such as access tokens) and to reduce the risk of bugs, this project targets the dynamic conversion of a user identity. This identity is used to authenticate the user instead of the original credentials. This project provides the conceptional idea and the architecture, as well as a platform specific example of such a solution. A Proof of Concept answers relevant questions for the realization of such a framework. The evaluation then shows that the proposed solution is as secure as the current state of the art and validates the architecture against the goals. The conclusion provides information about the project, possible use cases, and the goals of follow-up projects.
+abstract: |
+  As more and more applications run in containerized cloud environments, securing their architectures against attackers is an important concern. Applications defend themselves against intrusion with various authentication mechanisms such as OpenID Connect. However, legacy applications that are not updated nor rewritten tend not to support modern security standards. Enabling applications to communicate with legacy (or third-party) software often requires to introduce code changes to the modern apps.
+
+  To eliminate leaking credentials (such as access tokens) and to reduce the risk of bugs, this project targets the dynamic conversion of a user identity. This identity is used to authenticate the user instead of the original credentials. This project provides the conceptional idea and the architecture, as well as a platform specific example of such a solution. A Proof of Concept answers relevant questions for the realization of such a framework. The evaluation then shows that the proposed solution is as secure as the current state of the art and validates the architecture against the goals. The conclusion provides information about the project, possible use cases, and the goals of follow-up projects.
+
+  \newpage
 
 # Latex config
 papersize: a4
-documentclass: scrreprt
+documentclass: scrartcl
 toc: true
 numbersections: true
 lof: true
 lot: true
 bibliography: bibliography.bib
 thanks: I would like to express my appreciation to Dr. Olaf Zimmermann for guiding and reviewing this work. Furthermore, special thanks to Florian Forster, who challenged the results of this project from a practical perspective.
+header-includes: |
+  \usepackage{float}
+  \let\origfigure\figure
+  \let\endorigfigure\endfigure
+  \renewenvironment{figure}[1][2] {
+      \expandafter\origfigure\expandafter[H]
+  } {
+      \endorigfigure
+  }
 
 # Tool configuration
 fignos-cleveref: true

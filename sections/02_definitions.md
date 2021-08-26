@@ -6,13 +6,13 @@ This section provides general information about the project, the context, and pr
 
 This project addresses the specific problem of declarative conversion of user credentials, for example an access token, to ensure authorized communication between services. When multiple services with different authentication mechanisms communicate with each other, the services need to translate the credentials and send them to their counterpart. The goal of this project is to prevent user credentials from being transmitted to other services and to remove the need for code changes to transform credentials to another format.
 
-![Illustration of the problem with diverging authentication mechanisms](images/02/is_situation.png){#fig:02_def_is_situation}
+![Illustration of the problem with diverging authentication mechanisms](images/02/is_situation.png){#fig:02_def_is_situation width=85%}
 
 {@fig:02_def_is_situation} shows an example where an automatic and dynamic translation of access credentials would be useful. Service A needs to translate the received OIDC access token to some information encoded in Basic Authentication to access Service B.
 
 To solve the problem, an automation component enhances services that are part of the application with additional functionality. A proxy in front of the service captures in-, and outgoing traffic to modify the `Authorization` HTTP header. Additionally, a translator transforms the original authentication data into a form of identity and encodes it with a common language format. The receiving service can validate this encoded identity and transforms the identity into valid user credentials again. This automatic transformation of credentials (e.g. from OIDC to Basic Auth) replaces manual work which may introduce code changes to either service. The deliverables of this and further projects may aid applications or APIs to communicate with each other despite different authentication mechanisms.
 
-The solution may be runnable on various platforms but to provide a practical demo application, the Proof of Concept (PoC) runs on Kubernetes. Kubernetes^[<https://kubernetes.io/>] is an orchestration platform that works with containerized applications. The PoC resides in an initial version in an open-source GitHub repository. The PoC demonstrates that it is possible to instruct an Envoy^[<https://www.envoyproxy.io/>] proxy to communicate with an injected service to modify authentication credentials in-flight. To separate the proposed solution from more complex concepts like a service mesh, the PoC can run without a service mesh on a Kubernetes cluster and uses the built-in service discovery of Kubernetes to communicate.
+The solution may be feasible for various platforms but to provide a practical demo application, the Proof of Concept (PoC) runs on Kubernetes. Kubernetes^[<https://kubernetes.io/>] is an orchestration platform that works with containerized applications. The PoC resides in an initial version in an open-source GitHub repository. The PoC demonstrates that it is possible to instruct an Envoy^[<https://www.envoyproxy.io/>] proxy to communicate with an injected service to modify authentication credentials in-flight. To separate the proposed solution from more complex concepts like a service mesh, the PoC can run without a service mesh on a Kubernetes cluster and uses the built-in service discovery of Kubernetes to communicate.
 
 ## Kubernetes as an Orchestration Engine
 
@@ -41,13 +41,13 @@ Kubernetes works with containerized applications. In contrast to "plain" Docker,
 
 ### Terminology
 
-In {@tbl:kubernetes_terminology_small}, we state the key terms for Kubernetes. A more complete list can be found in the Appendix in {@tbl:kubernetes_terminology}.
+In {@tbl:kubernetes_terminology_small}, we state the key terms for Kubernetes. A more complete list can be found in Appendix A in {@tbl:kubernetes_terminology}.
 
 ```{.include}
 tables/kubernetes_terminology_small.md
 ```
 
-![UML of Kubernetes Resources (partially)](diagrams/component/kubernetes-parts.puml){#fig:02_kubernetes_parts}
+![UML of Kubernetes Resources (partially)](diagrams/component/kubernetes-parts.puml){#fig:02_kubernetes_parts width=75%}
 
 {@fig:02_kubernetes_parts} shows a partial part of Kubernetes objects. An operator can manage resources such as deployments or services. The operator may manage other resources or custom resources based on the configuration it uses. A deployment contains a pod, which contains containers. The container is the effective unit of work, defined by an image. The service allows communication with a specific container on a configured port.
 
@@ -64,7 +64,7 @@ Some examples of application operators are:
 
 There exists a broad list of operators, which can be (partially) viewed on [https://operatorhub.io](https://operatorhub.io/).
 
-![Kubernetes Operator Workflow](diagrams/sequences/kubernetes-operator-process.puml){#fig:02_kubernetes_operator_workflow}
+![Kubernetes Operator Workflow](diagrams/sequences/kubernetes-operator-process.puml){#fig:02_kubernetes_operator_workflow width=80%}
 
 In {@fig:02_kubernetes_operator_workflow}, we depict the general workflow of an event that is managed by an operator. When an operator is installed and runs on a Kubernetes cluster, it registers "Resource Watchers" with the API and receives notifications if the master node modifies resources. The overviewed events are "Added", "Modified" and "Deleted". There are two additional events that may be returned by the API ("Error" and "Bookmark"), but they are typically not needed for reconciliation.
 
@@ -76,7 +76,7 @@ A theoretical example of the concept is an Operator that creates database users 
 
 According to Brendan Burns and David Oppenheimer, the sidecar pattern is the most common pattern for multi-container deployments [@burns:DesignPatternsForContainerSystems]. Sidecars are containers that enhance the functionality of the main container in a pod. An example for such a sidecar is a log collector, that fetches log files written to the file system and forwards them towards some log processing software [@burns:DesignPatternsForContainerSystems]. Another example is the Google CloudSQL Proxy^[<https://github.com/GoogleCloudPlatform/cloudsql-proxy>], which provides access to a CloudSQL instance from a pod without routing the whole traffic through Kubernetes services.
 
-![Sidecar container extending a main container in a pod. As example, this could be a log collector [@burns:DesignPatternsForContainerSystems]. Both containers in the Pod share the same filesystem and can access files in the Pod. The Application writes logs into files and the Sidecar sends the logfiles into an S3 bucket.](images/02/sidecar_pattern.png){#fig:02_kubernetes_sidecar short-caption="Example of a Sidecar Container"}
+![Sidecar container extending a main container in a pod. As example, this could be a log collector [@burns:DesignPatternsForContainerSystems]. Both containers in the Pod share the same filesystem and can access files in the Pod. The Application writes logs into files and the Sidecar sends the logfiles into an S3 bucket.](images/02/sidecar_pattern.png){#fig:02_kubernetes_sidecar short-caption="Example of a Sidecar Container" width=45%}
 
 The example shown in {@fig:02_kubernetes_sidecar} is extensible. Common use cases for sidecars include controlling the data flow in a cluster with a service mesh^[As done by Istio (<https://istio.io/latest/docs/reference/config/networking/sidecar/>)], providing access to secure locations^[Like the Google CloudSQL Proxy] or performing additional tasks such as collecting logs of an application. Since sidecars are tightly coupled to the original application, they scale with the pod. It is not possible to scale a sidecar without scaling the pod — and therefore the application — itself.
 
@@ -90,7 +90,7 @@ The service mesh provides a set of features [@li:ServiceMesh]:
 - **Load balancing**: As an addition to the service discovery, the mesh provides load balancing mechanisms as is done by Kubernetes itself.
 - **Fault tolerance**: The router in a service mesh is responsible to route traffic to healthy services. If a service is unavailable or even reports a crash, traffic should not be routed to this instance.
 - **Traffic monitoring**: In contrast to the default Kubernetes possibilities, with a service mesh, the traffic from and to various services can be monitored in detail. This offers the opportunity to derive reports per target, success rates and other metrics.
-- **Circuit breaking**: The ability to cut off an overloaded service and back off the remaining requests instead of totally failing the service under stress. A circuit breaker pattern measures the failure rate of a service and applies states to the service: "Closed" - requests are passed to the service, "Open" - requests are not passed to this instance, "Half-Open" - only a limited number is passed [@montesi:CircuitBreakers].
+- **Circuit breaking**: The ability to cut off an overloaded service and back off the remaining requests instead of totally failing the service under stress. A circuit breaker pattern measures the failure rate of a service and applies states to the service: "Closed" — requests are passed to the service, "Open" — requests are not passed to this instance, "Half-Open" — only a limited number is passed [@montesi:CircuitBreakers].
 - **Authentication and access control**: Through the control plane, a service mesh may define the rules of communication. It defines which services can communicate with one another.
 
 As observed in the list above, many of the features of a service mesh are already provided by Kubernetes. Service discovery, load balancing, fault tolerance and — though limited — traffic monitoring is already possible with Kubernetes. Introducing a service mesh into a cluster enables administrators to build more complex scenarios and deployments.
@@ -109,7 +109,7 @@ OpenID Connect is not defined in an RFC. The specification is provided by the Op
 
 OpenID Connect is an authentication scheme, that extends/complements the `OAuth 2.0` framework. OAuth itself is an authorization framework, that enables applications to gain access to a resource (API or other) [@RFC6749]. OAuth 2.0 only deals with authorization and grants access to data and features on a specific application. The OAuth framework by itself does not define _how_ the credentials are transmitted and exchanged [@RFC6749]. OIDC adds additional logic to OAuth 2.0 that defines _how_ these credentials must be exchanged. Thus, OIDC enables login and profile capabilities in any application that uses OIDC [@spec:OIDC].
 
-![OIDC code authorization flow [@spec:OIDC]. Only contains the credential flow, without the explicit OAuth part. OAuth handles the authorization whereas OIDC handles the authentication.](diagrams/sequences/oidc-code-flow.puml){#fig:02_oidc_code_flow short-caption="OpenID Connect Code Flow"}
+![OIDC code authorization flow [@spec:OIDC]. Only contains the credential flow, without the explicit OAuth part. OAuth handles the authorization whereas OIDC handles the authentication.](diagrams/sequences/oidc-code-flow.puml){#fig:02_oidc_code_flow short-caption="OpenID Connect Code Flow" width=60%}
 
 When a user wants to authenticate himself with OIDC, one of the possible "flows" is the "Authorization Code Flow". Other possible flows are the "Implicit Flow" and the "Hybrid Flow" [@spec:OIDC]. {@fig:02_oidc_code_flow} depicts the "Authorization Code Flow". A user that wants to access a certain resource (e.g. an API) on a relying party (i.e. something that relies on the information about the user) and is not authenticated and authorized, the relying party forwards the user to the identity provider (IdP). The user provides his credentials to the IdP and is returned to the relying party with an authorization code. The relying party can then exchange the authorization code for valid tokens on the token endpoint of the IdP. Typically, `access_token` and `id_token` are provided. While the `id_token` must be a JSON Web Token (JWT), the `access_token` can be in any format [@spec:OIDC].
 

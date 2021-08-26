@@ -54,7 +54,7 @@ Since the topic of the mesh is security, error handling is a delicate matter. Th
 
 This section describes the architecture of the proposed solution in an abstract and generalized way. As stated in the non-functional requirements, the concepts are not bound to any specific platform or a specific implementation nor required to run in a cloud environment. The concepts could be implemented as a "fat-client" solution for a Windows machine.
 
-![Abstract Solution Architecture](diagrams/component/solution-architecture.puml){#fig:04_solution_architecture}
+![Abstract Solution Architecture](diagrams/component/solution-architecture.puml){#fig:04_solution_architecture width=85%}
 
 {@fig:04_solution_architecture} shows the abstract solution architecture. In the "support" package, generally available elements provide utility functions to the mesh. The solution requires a public key infrastructure (PKI) to deliver key material for signing and validation purposes. This key material may also be used to secure the communication between the nodes (or applications). Configuration and secret storage enable the applications to store and retrieve configurations and secret elements like passwords or key material.
 
@@ -74,15 +74,15 @@ Since the example is Kubernetes specific, error handling and recovery mechanisms
 
 The automation part of the mesh is optional. When no automation is provided, the required proxy and translator elements must be started and maintained by some other means. However, in the context of Kubernetes, an Operator pattern enables an automated enhancement and management of applications.
 
-![Automation with an Operator in a Kubernetes Environment](diagrams/component/automation-architecture.puml){#fig:automation_architecture}
+![Automation with an Operator in a Kubernetes Environment](diagrams/component/automation-architecture.puml){#fig:automation_architecture width=70%}
 
-The Operator (application lifecycle manager, see {#sec:definitions}) in {@fig:automation_architecture} watches the Kubernetes API for changes. When deployments or services are created, the Operator enhances the respective elements. "Enhancing" means that additional containers are injected into a deployment as sidecars. The additional containers contain the proxy and the translator. While the proxy manages incoming and outgoing communication, the translator manages the transformation of credentials from and to the DSL.
+The Operator (application lifecycle manager, see {@sec:definitions}) in {@fig:automation_architecture} watches the Kubernetes API for changes. When deployments or services are created, the Operator enhances the respective elements. "Enhancing" means that additional containers are injected into a deployment as sidecars. The additional containers contain the proxy and the translator. While the proxy manages incoming and outgoing communication, the translator manages the transformation of credentials from and to the DSL.
 
-![The Operator determines the relevance of an object with this logic. If an object in Kubernetes is not a Deployment nor a Service, or does not contain specific "Labels", it is rejected.](diagrams/states/automation-is-relevant.puml){#fig:automation_relevant_parts short-caption="Determination of the Relevance of a Deployment or a Service"}
+![The Operator determines the relevance of an object with this logic. If an object in Kubernetes is not a Deployment nor a Service, or does not contain specific "Labels", it is rejected.](diagrams/states/automation-is-relevant.puml){#fig:automation_relevant_parts short-caption="Determination of the Relevance of a Deployment or a Service" width=50%}
 
 To determine if an object is relevant for the automation, the operator uses the logic shown in {@fig:automation_relevant_parts}. If the object in question is not a deployment (or any other deployable resource, like a "Stateful Set" or "Daemon Set") or a service, then it is not relevant for the mesh. If the object is not configured to be part of the mesh, then the automation ends here as well.
 
-![Automated Enhancement of a Deployment and a Service. If the Operator decides that an object is relevant (see {@fig:automation_relevant_parts}), the object is enhanced depending on its type.](diagrams/sequences/automation-process.puml){#fig:automation_process short-caption="Automated Enhancement of a Deployment and a Service"}
+![Automated Enhancement of a Deployment and a Service. If the Operator decides that an object is relevant (see {@fig:automation_relevant_parts}), the object is enhanced depending on its type.](diagrams/sequences/automation-process.puml){#fig:automation_process short-caption="Automated Enhancement of a Deployment and a Service" width=70%}
 
 The sequence that enhances deployments and services is shown in {@fig:automation_process}. The operator registers a "watcher" for deployments and services with the Kubernetes API. Whenever a deployment or a service is created or modified, the operator receives a notification. Then, the operator checks if the object in question "is relevant" by checking if it should be part of the authentication mesh. This participation can be configured — in the example of Kubernetes — via annotations, labels, or any other means of configuration. If the object is relevant, the operator injects sidecars into the deployment or reconfigures the service to use the injected proxy as the target for the network communication.
 
@@ -92,15 +92,15 @@ If the automation engine encounters errors, it relies on Kubernetes to perform a
 
 The role of the public key infrastructure (PKI) in the solution is to act as the source for trust in the system. The PKI is responsible for generating and delivering key material to various components. As an example, a translator fetches a public/private key pair on startup and can sign the translated credentials with the key material. A receiver can then validate the signature and check the integrity of the transmitted data.
 
-![The Relation of the Public Key Infrastructure and the System](diagrams/component/pki-architecture.puml){#fig:pki_architecture}
+![The Relation of the Public Key Infrastructure and the System](diagrams/component/pki-architecture.puml){#fig:pki_architecture width=50%}
 
 {@fig:pki_architecture} depicts the relation of the translators and the PKI. When a translator starts, it acquires trusted key material from the PKI (for example, with a certificate signing request). This key material provides the possibility to sign the identity that is transmitted to the receiving party. The receiving translator can validate the signature of the identity and the sending party. The proxies are responsible for the communication between the instances.
 
-![Provide Key Material to the Translator](diagrams/sequences/pki-fetch-key-process.puml){#fig:pki_fetch_key_process}
+![Provide Key Material to the Translator](diagrams/sequences/pki-fetch-key-process.puml){#fig:pki_fetch_key_process width=65%}
 
 The sequence in {@fig:pki_fetch_key_process} shows how the PKI is used by the translator to create key material for itself. When a translator starts, it checks if it already generated a private key and obtains the key (either by creating a new one or fetching the existing one). Then, a certificate signing request (CSR) is sent to the PKI. The PKI will then create a certificate with the CSR and return the signed certificate. The provided sequence shows one possible use case for the PKI. During future work, the PKI may also be used to secure communication between proxies with mTLS [@siriwardena:mTLS].
 
-![Checking the Signature of the transmitted Identity](diagrams/sequences/pki-check-sign-process.puml){#fig:pki_check_signature}
+![Checking the Signature of the transmitted Identity](diagrams/sequences/pki-check-sign-process.puml){#fig:pki_check_signature width=70%}
 
 When communication happens, as shown in {@fig:pki_check_signature}, the proxy forwards the HTTP headers that contain the transferred identity of the user in the DSL to the translator. In the case of a JWT token, the transformer may now confirm the signature of the JWT token with the obtained certificate since it is signed by the same Certificate Authority (CA). Then the transformation is performed and the proxy forwards the communication to the destination.
 
@@ -112,7 +112,7 @@ If the PKI encounters illegal signing requests, it must deny them. If any other 
 
 Networking in the proposed solution works with a combination of routing and communication proxying. The general purpose of the networking element is to manage data transport between instances of the authentication mesh and route the traffic to the source/destination.
 
-![Networking with an Proxy](diagrams/component/networking-architecture.puml){#fig:networking_architecture}
+![Networking with an Proxy](diagrams/component/networking-architecture.puml){#fig:networking_architecture width=75%}
 
 As seen in {@fig:networking_architecture} the proxy is the mediator between source and destination of a communication. Additionally, he proxy manages the translation of the credentials by communicating with the translator to transform the identity of the authenticated user and transmit it to the destination where it gets transformed again. In addition, with the help of the PKI, the proxy can verify the identity of the sender via mTLS.
 
@@ -120,13 +120,13 @@ Since the authentication mesh relies on external software to take care of commun
 
 ##### Outbound Communication for an Application {.unnumbered}
 
-![Outbound Networking Sequence](diagrams/sequences/networking-process-outbound.puml){#fig:outbound_networking_process}
+![Outbound Networking Sequence](diagrams/sequences/networking-process-outbound.puml){#fig:outbound_networking_process width=60%}
 
 In {@fig:outbound_networking_process} the outbound traffic flow is shown. The proxy is required to catch all outbound traffic from the source and performs the reversed process of {@fig:inbound_networking_process} by transforming the provided credentials from the source to generate the common format with the user identity. This identity is then inserted into the HTTP headers and sent to the destination. At the sink, the process of {@fig:inbound_networking_process} takes place — if the sink is part of the authentication mesh.
 
 ##### Inbound Accepted Communication for an Application {.unnumbered}
 
-![Inbound Accepted Networking Sequence](diagrams/sequences/networking-process-inbound.puml){#fig:inbound_networking_process}
+![Inbound Accepted Networking Sequence](diagrams/sequences/networking-process-inbound.puml){#fig:inbound_networking_process width=65%}
 
 {@fig:inbound_networking_process} shows the general invocation during inbound request processing. When the proxy receives a request (in the stated example by the configured Kubernetes service), it calls the translator with the HTTP request detail. The PoC is implemented with an "Envoy" proxy. Envoy allows an external service to perform "external authorization"^[<https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter>] during which the external service may:
 
@@ -142,7 +142,7 @@ The translator uses this concept to consume a specific and well-known header to 
 
 If the incoming communication contains faulty, invalid, or no identification data, the proxy blocks the communication.
 
-![Inbound Rejected Networking Sequence](diagrams/sequences/networking-process-inbound-rejected.puml){#fig:inbound_networking_process_rejected}
+![Inbound Rejected Networking Sequence](diagrams/sequences/networking-process-inbound-rejected.puml){#fig:inbound_networking_process_rejected width=65%}
 
 {@fig:inbound_networking_process_rejected} shows the sequence when no or invalid identity data is provided. The responses of the translator are defined in **RFC1945** and are the HTTP response status codes [@RFC1945]. The translator distinguishes two cases:
 
@@ -155,7 +155,7 @@ If no identity data is present, the translator must return `HTTP 401 Unauthorize
 
 The translator is responsible for transforming the identity from and to the domain-specific language (the common format). In conjunction with the PKI, the translator can verify the validity and integrity of the incoming identity.
 
-![Translation of the transmitted user identity from the common format to the required format by the destination](diagrams/sequences/translator-process.puml){#fig:translator_process short-caption="Translator Process"}
+![Translation of the transmitted user identity from the common format to the required format by the destination](diagrams/sequences/translator-process.puml){#fig:translator_process short-caption="Translator Process" width=65%}
 
 When the translator receives a request to create the required credentials, it performs the sequence of actions as stated in {@fig:translator_process}. First, the proxy will forward the HTTP request data to the translator. Afterward, the translator checks if the transported identity is valid and signed by an authorized party in the authentication mesh. When the credentials are valid, they are translated according to the implementation of the translator. The proxy is then instructed with the actions to replace the transported identity with the correct credentials to access the destination.
 
@@ -223,11 +223,11 @@ To install and run the case study without any interference of the Operator or th
 
 When installed in a Kubernetes cluster, a user can open (depending on the local configuration) the URL to the frontend application^[In the example, it is "https://kubernetes.docker.internal" since this is the local configured default URL for "Docker Desktop"].
 
-![Component Diagram of the Case Study](diagrams/component/showcase-app.puml){#fig:impl_components_showcase_app}
+![Component Diagram of the Case Study](diagrams/component/showcase-app.puml){#fig:impl_components_showcase_app width=90%}
 
 {@fig:impl_components_showcase_app} gives an overview of the components in the showcase application. The system contains an ASP.NET Razor Page^[<https://docs.microsoft.com/en-us/aspnet/core/razor-pages/>] application as the frontend, an ASP.NET API application with configured ZITADEL OIDC authentication as "modern" backend service, and another ASP.NET API application that only supports Basic Authentication as "legacy" backend. The frontend can only communicate with the modern API while the modern API can call an additional service on the legacy API.
 
-![Sequence Diagram of the Communication in the Case Study](diagrams/sequences/showcase-app-calls.puml){#fig:seq_showcase_call}
+![Sequence Diagram of the Communication in the Case Study](diagrams/sequences/showcase-app-calls.puml){#fig:seq_showcase_call width=75%}
 
 In {@fig:seq_showcase_call}, we show the process of a user call in the demo application. The user opens the web application and authenticates himself with ZITADEL. After that, the user is presented with the application and can click the "Call API" button. The frontend application calls the modern backend API with the access token from ZITADEL and asks for customer and order data. The customer data is present on the modern API, therefore it is directly returned. To fetch the order data, the modern service relies on a legacy application which is only capable of Basic Authentication.
 
@@ -237,7 +237,7 @@ Depending on the configuration (i.e. the environment variable `USE_WIREPACT`), t
 
 As explained in {@sec:abstract_architecture}, the automation engine is generally optional. If omitted, the user is responsible for configuring the proxy and the translator. In the PoC, the automation engine is a Kubernetes Operator written with the .NET SDK in C\#. The source of the PoC Operator resides on GitHub: <https://github.com/WirePact/poc-operator>. The Operator (automated and customized management of resources in Kubernetes, see {@sec:kubernetes_operator}) intercepts events for `Deployments` and `Services`. To update services and deployments in the PoC, an annotation (key-value storage in the metadata of an object in Kubernetes) is used. In future work, the Operator may react to Custom Resource Definitions (CRD) as well.
 
-![Activity Model for Kubernetes Resources in the Automation Engine](diagrams/states/operator-events.puml){#fig:poc_operator_events}
+![Activity Model for Kubernetes Resources in the Automation Engine](diagrams/states/operator-events.puml){#fig:poc_operator_events width=50%}
 
 {@fig:poc_operator_events} gives an overview of the process that an event of the Kubernetes API completes. When the Operator receives a notification by Kubernetes that a service or a deployment was created or modified, the Operator determines the type and uses the specific controller to reconcile the resource. If the entity is a deployment/service and is relevant for the authentication mesh, the Operator will modify the deployment/service.
 
@@ -301,11 +301,11 @@ This configures Envoy to find the external authorization service on the local lo
 
 The translator is the part of the PoC that performs the modification of HTTP headers per request. Since the intermediate DSL is not implemented in the PoC, the translator converts an access token to static basic authentication credentials. If any error occurs or the translator call exceeds ten seconds, Envoy returns a HTTP 403 Forbidden message by default. The source code is on GitHub: <https://github.com/WirePact/poc-demo-translator>.
 
-![Communication with an Invalid Access Token](diagrams/sequences/translator-poc-process-403.puml){#fig:poc_translator_403}
+![Communication with an Invalid Access Token](diagrams/sequences/translator-poc-process-403.puml){#fig:poc_translator_403 width=90%}
 
 {@fig:poc_translator_403} shows the sequence for an access token that is not valid. Envoy forwards the HTTP headers to the translator that extracts the `Authorization` header. If it is not a `Bearer` access token, or if the validation with ZITADEL fails (if the token is invalid or has expired), the translator returns an `Unauthorized` (HTTP 401) or `Forbidden` (HTTP 403) response depending on the status. The `Unauthorized` status is returned when no access token is provided (i.e. the HTTP header is missing). `Forbidden` is used if the token is invalid. In either case, Envoy will return the returned status code to the caller and terminates the request. The destination application does not receive any communication or notification about this event.
 
-![Communication with a Valid Access Token](diagrams/sequences/translator-poc-process-200.puml){#fig:poc_translator_200}
+![Communication with a Valid Access Token](diagrams/sequences/translator-poc-process-200.puml){#fig:poc_translator_200 width=90%}
 
 In contrast to {@fig:poc_translator_403}, the sequence in {@fig:poc_translator_200} shows the success path of a communication. If the given access token is valid, the translator fetches the static Basic Authentication credentials (i.e. username and password) from the secret storage. The secret storage in the PoC is a simple Kubernetes Secret. The received credentials are then transformed in the correct encoded Basic Authentication format (as described in RFC7617). The translator returns an instruction set for Envoy to process the HTTP request. Envoy executes the instructions and forwards the call to the destination and returns the response — if any.
 

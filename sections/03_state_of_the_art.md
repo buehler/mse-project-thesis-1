@@ -16,7 +16,7 @@ However, with CNAs and the general movement to cloud environments and digitaliza
 
 If legacy applications (for example an old enterprise resource planning system) are mixed with CNAs, then the need of "translation" arises. Assuming that the CNA is a secure application that uses OIDC to authenticate its users and the application needs to fetch data from a legacy system. The legacy application does not understand OIDC, thus, either the modern or the legacy application must receive code changes (i.e. enable the application to convert the user credentials to the scheme of the target service) to enable communication between the services. Following the previous assumption, the code changes will likely be introduced into the CNA, since it is presumably better maintainable and deployable than the legacy app. Hence, the modern application receives changes that may introduce new bugs or vulnerabilities. If new code is introduced into an application, "normal" software bugs may be created and external dependencies (such as libraries for authentication and authorization) may import vulnerabilities caused by bugs or by deviation from standards.
 
-![Microservice architecture that contains modern applications as well as legacy services.](diagrams/component/is-solution-showcase.puml){#fig:03_is_solution_components short-caption="Microservice Architecture with Legacy Components"}
+![Microservice architecture that contains modern applications as well as legacy services.](diagrams/component/is-solution-showcase.puml){#fig:03_is_solution_components short-caption="Microservice Architecture with Legacy Components" width=80%}
 
 We consider the components in {@fig:03_is_solution_components}:
 
@@ -28,7 +28,7 @@ We consider the components in {@fig:03_is_solution_components}:
 
 In practice, we encountered the stated scenario at various points in time. Legacy services may not be the primary use case. Another example is the usage of third-party applications without any access to the source code.
 
-![Current state of the art of accessing legacy systems from modern services with differing authentication schemes.](diagrams/sequences/is-solution-process.puml){#fig:03_is_solution_process short-caption="Current Process of Legacy Communication"}
+![Current state of the art of accessing legacy systems from modern services with differing authentication schemes.](diagrams/sequences/is-solution-process.puml){#fig:03_is_solution_process short-caption="Current Process of Legacy Communication" width=70%}
 
 The invocation sequence in {@fig:03_is_solution_process} shows the process of communication in such a scenario. In {@fig:03_is_solution_process}, the SPA (Client) authenticates against an arbitrary IAM. The CNA is the modern backend that supports the SPA as a backend API. Therefore, the CNA provides functionality for the SPA. The legacy application, for example an old ERP with order information, was moved into the cloud, but is not refactored nor re-written to communicate with modern authentication technologies.
 
@@ -48,7 +48,7 @@ All the discussed technologies and applications above do not support the dynamic
 
 The situation described in the previous sections introduces several problems. It does not matter whether the legacy system is a third-party application to which no code changes can be applied to, or if it is an application that cannot be updated for the time being. Most likely, the code change to provide the ability to communicate will be introduced into the CNA. This adds the risk of errors since new code must be produced, which would not be necessary if the legacy service was refactored. Also, changing the CNA to communicate with the legacy software may be a feasible solution in a small setup. But as the landscape of the application grows, this solution does not scale well.
 
-![Service Landscape with various authentication mechanism](diagrams/component/matrix-problem.puml){#fig:03_matrix_problem}
+![Service Landscape with various authentication mechanism](diagrams/component/matrix-problem.puml){#fig:03_matrix_problem width=80%}
 
 The problem, as depicted in {@fig:03_matrix_problem}, shows that the number of conversion mechanisms increases with each service and each authentication method. As the landscape and the different methods of authentication grow, it is not a feasible solution to implement every authentication scheme in all the callers. In {@fig:03_matrix_problem}, "Caller 1" is required to transform the user credentials into four different formats to communicate with services one to four. When another caller enters the landscape, it must implement the same four mechanisms as well.
 
