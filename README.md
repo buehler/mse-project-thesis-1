@@ -13,7 +13,7 @@ To eliminate leaking credentials (such as access tokens) and to reduce the risk 
 
 ## Thanks
 
-I would like to express my appreciation to Dr. Olaf Zimmermann for guiding and reviewing this work. Furthermore, special thanks to Florian Forster, who challenged the results of this project from a practical perspective.
+I would like to express my appreciation to [Dr. Olaf Zimmermann](https://ozimmer.ch/about/) for guiding and reviewing this work. Furthermore, special thanks to [Florian Forster](https://github.com/fforootd), who challenged the results of this project from a practical perspective.
 
 ## Full Report
 
