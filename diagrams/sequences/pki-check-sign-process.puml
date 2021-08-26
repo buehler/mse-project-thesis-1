@@ -1,0 +1,17 @@
+@startuml
+skinparam backgroundcolor transparent
+
+participant "Proxy" as p
+participant "Translator" as t
+
+[-> p : Inbound Communication
+activate p
+    p -> t : Provide HTTP Request Headers\nRequest Translation
+    activate t
+    t -> t : Check Signature\nof transmitted Identity
+    t -> t : Transform Identity\nto Target Credentials
+    return Transformed Credentials
+    p ->] : Forward to Destination
+deactivate p
+
+@enduml
