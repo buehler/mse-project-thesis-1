@@ -10,7 +10,7 @@ date-released: 2021-08-31
 url: 'https://github.com/buehler/mse-project-thesis-1'
 license: Apache-2.0
 preferred-citation:
-  type: techreport
+  type: generic
   title: 'Distributed Authentication Mesh - A Concept for Declarative Ad Hoc Conversion of Credentials'
   abstract: As more and more applications run in containerized cloud environments, securing their architectures against attackers is an important concern. Applications defend themselves against intrusion with various authentication mechanisms such as OpenID Connect. However, legacy applications that are not updated nor rewritten tend not to support modern security standards. Enabling applications to communicate with legacy (or third-party) software often requires to introduce code changes to the modern apps. To eliminate leaking credentials (such as access tokens) and to reduce the risk of bugs, this project targets the dynamic conversion of a user identity. This identity is used to authenticate the user instead of the original credentials. This project provides the conceptional idea and the architecture, as well as a platform specific example of such a solution. A Proof of Concept answers relevant questions for the realization of such a framework. The evaluation then shows that the proposed solution is as secure as the current state of the art and validates the architecture against the goals. The conclusion provides information about the project, possible use cases, and the goals of follow-up projects.
   authors:
@@ -21,3 +21,5 @@ preferred-citation:
   address: Oberseestrasse 10, 8640 Rapperswil, Switzerland
   year: 2021
   month: aug
+  url: https://buehler.github.io/mse-project-thesis-1/report.pdf
+  howpublished: GitHub Pages
