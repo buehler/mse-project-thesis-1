@@ -29,7 +29,7 @@ numbersections: true
 lof: true
 lot: true
 bibliography: bibliography.bib
-thanks: I would like to express my appreciation to Dr. Olaf Zimmermann for guiding and reviewing this work. Furthermore, special thanks to Florian Forster, who challenged the results of this project from a practical perspective.
+thanks: I would like to express my appreciation to Dr. Olaf Zimmermann for guiding and reviewing this work. Furthermore, special thanks to Florian Forster, who provided the initial inspiration and challenged the results of this project from a practical perspective.
 header-includes: |
   \usepackage{float}
   \let\origfigure\figure
