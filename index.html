@@ -243,6 +243,7 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
+<li><a href="#declaration-of-authorship">Declaration of Authorship</a></li>
 <li><a href="#sec:introduction">Introduction</a></li>
 <li><a href="#sec:definitions">Definitions and Clarification of the Scope</a>
 <ul>
@@ -329,6 +330,17 @@ University of Applied Science of Eastern Switzerland (OST)</p></p>
 </ul></li>
 </ul>
 </nav>
+<h1 class="unnumbered" id="declaration-of-authorship">Declaration of Authorship</h1>
+<p>I, Christoph Bühler, declare that this project report titled, “Distributed Authentication Mesh” and the work presented in it are my own.</p>
+<p>I confirm that:</p>
+<ul>
+<li>Where I have consulted the published work of others, this is always clearly attributed.</li>
+<li>Where I have quoted from the work of others, the source is always given. Except for such quotations, this project report is entirely my own work.</li>
+<li>I have acknowledged all main sources of help.</li>
+<li>Where the project report is based on work done by myself jointly with others, I have made clear exactly what was done by others and what I have contributed myself.</li>
+</ul>
+<p>Gossau SG, August 31, 2021</p>
+<p>Christoph Bühler</p>
 <h1 id="sec:introduction">Introduction</h1>
 <p>Cloud environments like Kubernetes solve many problems such as the discovery of services and data transfer or communication between services and applications in general. As the development of cloud-native applications (CNA) evolves, older applications move to the cloud as well.</p>
 <p>However, a specific problem is not yet solved: “dynamic” trusted communication between services. For example, a service with the capability of handling OpenID Connect (OIDC) credentials wants to communicate with a service that only knows Basic Authentication. The OIDC-capable service must implement some conversion mechanism or know static Basic Auth credentials to communicate with the basic auth service. In general, this introduces changes to the software. In small applications that consist of one or two services, implementing this conversion may be a feasible option. But if we look at an application that spans over a big landscape and a multitude of services, implementing every used authentication mechanism will be error-prone work and does not scale well<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. In practice, we encountered the given scenario at various points in time when older applications were migrated into a cloud environment and newer applications were built around it. In almost all cases, the modern software was changed to communicate with the legacy systems, instead of modifying the legacy application.</p>
