@@ -1,3 +1,4 @@
+\newpage
 # Introduction {#sec:introduction}
 
 Cloud environments like Kubernetes solve many problems such as the discovery of services and data transfer or communication between services and applications in general. As the development of cloud-native applications (CNA) evolves, older applications move to the cloud as well.

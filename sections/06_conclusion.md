@@ -1,3 +1,5 @@
+\newpage
+
 # Conclusions and Outlook
 
 This report developed a potential solution to the problem of dynamic credential transformation in systems with diverging authentication mechanisms. In {@sec:introduction}, a brief overview stated the problem and described the goal of the project.

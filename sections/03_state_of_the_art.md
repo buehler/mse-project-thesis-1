@@ -1,3 +1,5 @@
+\newpage
+
 # State of the Art and the Practice {#sec:state_of_the_art}
 
 This section gives an overview of the current state of the art and the practice. Furthermore, it states the deficiencies that this project tries to solve.

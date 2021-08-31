@@ -6,6 +6,8 @@ In {@tbl:kubernetes_terminology}, we state the most common Kubernetes terminolog
 tables/kubernetes_terminology.md
 ```
 
+\newpage
+
 # Appendix B: Installation of the PoC {.unnumbered}
 
 This section shows how to install the case study locally. The installation guide is also hosted on GitHub (<https://github.com/WirePact/wirepact-poc>). The installation consists of the operator and the case study with three application parts. To access the application, Ambassador acts as API gateway.
@@ -15,6 +17,8 @@ To begin the installation of the PoC, a Kubernetes environment is needed. On Win
 For the last step, the `Kustomize`^[<https://kustomize.io/>] executable is required. Change into the `Kubernetes` directory and run `kustomize build` to see the output of the `kustomization.yaml` file or `kustomize build | kubectl apply -f -` to build and directly apply the result to Kubernetes. This installs the operator and the case study. When everything is set up, the frontend application can be accessed via `https://localhost`, `https://kubernetes.docker.internal`, or `https://kubernetes.local` depending on the host's config of the machine.
 
 To be able to log in into the frontend application, any ZITADEL account may be used. It does not matter if the account is bound to an organization or resides in the global organization.
+
+\newpage
 
 # Appendix C: Teaching Material for Kubernetes Operators {#sec:teaching-material .unnumbered}
 
